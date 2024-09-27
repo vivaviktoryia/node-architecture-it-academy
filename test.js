@@ -4,7 +4,8 @@ const webserver = express();
 
 webserver.use(express.urlencoded({ extended: true }));
 
-const port = 7122;
+// const port = 7122;
+const port = 7180;
 
 webserver.get('/service1', (req, res) => {
 	console.log('service1 called');
