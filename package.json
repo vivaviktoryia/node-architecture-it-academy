@@ -1,0 +1,15 @@
+{
+  "name": "architecture-it-academy",
+  "version": "1.0.0",
+  "description": "Node.js - architecture of web projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon test.js"
+  },
+  "author": "Viktoryia Antonchyk",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.0",
+    "nodemon": "^3.1.7"
+  }
+}
