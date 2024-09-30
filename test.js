@@ -44,6 +44,12 @@ webserver.get('/service7', (req, res, next) => {
 	res.sendFile(path.resolve(__dirname, fileName));
 });
 
+webserver.post('/service6', (req, res, next) => {
+	console.log(`${req.originalUrl} called`);
+	console.log(req.body);
+	res.send(`service6 ok, req.body= ${JSON.stringify(req.body)} `);
+});
+
 // 404 error
 webserver.use('*', (req, res, next) => {
 	res.status(404).send(`Can't find ${req.originalUrl} on this server!`);
