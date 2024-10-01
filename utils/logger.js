@@ -1,14 +1,22 @@
 const fs = require('fs');
 const os = require('os');
+const http = require('http');
 
- 
-const  logRequest = (req, res) => {
-	return `${req.method} request ${req.originalUrl} - Status: ${res.statusCode} ${res.statusMessage} `;
-}
+exports.logRequest = (req, res) => {
+	let requestData;
 
-const logServerRunning  = (port) => {
-	return `Web server running on port  ${port}, process.pid = ${process.pid}`;
-}
+	if (req.method === 'GET') {
+		requestData = Object.keys(req.params).length > 0 ? req.params : req.query;
+	} else if (req.method === 'POST') {
+		requestData = req.body;
+	} else requestData = {};
+
+	const statusMessage = res.statusMessage || http.STATUS_CODES[res.statusCode];
+
+	return `${req.method} ${req.originalUrl} - Status ${
+		res.statusCode
+	} ${statusMessage}, requestData: ${JSON.stringify(requestData)}`;
+};
 
 const getFullLogLine = (logLine) => {
 	const logDate = new Date();
@@ -17,12 +25,12 @@ const getFullLogLine = (logLine) => {
 	return `${date} - ${logLine}`;
 };
 
-const getFullUrl = (req) => {
+exports.getFullUrl = (req) => {
 	return `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 };
 
 // Synchronous logging function
-const logLineSync = (logFilePath, logLine) => {
+exports.logLineSync = (logFilePath, logLine) => {
 	const fullLogLine = getFullLogLine(logLine);
 
 	console.log(fullLogLine);
@@ -36,14 +44,18 @@ const appendFilePromise = (filePath, data) => {
 	return new Promise((resolve, reject) => {
 		fs.appendFile(filePath, data, (error) => {
 			if (error) reject(error);
-			else resolve();
+			resolve();
 		});
 	});
 };
 
 // Asynchronous logging function
-const logLineAsync = async (logFilePath, logLine) => {
+exports.logLineAsync = async (logFilePath, logLine) => {
 	try {
+		if (!logLine) {
+			throw new Error('logLine is undefined or null');
+		}
+
 		const fullLogLine = getFullLogLine(logLine);
 
 		console.log(fullLogLine);
@@ -52,11 +64,4 @@ const logLineAsync = async (logFilePath, logLine) => {
 	} catch (error) {
 		console.error('Error writing log:', error);
 	}
-};
-
-module.exports = {
-	logLineSync,
-	logLineAsync,
-	logServerRunning,
-	logRequest,
 };

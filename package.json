@@ -4,12 +4,14 @@
   "description": "Node.js - architecture of web projects",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon test.js"
+    "test": "nodemon test.js",
+    "vote": "nodemon vote.js"
   },
   "author": "Viktoryia Antonchyk",
   "license": "ISC",
   "dependencies": {
     "express": "^4.21.0",
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.7",
+    "xss-clean": "^0.1.4"
   }
 }
