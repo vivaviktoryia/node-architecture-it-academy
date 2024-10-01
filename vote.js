@@ -20,55 +20,49 @@ webserver.use(xss());
 
 const port = 7180 || 7181;
 
+const variants = [
+	{ code: 0, text: 'JavaScript' },
+	{ code: 1, text: 'Python' },
+	{ code: 2, text: 'Java' },
+];
+
+// Vote statistics
+const statistics = {
+	0: 0,
+	1: 0,
+	2: 0,
+};
+
 process.on('uncaughtException', (err) => {
 	const logLine = `UNCAUGHT EXCEPTION!💥 Shutting down... ${err.name}: ${err.message}`;
 	logger.logLineSync(logFilePath, logLine);
 	process.exit(1);
 });
 
-webserver.get('/service1', (req, res, next) => {
-	const fullUrl = logger.getFullUrl(req);
-	console.log(`Full URL: ${fullUrl}`);
-
-	res.status(200).send(`service1 ok! Full URL: ${fullUrl}`);
-
+webserver.get('/variants', (req, res) => {
+	res.status(200).json(variants);
 	const logLine = logger.logRequest(req, res);
 	logger.logLineAsync(logFilePath, logLine);
 });
 
-// req.query - query params
-webserver.get('/service2', (req, res, next) => {
-	// res.send(`service2 ok, par1= ${req.query.par1}  par2= ${req.query.par2}`);
-	res.status(200).send(`service2 ok, req.query= ${JSON.stringify(req.query)} `);
-
-	const logLine = logger.logRequest(req, res);
-	logger.logLineAsync(logFilePath, logLine);
+webserver.post('/stat', (req, res) => {
+	const stats = variants.map((variant) => ({
+		code: variant.code,
+		votes: statistics[variant.code],
+	}));
+	res.status(200).json(stats);
 });
 
-// req.params - path variables
-webserver.get('/service2b/:par1/:par2', (req, res, next) => {
-	res
-		.status(200)
-		.send(`service2b ok, req.params= ${JSON.stringify(req.params)} `);
-
-	const logLine = logger.logRequest(req, res);
-	logger.logLineAsync(logFilePath, logLine);
+webserver.post('/vote', (req, res) => {
+	const { code } = req.body;
+	if (statistics[code] !== undefined) {
+		statistics[code]++;
+		res.status(200).send('Vote accepted');
+	} else {
+		res.status(400).send('Invalid option code');
+	}
 });
 
-// work with file
-webserver.get('/service7', (req, res, next) => {
-	res.status(200).sendFile(resultsFilePath);
-
-	const logLine = logger.logRequest(req, res);
-
-	logger.logLineAsync(logFilePath, logLine);
-});
-
-webserver.post('/service6', (req, res, next) => {
-	res.status(200).send(`service6 ok, req.body= ${JSON.stringify(req.body)} `);
-	const logLine = logger.logRequest(req, res);
-	logger.logLineAsync(logFilePath, logLine);
-});
 
 // 404 error
 webserver.use('*', (req, res, next) => {
