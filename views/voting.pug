@@ -1,0 +1,12 @@
+extends base
+
+block content
+    h1 Choose your favorite language
+    form(action='/vote' method='post' id='voteForm')
+        each variant in variants
+            div
+                input(type='radio' name='code' value=variant.code id=variant.code)
+                label(for=variant.code) #{variant.text}
+        button(type='submit') Submit Vote
+
+

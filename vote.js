@@ -1,4 +1,6 @@
 const express = require('express');
+const path = require('path');
+
 const xss = require('xss-clean'); // Data sanitization - XSS
 
 const logger = require('./utils/logger');
@@ -11,6 +13,9 @@ const resultsFilePath = getFilePath(resultsFileName, true);
 
 const webserver = express();
 
+webserver.set('view engine', 'pug');
+webserver.set('views', getFilePath('views', true));
+
 // Body parser
 webserver.use(express.json({ limit: '10kb' })); // content-type: application/json
 webserver.use(express.urlencoded({ extended: true, limit: '10kb' })); // content-type: application/x-www-form-urlencoded
@@ -19,6 +24,8 @@ webserver.use(express.urlencoded({ extended: true, limit: '10kb' })); // content
 webserver.use(xss());
 
 const port = 7180 || 7181;
+
+webserver.use(express.static(path.join(__dirname, 'public'))); 
 
 const variants = [
 	{ code: 0, text: 'JavaScript' },
@@ -39,13 +46,13 @@ process.on('uncaughtException', (err) => {
 	process.exit(1);
 });
 
-webserver.get('/variants', (req, res) => {
+webserver.get('/variants', (req, res, next) => {
 	res.status(200).json(variants);
 	const logLine = logger.logRequest(req, res);
 	logger.logLineAsync(logFilePath, logLine);
 });
 
-webserver.post('/stat', (req, res) => {
+webserver.post('/stat', (req, res, next) => {
 	const stats = variants.map((variant) => ({
 		code: variant.code,
 		votes: statistics[variant.code],
@@ -53,16 +60,44 @@ webserver.post('/stat', (req, res) => {
 	res.status(200).json(stats);
 });
 
-webserver.post('/vote', (req, res) => {
+
+webserver.post('/vote', (req, res, next) => {
 	const { code } = req.body;
-	if (statistics[code] !== undefined) {
-		statistics[code]++;
-		res.status(200).send('Vote accepted');
-	} else {
-		res.status(400).send('Invalid option code');
+	const stats = variants.map((variant) => ({
+		text: variant.text,
+		votes: statistics[variant.code],
+	}));
+
+	if (
+		
+		Object.keys(req.body).length === 0 ||
+		statistics[code] === undefined
+	) {
+		res.render('statistics', {
+			status: 'error',
+			message:
+				Object.keys(req.body).length === 0 || statistics[code] === undefined
+					? 'No vote submitted! Please select an option.'
+					: 'Vote not accepted! Invalid option code.',
+			stats,
+		});
+		return; 
 	}
+
+	statistics[code]++;
+	res.render('statistics', {
+		status: 'success',
+		message: 'Vote accepted!',
+		stats,
+	});
 });
 
+
+webserver.get('/', (req, res, next) => {
+	res.render('voting', { variants });
+	const logLine = logger.logRequest(req, res);
+	logger.logLineAsync(logFilePath, logLine);
+});
 
 // 404 error
 webserver.use('*', (req, res, next) => {
