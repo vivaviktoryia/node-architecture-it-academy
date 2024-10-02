@@ -1,0 +1,14 @@
+extends base
+
+block content
+    h1 Voting Results
+    ul
+        each stat in stats
+            li #{stat.text}: #{stat.votes} votes
+
+    a(href='/') Go to Voting Page
+
+
+    if status && message
+      div(class=`popup popup--${status}`)
+        p #{message}

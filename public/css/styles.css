@@ -1,0 +1,22 @@
+.popup {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 1rem 2rem; 
+	border-radius: 10px; 
+	font-family: Arial, sans-serif;
+	font-size: 1.2rem; 
+	font-weight: bold;
+	color: white;
+   text-align: center;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+	z-index: 1000;
+	display: none;
+}
+.popup--success {
+	background-color: #20bf6b;
+}
+.popup--error {
+	background-color: #eb4d4b;
+}
