@@ -2,8 +2,6 @@ extends base
 
 block content
     h1 Voting Results
-    ul
-        each stat in stats
-            li #{stat.option}: #{stat.votes} votes
-
-    a(href='/') Go to Voting Page
+    ul(id='statisticsList')
+       
+    button(onclick="window.location.href='/'") Go to Voting Page
