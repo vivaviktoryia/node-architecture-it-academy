@@ -1,0 +1,102 @@
+10/3/2024 9:03:16 PM - Web server running on port  7181, process.pid = 18820
+10/3/2024 9:03:18 PM - Web server running on port  7181, process.pid = 1028
+10/3/2024 9:03:20 PM - Web server running on port  7181, process.pid = 16924
+10/3/2024 9:03:30 PM - GET / - Status 200 OK, requestData: {}
+10/3/2024 9:04:28 PM - GET / - Status 200 OK, requestData: {}
+10/3/2024 9:04:39 PM - GET / - Status 200 OK, requestData: {}
+10/3/2024 9:04:39 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:04:39 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:04:39 PM - GET /favicon.ico - Status 200 OK, requestData: {}
+10/3/2024 9:07:36 PM - Web server running on port  7181, process.pid = 14500
+10/3/2024 9:07:38 PM - UNCAUGHT EXCEPTION!💥 Shutting down... ReferenceError: app is not defined
+10/3/2024 9:07:43 PM - Web server running on port  7181, process.pid = 7432
+10/3/2024 9:07:45 PM - Web server running on port  7181, process.pid = 292
+10/3/2024 9:07:52 PM - Web server running on port  7181, process.pid = 19644
+10/3/2024 9:08:02 PM - GET / - Status 200 OK, requestData: {}
+10/3/2024 9:08:13 PM - Web server running on port  7181, process.pid = 19764
+10/3/2024 9:08:15 PM - GET / - Status 200 OK, requestData: {}
+10/3/2024 9:08:15 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:08:15 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:08:52 PM - Web server running on port  7181, process.pid = 18540
+10/3/2024 9:08:53 PM - UNCAUGHT EXCEPTION!💥 Shutting down... ReferenceError: app is not defined
+10/3/2024 9:08:57 PM - UNCAUGHT EXCEPTION!💥 Shutting down... ReferenceError: check is not defined
+10/3/2024 9:09:39 PM - Web server running on port  7181, process.pid = 21292
+10/3/2024 9:09:55 PM - GET / - Status 200 OK, requestData: {}
+10/3/2024 9:09:55 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:09:55 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:10:20 PM - Web server running on port  7181, process.pid = 18928
+10/3/2024 9:10:23 PM - Web server running on port  7181, process.pid = 5024
+10/3/2024 9:10:26 PM - Web server running on port  7181, process.pid = 21072
+10/3/2024 9:10:29 PM - Web server running on port  7181, process.pid = 4540
+10/3/2024 9:10:31 PM - Web server running on port  7181, process.pid = 68
+10/3/2024 9:10:58 PM - Web server running on port  7181, process.pid = 20748
+10/3/2024 9:11:19 PM - GET / - Status 200 OK, requestData: {}
+10/3/2024 9:11:20 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:11:20 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:12:35 PM - GET / - Status 200 OK, requestData: {}
+10/3/2024 9:12:35 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:12:35 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:13:11 PM - GET /submit?name=&email=a%40gg.ff - Status 200 OK, requestData: {"name":"","email":"a@gg.ff"}
+10/3/2024 9:13:11 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:13:11 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:13:15 PM - GET /submit?name=dd&email=a%40gg.ff - Status 200 OK, requestData: {"name":"dd","email":"a@gg.ff"}
+10/3/2024 9:22:27 PM - Web server running on port  7181, process.pid = 11284
+10/3/2024 9:22:29 PM - Web server running on port  7181, process.pid = 13716
+10/3/2024 9:22:33 PM - Web server running on port  7181, process.pid = 4996
+10/3/2024 9:22:36 PM - Web server running on port  7181, process.pid = 14140
+10/3/2024 9:22:38 PM - Web server running on port  7181, process.pid = 19168
+10/3/2024 9:22:45 PM - Web server running on port  7181, process.pid = 10304
+10/3/2024 9:24:35 PM - Web server running on port  7181, process.pid = 20848
+10/3/2024 9:24:56 PM - Web server running on port  7181, process.pid = 20348
+10/3/2024 9:25:46 PM - GET /submit?name=dd&email=a%40gg.ff - Status 200 OK, requestData: {"name":"dd","email":"a@gg.ff"}
+10/3/2024 9:25:46 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:25:46 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:25:54 PM - GET /submit?name=dd&email=a%40gg.ff - Status 200 OK, requestData: {"name":"dd","email":"a@gg.ff"}
+10/3/2024 9:25:54 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:25:54 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:26:02 PM - GET / - Status 200 OK, requestData: {}
+10/3/2024 9:26:02 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:26:02 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:26:14 PM - GET /submit?name=rr&email=r%40g - Status 200 OK, requestData: {"name":"rr","email":"r@g"}
+10/3/2024 9:26:15 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:26:15 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:26:19 PM - GET /submit?name=rr&email=r%40g.yy - Status 200 OK, requestData: {"name":"rr","email":"r@g.yy"}
+10/3/2024 9:26:19 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:26:19 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:28:13 PM - GET / - Status 200 OK, requestData: {}
+10/3/2024 9:28:13 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:28:13 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:29:22 PM - Web server running on port  7181, process.pid = 20488
+10/3/2024 9:29:29 PM - UNCAUGHT EXCEPTION!💥 Shutting down... TypeError: check(...)(...).withMessage is not a function
+10/3/2024 9:29:41 PM - UNCAUGHT EXCEPTION!💥 Shutting down... TypeError: check(...).check is not a function
+10/3/2024 9:32:39 PM - Web server running on port  7181, process.pid = 21004
+10/3/2024 9:32:50 PM - Web server running on port  7181, process.pid = 8660
+10/3/2024 9:33:00 PM - Web server running on port  7181, process.pid = 11464
+10/3/2024 9:36:50 PM - Web server running on port  7181, process.pid = 8048
+10/3/2024 9:36:56 PM - Web server running on port  7181, process.pid = 18384
+10/3/2024 9:38:11 PM - Web server running on port  7181, process.pid = 16700
+10/3/2024 9:38:13 PM - UNCAUGHT EXCEPTION!💥 Shutting down... Error: Route.get() requires a callback function but got a [object Undefined]
+10/3/2024 9:38:15 PM - UNCAUGHT EXCEPTION!💥 Shutting down... Error: Route.get() requires a callback function but got a [object Undefined]
+10/3/2024 9:38:19 PM - Web server running on port  7181, process.pid = 21000
+10/3/2024 9:38:45 PM - Web server running on port  7181, process.pid = 18928
+10/3/2024 9:38:49 PM - GET / - Status 200 OK, requestData: {}
+10/3/2024 9:38:50 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:38:50 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:38:53 PM - GET /submit?name=c&email= - Status 200 OK, requestData: {"name":"c","email":""}
+10/3/2024 9:38:53 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:38:53 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:39:06 PM - GET /submit?name=++++&email= - Status 200 OK, requestData: {"name":"    ","email":""}
+10/3/2024 9:39:06 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:39:06 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:40:30 PM - Web server running on port  7181, process.pid = 14812
+10/3/2024 9:40:50 PM - Web server running on port  7181, process.pid = 15140
+10/3/2024 9:41:59 PM - Web server running on port  7181, process.pid = 2160
+10/3/2024 9:42:24 PM - Web server running on port  7181, process.pid = 16620
+10/3/2024 9:42:26 PM - Web server running on port  7181, process.pid = 14004
+10/3/2024 9:42:38 PM - Web server running on port  7181, process.pid = 5396
+10/3/2024 9:43:24 PM - GET /submit?name=++++&email= - Status 200 OK, requestData: {"name":"    ","email":""}
+10/3/2024 9:43:25 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:43:25 PM - GET /js/script.js - Status 200 OK, requestData: {}
+10/3/2024 9:43:35 PM - GET /submit?name=vvvv&email=d%40f.hh - Status 200 OK, requestData: {"name":"vvvv","email":"d@f.hh"}
+10/3/2024 9:43:35 PM - GET /css/styles.css - Status 200 OK, requestData: {}
+10/3/2024 9:43:35 PM - GET /js/script.js - Status 200 OK, requestData: {}
