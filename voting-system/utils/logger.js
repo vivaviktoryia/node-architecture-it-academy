@@ -1,10 +1,10 @@
 const fs = require('fs');
+const path = require('path');
 const os = require('os');
 const http = require('http');
 
-const getFilePath = require('./getFilePath');
 const logFileName = '_server.log';
-const logFilePath = getFilePath(logFileName, true);
+const logFilePath = path.resolve('logs', logFileName);
 
 const logRequest = (req, res) => {
 	let requestData;
@@ -70,12 +70,11 @@ const logLineAsync = async (logFilePath, logLine) => {
 	}
 };
 
-
 // Logger middleware function
 const loggerMiddleware = (req, res, next) => {
-    const logLine = logRequest(req, res);
-    logLineAsync(logFilePath, logLine); 
-    next();
+	const logLine = logRequest(req, res);
+	logLineAsync(logFilePath, logLine);
+	next();
 };
 
 module.exports = {

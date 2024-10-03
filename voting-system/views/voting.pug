@@ -6,7 +6,5 @@ block content
         each variant in variants
             div
                 input(type='radio' name='code' value=variant.code id=variant.code)
-                label(for=variant.code) #{variant.text}
+                label(for=variant.code) #{variant.option}
         button(type='submit') Submit Vote
-
-
