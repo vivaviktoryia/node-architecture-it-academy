@@ -12,7 +12,7 @@
    text-align: center;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
 	z-index: 1000;
-	display: none;
+	display: block;
 }
 .popup--success {
 	background-color: #20bf6b;
