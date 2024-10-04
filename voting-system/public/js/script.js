@@ -1,3 +1,6 @@
+const voteForm = document.getElementById('voteForm');
+const statisticsList = document.getElementById('statisticsList');
+
 const hidePopup = () => {
 	const el = document.querySelector('.popup');
 	if (el) el.parentElement.removeChild(el);
@@ -10,106 +13,98 @@ const displayPopup = (type, msg) => {
 	window.setTimeout(hidePopup, 5000);
 };
 
-// Load variants for the voting page
-async function loadVariants() {
+// Load variants for voting
+const loadVariants = async () => {
 	try {
 		const response = await fetch('/variants');
-		const result = await response.json();
+		const { status, data } = await response.json();
 
-		if (result.status === 'success') {
-			const voteForm = document.getElementById('voteForm');
+		if (status === 'success') {
 			voteForm.innerHTML = '';
 
-			result.data.data.forEach((variant) => {
-				const div = document.createElement('div');
-				const input = document.createElement('input');
-				input.type = 'radio';
-				input.name = 'code';
-				input.value = variant.code;
-				input.id = variant.code;
-
-				const label = document.createElement('label');
-				label.htmlFor = variant.code;
-				label.textContent = variant.option;
-
-				div.appendChild(input);
-				div.appendChild(label);
-				voteForm.appendChild(div);
+			data.data.forEach(({ code, option }) => {
+				const variantHTML = `
+					<div>
+						<input type="radio" id="${code}" name="code" value="${code}">
+						<label for="${code}">${option}</label>
+					</div>`;
+				voteForm.insertAdjacentHTML('beforeend', variantHTML);
 			});
 
-			const submitButton = document.createElement('button');
-			submitButton.type = 'submit';
-			submitButton.textContent = 'Submit Vote';
-			voteForm.appendChild(submitButton);
+			voteForm.insertAdjacentHTML(
+				'beforeend',
+				'<button type="submit">Submit Vote</button>',
+			);
 		} else {
 			console.error('Failed to load variants');
+			displayPopup('error', 'Failed to load variants');
 		}
 	} catch (error) {
 		console.error('Error loading variants:', error);
+		displayPopup('error', 'Failed to load variants');
 	}
-}
+};
 
-// Voting form submission handling
-document
-	.getElementById('voteForm')
-	?.addEventListener('submit', async (event) => {
-		event.preventDefault();
+// Handle voting form submission
+const handleVoteSubmit = async (event) => {
+	event.preventDefault();
 
-		const code = document.querySelector('input[name="code"]:checked')?.value;
-		if (!code)
-			return displayPopup('error', 'Please Choose a Language to Vote!😉');
+	const selectedCode = document.querySelector(
+		'input[name="code"]:checked',
+	)?.value;
+	if (!selectedCode) {
+		return displayPopup('error', 'Please Choose a Language to Vote!😉');
+	}
 
-		try {
-			const response = await fetch('/vote', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ code }),
-			});
+	try {
+		const response = await fetch('/vote', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ code: selectedCode }),
+		});
+		const { status, message } = await response.json();
 
-			const { status, message } = await response.json();
-			displayPopup(status, message);
-
-			if (status === 'success') {
-				setTimeout(() => (window.location.href = '/statistics'), 3000);
-			}
-		} catch (error) {
-			displayPopup('error', 'Something Went Wrong!💥 Please Try Again Later!');
+		displayPopup(status, message);
+		if (status === 'success') {
+			setTimeout(() => (window.location.href = '/statistics'), 3000);
 		}
-	});
+	} catch (error) {
+		console.error('Error:', error);
+		displayPopup('error', 'Something Went Wrong!💥 Please Try Again Later!');
+	}
+};
 
-// Load statistics for the statistics page
-async function loadStatistics() {
+// Load statistics
+const loadStatistics = async () => {
 	try {
 		const response = await fetch('/stat', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 		});
+		const { status, data } = await response.json();
 
-		const result = await response.json();
-
-		if (result.status === 'success') {
-			const statisticsList = document.getElementById('statisticsList');
+		if (status === 'success') {
 			statisticsList.innerHTML = '';
-
-			result.data.data.forEach((stat) => {
-				const listItem = document.createElement('li');
-				listItem.textContent = `${stat.option}: ${stat.votes} votes`;
-				statisticsList.appendChild(listItem);
+			data.data.forEach(({ option, votes }) => {
+				const listItemHTML = `<li>${option}: ${votes} votes</li>`;
+				statisticsList.insertAdjacentHTML('beforeend', listItemHTML);
 			});
 		} else {
 			console.error('Failed to load statistics');
+			displayPopup('error', 'Failed to load statistics');
 		}
 	} catch (error) {
 		console.error('Error loading statistics:', error);
+		displayPopup('error', 'Something Went Wrong!💥 Please Try Again Later!');
 	}
-}
+};
 
-// Only load the variants on the voting page
-if (document.getElementById('voteForm')) {
+// Initialize Event Listeners
+if (voteForm) {
 	document.addEventListener('DOMContentLoaded', loadVariants);
+	voteForm.addEventListener('submit', handleVoteSubmit);
 }
 
-// Only load the statistics on the statistics page
-if (document.getElementById('statisticsList')) {
+if (statisticsList) {
 	document.addEventListener('DOMContentLoaded', loadStatistics);
 }
