@@ -3,7 +3,6 @@ const fs = require('fs').promises;
 async function renderHtml(replacements, filePath) {
 	try {
 		let html = await fs.readFile(filePath, 'utf-8');
-console.log(html);
 		for (const key in replacements) {
 			html = html.replace(new RegExp(key, 'g'), replacements[key]);
 		}

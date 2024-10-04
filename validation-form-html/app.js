@@ -21,10 +21,10 @@ const logFilePath = path.resolve('logs', logFileName);
 // const resultPagePath = path.join(__dirname, 'public', 'result.html');
 
 const webserver = express();
-webserver.use(express.static(path.join(__dirname, 'public')));
 
 // html
-const pageFilePath = path.join(__dirname, 'public', 'index.html');
+const pageFilePath = path.join(__dirname, 'public', 'form.html');
+webserver.use(express.static(path.join(__dirname, 'public')));
 
 const port = 7181 || 7180;
 
@@ -53,6 +53,7 @@ webserver.get('/', async (req, res, next) => {
 	const replacements = {
 		'#TITLE': 'Form Page',
 		'#CONTENT': `
+		    <h1>Please Fill Out the Form</h1>
             <div class="form-container">
                 ${errorMessage}
                 <form method="get" action="/submit">
@@ -76,61 +77,65 @@ webserver.get('/', async (req, res, next) => {
 	}
 });
 
+webserver.get(
+	'/submit',
+	[
+		check('name')
+			.trim()
+			.notEmpty()
+			.withMessage('Name is required')
+			.isLength({ min: 2, max: 50 })
+			.withMessage('Name should be between 2 and 50 characters')
+			.matches(/^[A-Za-z\s]+$/)
+			.withMessage('Name can only contain letters and spaces'),
 
-// webserver.get(
-// 	'/submit',
-// 	[
-// 		check('name')
-// 			.trim()
-// 			.notEmpty()
-// 			.withMessage('Name is required')
-// 			.isLength({ min: 2, max: 50 })
-// 			.withMessage('Name should be between 2 and 50 characters')
-// 			.matches(/^[A-Za-z\s]+$/)
-// 			.withMessage('Name can only contain letters and spaces'),
+		check('email')
+			.isEmail()
+			.withMessage('Invalid email address')
+			.notEmpty()
+			.withMessage('Email is required')
+			.normalizeEmail()
+			.isLength({ min: 5, max: 50 })
+			.withMessage('Email should be between 5 and 50 characters'),
+	],
+	async (req, res) => {
+		const errors = validationResult(req);
 
-// 		check('email')
-// 			.isEmail()
-// 			.withMessage('Invalid email address')
-// 			.notEmpty()
-// 			.withMessage('Email is required')
-// 			.normalizeEmail()
-// 			.isLength({ min: 5, max: 50 })
-// 			.withMessage('Email should be between 5 and 50 characters'),
-// 	],
-// 	(req, res) => {
-// 		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			const errorMessages = errors
+				.array()
+				.map((err) => err.msg)
+				.join(', ');
 
-// 		if (!errors.isEmpty()) {
-// 			const errorMessages = errors
-// 				.array()
-// 				.map((err) => err.msg)
-// 				.join(', ');
+			return res.redirect(
+				`/?name=${req.query.name}&email=${
+					req.query.email
+				}&error=${encodeURIComponent(errorMessages)}`,
+			);
+		}
 
-// 			return res.redirect(
-// 				`/?name=${req.query.name}&email=${
-// 					req.query.email
-// 				}&error=${encodeURIComponent(errorMessages)}`,
-// 			);
-// 		}
+		const { name, email } = req.query;
 
-// 		const { name, email } = req.query;
+		const replacements = {
+			'#TITLE': 'Form Result',
+			'#CONTENT': `
+        <h1>Form Submitted Successfully!</h1>
+        <ul>
+          <li>Name: ${name}</li>
+          <li>Email: ${email}</li>
+        </ul>
+        <a href="/">Go Back to Form</a>
+      `,
+		};
 
-// 		fs.readFile(resultPagePath, 'utf8', (err, data) => {
-// 			if (err) {
-// 				return res.status(500).send('Internal Server Error');
-// 			}
-
-// 			// Replace placeholders with actual values
-// 			const resultPageHtml = data
-// 				.replace(/#TITLE/g, 'Form Result')
-// 				.replace(/#NAME/g, name)
-// 				.replace(/#EMAIL/g, email);
-
-// 			res.send(resultPageHtml);
-// 		});
-// 	},
-// );
+		try {
+			const resultPageHtml = await renderHtml(replacements, pageFilePath);
+			res.send(resultPageHtml);
+		} catch (error) {
+			res.status(500).send('Internal Server Error');
+		}
+	},
+);
 
 // 404 error
 webserver.all('*', async (req, res, next) => {
@@ -155,7 +160,6 @@ webserver.all('*', async (req, res, next) => {
 		res.status(500).send('Internal Server Error');
 	}
 });
-
 
 webserver.listen(port, () => {
 	const logLine = `Web server running on port  ${port}, process.pid = ${process.pid}`;
