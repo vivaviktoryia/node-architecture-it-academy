@@ -14,12 +14,6 @@ const {
 const logFileName = '_server.log';
 const logFilePath = path.resolve('logs', logFileName);
 
-// html
-// const pageFilePath = path.join(__dirname, 'public', 'index.html');
-// const errorFilePath = path.join(__dirname, 'public', 'error.html');
-// const formPagePath = path.join(__dirname, 'public', 'form.html');
-// const resultPagePath = path.join(__dirname, 'public', 'result.html');
-
 const webserver = express();
 
 // html
@@ -58,10 +52,10 @@ webserver.get('/', async (req, res, next) => {
                 ${errorMessage}
                 <form method="get" action="/submit">
                     <label for="name">Name:</label>
-                    <input type="text" name="name" value="${nameValue}">
+                    <input type="text" placeholder="Enter your name" name="name" value="${nameValue}">
                     <br>
                     <label for="email">Email:</label>
-                    <input type="email" name="email" value="${emailValue}">
+                    <input type="email"  placeholder="Enter your email" name="email" value="${emailValue}">
                     <br>
                     <input type="submit" value="Submit">
                 </form>
