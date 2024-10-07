@@ -4,7 +4,12 @@ const fs = require('fs');
 const { check, validationResult } = require('express-validator');
 const xss = require('xss-clean'); // Data sanitization - XSS
 
-const { renderHtml } = require('./utils/renderHtml');
+const {
+	removeHtml,
+	renderHtml,
+	composeForm,
+	composeSuccess,
+} = require('./utils/htmlUtils');
 const {
 	logLineSync,
 	logLineAsync,
@@ -38,40 +43,20 @@ process.on('uncaughtException', (err) => {
 });
 
 webserver.get('/', async (req, res, next) => {
-	const errorMessage = req.query.error
-		? `<p style="color: red;">${req.query.error}</p>`
-		: '';
-	const nameValue = req.query.name || '';
-	const emailValue = req.query.email || '';
-
-	const replacements = {
+	const formReplacements = {
 		'#TITLE': 'Form Page',
-		'#CONTENT': `
-		    <h1>Please Fill Out the Form</h1>
-            <div class="form-container">
-                ${errorMessage}
-                <form method="get" action="/submit">
-                    <label for="name">Name:</label>
-                    <input type="text" placeholder="Enter your name" name="name" value="${nameValue}">
-                    <br>
-                    <label for="email">Email:</label>
-                    <input type="email"  placeholder="Enter your email" name="email" value="${emailValue}">
-                    <br>
-                    <input type="submit" value="Submit">
-                </form>
-            </div>
-        `,
+		'#CONTENT': composeForm({}, null),
 	};
 
 	try {
-		const html = await renderHtml(replacements, pageFilePath);
+		const html = await renderHtml(formReplacements, pageFilePath);
 		res.send(html);
 	} catch (error) {
 		res.status(500).send('Internal Server Error');
 	}
 });
 
-webserver.get(
+webserver.post(
 	'/submit',
 	[
 		check('name')
@@ -96,34 +81,25 @@ webserver.get(
 		const errors = validationResult(req);
 
 		if (!errors.isEmpty()) {
-			const errorMessages = errors
-				.array()
-				.map((err) => err.msg)
-				.join(', ');
 
-			return res.redirect(
-				`/?name=${req.query.name}&email=${
-					req.query.email
-				}&error=${encodeURIComponent(errorMessages)}`,
-			);
+			const formReplacements = {
+				'#TITLE': 'Form Page',
+				'#CONTENT': composeForm(req.body, errors),
+			};
+			const html = await renderHtml(formReplacements, pageFilePath);
+			return res.status(400).send(html);
 		}
 
-		const { name, email } = req.query;
-
-		const replacements = {
+		const successReplacements = {
 			'#TITLE': 'Form Result',
-			'#CONTENT': `
-        <h1>Form Submitted Successfully!</h1>
-        <ul>
-          <li>Name: ${name}</li>
-          <li>Email: ${email}</li>
-        </ul>
-        <a href="/">Go Back to Form</a>
-      `,
+			'#CONTENT': composeSuccess(req.body),
 		};
 
 		try {
-			const resultPageHtml = await renderHtml(replacements, pageFilePath);
+			const resultPageHtml = await renderHtml(
+				successReplacements,
+				pageFilePath,
+			);
 			res.send(resultPageHtml);
 		} catch (error) {
 			res.status(500).send('Internal Server Error');
@@ -131,7 +107,42 @@ webserver.get(
 	},
 );
 
-// 404 error
+// CUSTOM GENERATED VALIDATION
+// GET
+// webserver.get('/', async (req, res) => {
+// 	res.send(composeForm({}, null));
+// });
+
+// // POST
+// webserver.post('/submit', async (req, res) => {
+// 	const sanitizedBody = {
+// 		name: removeHtml(req.body.name || ''),
+// 		email: removeHtml(req.body.email || ''),
+// 	};
+// 	const errs = [];
+
+// 	if (!sanitizedBody.name) {
+// 		errs.push({
+// 			value: sanitizedBody.name || '',
+// 			msg: 'Name is required',
+// 			path: 'name',
+// 		});
+// 	}
+// 	if (!sanitizedBody.email) {
+// 		errs.push({
+// 			value: sanitizedBody.email || '',
+// 			msg: 'Email is required',
+// 			path: 'email',
+// 		});
+// 	}
+// 	if (errs.length > 0) {
+// 		res.status(400).send(composeForm(sanitizedBody, errs));
+// 	} else {
+// 		res.send(composeSuccess(sanitizedBody));
+// 	}
+// });
+
+// 404 ERROR
 webserver.all('*', async (req, res, next) => {
 	const statusCode = 404;
 	const errorMessage = `Can't find ${req.originalUrl} on this server!`;
