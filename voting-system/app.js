@@ -144,6 +144,7 @@ webserver.use(globalErrorHandler);
 
 webserver.listen(port, () => {
 	const logLine = `Web server running on port  ${port}, process.pid = ${process.pid}`;
+	console.log(process.env.NODE_ENV);
 	logLineAsync(logFilePath, logLine);
 });
 
