@@ -4,7 +4,8 @@
   "description": "Voting system",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start:dev": "cross-env NODE_ENV=development nodemon app.js &",
+    "start:prod": "cross-env NODE_ENV=production nodemon app.js &"
   },
   "author": "Viktoryia Antonchyk",
   "license": "ISC",
@@ -13,5 +14,8 @@
     "nodemon": "^3.1.7",
     "pug": "^3.0.3",
     "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }
