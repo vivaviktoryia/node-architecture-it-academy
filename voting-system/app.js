@@ -142,7 +142,7 @@ webserver.all('*', (req, res, next) => {
 
 webserver.use(globalErrorHandler);
 
-webserver.listen(port, () => {
+webserver.listen(port, '127.0.0.2', () => {
 	const logLine = `Web server running on port  ${port}, process.pid = ${process.pid}`;
 	console.log(process.env.NODE_ENV);
 	logLineAsync(logFilePath, logLine);

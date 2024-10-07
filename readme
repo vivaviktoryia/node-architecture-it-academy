@@ -1,0 +1,6 @@
+C:\Windows\System32\drivers\etc\hosts - can manage
+# localhost name resolution is handled within DNS itself.
+127.0.0.1       localhost
+127.0.0.2       voting
+127.0.0.3       validation
+::1             localhost
