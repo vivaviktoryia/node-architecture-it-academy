@@ -1,8 +1,11 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const { check, validationResult } = require('express-validator');
 const xss = require('xss-clean'); // Data sanitization - XSS
+
+dotenv.config({ path: `${__dirname}/config.env` });
 
 const {
 	removeHtml,
@@ -25,7 +28,7 @@ const webserver = express();
 const pageFilePath = path.join(__dirname, 'public', 'form.html');
 webserver.use(express.static(path.join(__dirname, 'public')));
 
-const port = 7181 || 7180;
+const port = process.env.PORT || 7180;
 
 // Body parser
 webserver.use(express.json({ limit: '10kb' })); // content-type: application/json
@@ -168,6 +171,7 @@ webserver.all('*', async (req, res, next) => {
 
 webserver.listen(port, () => {
 	const logLine = `Web server running on port  ${port}, process.pid = ${process.pid}`;
+	console.log(process.env.NODE_ENV);
 	logLineAsync(logFilePath, logLine);
 });
 
