@@ -1,7 +1,10 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
 const { check, validationResult } = require('express-validator');
 const xss = require('xss-clean'); // Data sanitization - XSS
+
+dotenv.config({path: `${__dirname}/config.env`})
 
 const {
 	logLineSync,
@@ -13,7 +16,7 @@ const logFileName = '_server.log';
 const logFilePath = path.resolve('logs', logFileName);
 
 const webserver = express();
-const port = 7181 || 7180;
+const port = process.env.PORT || 7180;
 
 webserver.set('view engine', 'pug');
 webserver.set('views', path.join(__dirname, 'views'));
