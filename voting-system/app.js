@@ -63,17 +63,33 @@ webserver.post(
 			return next(
 				new AppError('Statistics or variants were not provided!', 400),
 			);
+
 		const stats = variants.map((variant) => ({
 			code: variant.code,
 			option: variant.option,
 			votes: statistics[variant.code] || 0,
 		}));
-		res.status(200).json({
-			status: 'success',
-			data: {
+
+		const acceptHeader = req.headers.accept;
+
+		if (acceptHeader === 'application/json') {
+			res.set('Content-Type', 'application/json');
+			res.status(200).json({
+				status: 'success',
 				data: stats,
-			},
-		});
+			});
+		} else if (acceptHeader === 'application/xml') {
+			res.setHeader('Content-Type', 'application/xml');
+			res
+				.status(200)
+				.send('<busket><count>5</count><price>777</price></busket>');
+		} else {
+			res.setHeader('Content-Type', 'text/html');
+			res.status(200).json({
+				status: 'success',
+				data: stats,
+			});
+		}
 	}),
 );
 
@@ -95,10 +111,15 @@ webserver.post(
 				votes: statistics[variant.code] || 0,
 			}));
 
+			const totalVotes = stats.reduce((acc, curr) => acc + curr.votes, 0);
+
 			res.status(200).json({
 				status: 'success',
 				message: 'Vote Accepted!😊',
-				data: stats.find((stat) => stat.code === +code),
+				data: {
+					votedData: stats.find((stat) => stat.code === +code),
+					totalVotes,
+				},
 			});
 		} else {
 			res.status(400).json({
@@ -126,11 +147,13 @@ webserver.get(
 			return next(
 				new AppError('Statistics or variants were not provided!', 400),
 			);
-		const stats = variants.map((variant) => ({
-			option: variant.option,
-			votes: statistics[variant.code] || 0,
-		}));
-		res.render('statistics', { stats });
+		// const stats = variants.map((variant) => ({
+		// 	option: variant.option,
+		// 	votes: statistics[variant.code] || 0,
+		// }));
+		const { votedOption } = req.query;
+		console.log(votedOption);
+		res.render('statistics', { votedOption });
 	}),
 );
 
