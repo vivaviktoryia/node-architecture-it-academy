@@ -42,7 +42,7 @@ process.on('uncaughtException', (err) => {
 });
 
 webserver.get(
-	'/variants',
+	'/api/v1/variants',
 	catchAsync(async (req, res, next) => {
 		if (!variants)
 			return next(new AppError('Variants were not provided!', 400));
@@ -56,7 +56,7 @@ webserver.get(
 );
 
 webserver.post(
-	'/stat',
+	'/api/v1/stat',
 	catchAsync(async (req, res, next) => {
 		const statistics = await loadStatistics(statFilePath);
 		if (!statistics || !variants)
@@ -78,18 +78,19 @@ webserver.post(
 );
 
 webserver.post(
-	'/vote',
+	'/api/v1/vote',
 	catchAsync(async (req, res, next) => {
 		const { code } = req.body;
 		if (!code) return next(new AppError('Code was not provided!', 400));
 		const statistics = await loadStatistics(statFilePath);
 		if (!statistics)
-			return next(new AppError('statistics were not provided!', 400));
+			return next(new AppError('Statistics were not provided!', 400));
 		if (statistics[code] !== undefined) {
 			statistics[code]++;
 			await saveStatistics(statistics, statFilePath);
 
 			const stats = variants.map((variant) => ({
+				code: variant.code,
 				option: variant.option,
 				votes: statistics[variant.code] || 0,
 			}));
@@ -97,9 +98,7 @@ webserver.post(
 			res.status(200).json({
 				status: 'success',
 				message: 'Vote Accepted!😊',
-				data: {
-					data: stats,
-				},
+				data: stats.find((stat) => stat.code === +code),
 			});
 		} else {
 			res.status(400).json({
@@ -142,9 +141,9 @@ webserver.all('*', (req, res, next) => {
 
 webserver.use(globalErrorHandler);
 
-webserver.listen(port, '127.0.0.2', () => {
+webserver.listen(port, () => {
 	const logLine = `Web server running on port  ${port}, process.pid = ${process.pid}`;
-	console.log(process.env.NODE_ENV);
+	// console.log(process.env.NODE_ENV);
 	logLineAsync(logFilePath, logLine);
 });
 

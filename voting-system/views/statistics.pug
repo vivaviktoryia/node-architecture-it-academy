@@ -3,5 +3,11 @@ extends base
 block content
     h1 Voting Results
     ul(id='statisticsList')
-       
-    button(onclick="window.location.href='/'") Go to Voting Page
+
+    div.buttons.button--vote
+        button#btn-json(type="button", aria-label="Get JSON Results" ) Get JSON Results
+        button#btn-xml(type="button", aria-label="Get XML Results" ) Get XML Results
+        button#btn-html(type="button", aria-label="Get HTML Results") Get HTML Results
+
+    div.buttons.button--go
+        button(onclick="window.location.href='/'") Go to Voting Page
