@@ -2,12 +2,18 @@ extends base
 
 block content
     h1 Voting Results
-    ul(id='statisticsList')
+    p Your Vote For #{votedOption} Was Accepted!😉
+        ul#statisticsList
 
-    div.buttons.button--vote
-        button#btn-json(type="button", aria-label="Get JSON Results" ) Get JSON Results
-        button#btn-xml(type="button", aria-label="Get XML Results" ) Get XML Results
-        button#btn-html(type="button", aria-label="Get HTML Results") Get HTML Results
+    h2 See Total Statistics
 
-    div.buttons.button--go
-        button(onclick="window.location.href='/'") Go to Voting Page
+        div.buttons.button--vote
+            button#jsonBtn(type="button" aria-label="Get JSON Results" ) Get JSON Results
+            button#xmlBtn(type="button" aria-label="Get XML Results" ) Get XML Results
+            button#htmlBtn(type="button" aria-label="Get HTML Results") Get HTML Results
+           
+
+        div.buttons.button--go
+            button(onclick="window.location.href='/'") Go to Voting Page
+
+
