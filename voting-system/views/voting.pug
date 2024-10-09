@@ -2,7 +2,7 @@ extends base
 
 block content
   h2 Choose Your Favorite Language
-  form(id='voteForm')
-   
-    if !variants || variants.length === 0
-      p No variants available.
+  if !variants || variants.length === 0
+    p No variants available.
+  else
+    form(id='voteForm')

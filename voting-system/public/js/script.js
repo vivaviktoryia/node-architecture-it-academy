@@ -13,10 +13,10 @@ const displayPopup = (type, msg) => {
 	window.setTimeout(hidePopup, 5000);
 };
 
-// Load variants for voting
+// Load variants for voting - use GET '/api/v1/variants'
 const loadVariants = async () => {
 	try {
-		const response = await fetch('/variants');
+		const response = await fetch('/api/v1/variants');
 		const { status, data } = await response.json();
 
 		if (status === 'success') {
@@ -45,7 +45,7 @@ const loadVariants = async () => {
 	}
 };
 
-// Handle voting form submission
+// Handle voting form submission - use POST '/api/v1/vote'
 const handleVoteSubmit = async (event) => {
 	event.preventDefault();
 
@@ -57,7 +57,7 @@ const handleVoteSubmit = async (event) => {
 	}
 
 	try {
-		const response = await fetch('/vote', {
+		const response = await fetch('/api/v1/vote', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ code: selectedCode }),
@@ -74,10 +74,10 @@ const handleVoteSubmit = async (event) => {
 	}
 };
 
-// Load statistics
+// Load statistics - use POST '/api/v1/stat'
 const loadStatistics = async () => {
 	try {
-		const response = await fetch('/stat', {
+		const response = await fetch('/api/v1/stat', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 		});
