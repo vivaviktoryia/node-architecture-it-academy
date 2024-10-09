@@ -1,10 +1,8 @@
 extends base
 
 block content
-    h1 Choose Your Favorite Language
-    form(action='/vote' method='post' id='voteForm')
-        each variant in variants
-            div
-                input(type='radio' name='code' value=variant.code id=variant.code)
-                label(for=variant.code) #{variant.option}
-        button(type='submit') Submit Vote
+  h2 Choose Your Favorite Language
+  form(id='voteForm')
+   
+    if !variants || variants.length === 0
+      p No variants available.

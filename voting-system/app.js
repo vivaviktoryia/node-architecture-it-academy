@@ -65,6 +65,7 @@ webserver.post(
 			);
 		const stats = variants.map((variant) => ({
 			code: variant.code,
+			option: variant.option,
 			votes: statistics[variant.code] || 0,
 		}));
 		res.status(200).json({
