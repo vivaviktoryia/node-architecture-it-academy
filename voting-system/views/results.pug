@@ -1,0 +1,9 @@
+extends base
+
+block content
+    h1 Voting Results
+    p Your Vote For "<strong>#{votedOption}</strong>" Was Accepted!😉
+
+        div.buttons.button--go
+            button(onclick="window.location.href='/'") Go to Voting Page
+            button(onclick="window.location.href='/statistics'") See Total Statistics
