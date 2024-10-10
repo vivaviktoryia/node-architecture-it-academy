@@ -75,18 +75,24 @@ webserver.post(
 		const acceptHeader = req.headers.accept;
 
 		if (acceptHeader === 'application/json') {
-			res.set('Content-Type', 'application/json');
+			res.set({
+				'Content-Type': 'application/json',
+				'Content-Disposition': 'attachment; filename="statistics.json"',
+			});
 			res.status(200).json({
 				status: 'success',
 				data: stats,
 			});
 		} else if (acceptHeader === 'application/xml') {
 			const xmlBody = toXML(stats);
-			res.setHeader('Content-Type', 'application/xml');
+			res.set({
+				'Content-Type': 'application/xml',
+				'Content-Disposition': 'attachment; filename="statistics.xml"',
+			});
 			res.status(200).send(xmlBody);
 		} else {
 			const htmlBody = toHTML(stats);
-			res.setHeader('Content-Type', 'text/html');
+			res.set('Content-Type', 'text/html');
 			res.status(200).send(htmlBody);
 		}
 	}),
