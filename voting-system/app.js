@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const xss = require('xss-clean'); // Data sanitization - XSS
+const { xss } = require('express-xss-sanitizer'); // Data sanitization - XSS
 
 const {
 	logLineSync,
