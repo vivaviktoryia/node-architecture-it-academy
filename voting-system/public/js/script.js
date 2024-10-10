@@ -165,6 +165,53 @@ const fetchHTMLResults = async () => {
 	}
 };
 
+// Function to trigger download of results in JSON format
+const downloadJSONResults = async () => {
+	try {
+		const response = await fetch('/api/v1/stat', {
+			method: 'POST',
+			headers: { Accept: 'application/json' },
+		});
+		const blob = await response.blob();
+		const url = window.URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.style.display = 'none';
+		a.href = url;
+		a.download = 'statistics.json';
+		document.body.appendChild(a);
+		a.click();
+		window.URL.revokeObjectURL(url);
+		displayPopup('success', 'Downloading JSON results...');
+	} catch (error) {
+		console.error('Error downloading JSON results:', error);
+		displayPopup('error', 'Failed to download JSON results!');
+	}
+};
+
+// Function to trigger download of results in XML format
+const downloadXMLResults = async () => {
+	try {
+		const response = await fetch('/api/v1/stat', {
+			method: 'POST',
+			headers: { Accept: 'application/xml' },
+		});
+		const blob = await response.blob();
+		const url = window.URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.style.display = 'none';
+		a.href = url;
+		a.download = 'statistics.xml';
+		document.body.appendChild(a);
+		a.click();
+		window.URL.revokeObjectURL(url);
+		displayPopup('success', 'Downloading XML results...');
+	} catch (error) {
+		console.error('Error downloading XML results:', error);
+		displayPopup('error', 'Failed to download XML results!');
+	}
+};
+
+
 // Initialize Event Listeners
 if (voteForm) {
 	document.addEventListener('DOMContentLoaded', loadVariants);
@@ -175,6 +222,6 @@ if (voteForm) {
 // 	document.addEventListener('DOMContentLoaded', loadStatistics);
 // }
 
-if (jsonBtn) jsonBtn.addEventListener('click', fetchJSONResults);
-if (xmlBtn) xmlBtn.addEventListener('click', fetchXMLResults);
+if (jsonBtn) jsonBtn.addEventListener('click', downloadJSONResults);
+if (xmlBtn) xmlBtn.addEventListener('click', downloadXMLResults);
 if (htmlBtn) htmlBtn.addEventListener('click', fetchHTMLResults);
