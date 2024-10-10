@@ -1,6 +1,6 @@
 .popup {
 	position: fixed;
-	top: 50%;
+	top: 60%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	padding: 1rem 2rem;
@@ -53,6 +53,7 @@
 .button--vote button {
 	margin-right: 15px;
 }
-.button--go {
+.button--go button{
 	margin-top: 20px;
+	margin-right: 15px;
 }

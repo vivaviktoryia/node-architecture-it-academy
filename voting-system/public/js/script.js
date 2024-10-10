@@ -71,7 +71,7 @@ const handleVoteSubmit = async (event) => {
 		if (status === 'success') {
 			setTimeout(
 				() =>
-					(window.location.href = `/statistics?votedOption=${data.votedData.option}`),
+					(window.location.href = `/results?votedOption=${data.votedData.option}`),
 				3000,
 			);
 		}
@@ -111,9 +111,9 @@ const fetchJSONResults = async () => {
 	try {
 		const response = await fetch('/api/v1/stat', {
 			method: 'POST',
-			headers: { 'Accept': 'application/json' },
+			headers: { Accept: 'application/json' },
 		});
-		
+
 		const { status, data } = await response.json();
 		if (status === 'success') {
 			displayPopup('success', 'Check console for JSON results.');
@@ -133,10 +133,12 @@ const fetchXMLResults = async () => {
 	try {
 		const response = await fetch('/api/v1/stat', {
 			method: 'POST',
-			headers: { 'Accept': 'application/xml' },
+			headers: { Accept: 'application/xml' },
 		});
-		const xml = await response.text(); 
-		console.log(xml); 
+		const textResponse = await response.text();
+		const parser = new DOMParser();
+		const xmlDoc = parser.parseFromString(textResponse, 'application/xml');
+		console.log(xmlDoc);
 		displayPopup('success', 'Check console for XML results.');
 	} catch (error) {
 		console.error('Error fetching XML results:', error);
@@ -149,15 +151,13 @@ const fetchHTMLResults = async () => {
 	try {
 		const response = await fetch('/api/v1/stat', {
 			method: 'POST',
-			headers: { 'Accept': 'text/html' },
+			headers: { Accept: 'text/html' },
 		});
-		const { data } = await response.json();
-		const htmlResults = data
-			.map((stat) => `<li>${stat.option}: ${stat.votes} votes</li>`)
-			.join('');
-		document
-			.getElementById('statisticsList')
-			.insertAdjacentHTML('beforeend', htmlResults);
+		const htmlResponse = await response.text();
+
+		statisticsList.innerHTML = '';
+
+		statisticsList.insertAdjacentHTML('beforeend', htmlResponse);
 		displayPopup('success', 'HTML results added to the list.');
 	} catch (error) {
 		console.error('Error fetching HTML results:', error);

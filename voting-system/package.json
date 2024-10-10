@@ -11,9 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.21.0",
+    "express-xss-sanitizer": "^1.2.0",
     "nodemon": "^3.1.7",
-    "pug": "^3.0.3",
-    "xss-clean": "^0.1.4"
+    "pug": "^3.0.3"
   },
   "devDependencies": {
     "cross-env": "^7.0.3"

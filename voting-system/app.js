@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const xss = require('xss-clean'); // Data sanitization - XSS
+const { xss } = require('express-xss-sanitizer'); // Data sanitization - XSS
 
 const {
 	logLineSync,
@@ -9,6 +9,8 @@ const {
 } = require('./utils/logger');
 
 const { loadStatistics, saveStatistics } = require('./utils/statistics');
+const { toXML, toHTML } = require('./utils/parseData');
+
 const { catchAsync } = require('./utils/catchAsync');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./utils/globalErrorHandler');
@@ -79,16 +81,13 @@ webserver.post(
 				data: stats,
 			});
 		} else if (acceptHeader === 'application/xml') {
+			const xmlBody = toXML(stats);
 			res.setHeader('Content-Type', 'application/xml');
-			res
-				.status(200)
-				.send('<busket><count>5</count><price>777</price></busket>');
+			res.status(200).send(xmlBody);
 		} else {
+			const htmlBody = toHTML(stats);
 			res.setHeader('Content-Type', 'text/html');
-			res.status(200).json({
-				status: 'success',
-				data: stats,
-			});
+			res.status(200).send(htmlBody);
 		}
 	}),
 );
@@ -140,22 +139,20 @@ webserver.get(
 );
 
 webserver.get(
-	'/statistics',
+	'/results',
 	catchAsync(async (req, res, next) => {
-		const statistics = await loadStatistics(statFilePath);
-		if (!statistics || !variants)
-			return next(
-				new AppError('Statistics or variants were not provided!', 400),
-			);
-		// const stats = variants.map((variant) => ({
-		// 	option: variant.option,
-		// 	votes: statistics[variant.code] || 0,
-		// }));
 		const { votedOption } = req.query;
-		console.log(votedOption);
-		res.render('statistics', { votedOption });
+		if (!votedOption)
+			return next(
+				new AppError('Vote Not Accepted! Please Try Again Later!😉', 400),
+			);
+		res.render('results', { votedOption });
 	}),
 );
+
+webserver.get('/statistics', (req, res, next) => {
+	res.render('statistics');
+});
 
 // 404 error
 webserver.all('*', (req, res, next) => {
