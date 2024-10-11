@@ -20,6 +20,7 @@ const statFilePath = path.resolve('data', statFileName);
 const logFileName = '_server.log';
 const logFilePath = path.resolve('logs', logFileName);
 const variants = require('./data/variants');
+const { statSync } = require('fs');
 
 const webserver = express();
 const port = 7180 || 7181;
@@ -91,7 +92,7 @@ webserver.post(
 			});
 			res.status(200).send(xmlBody);
 		} else {
-			const htmlBody = toHTML(stats);
+			const htmlBody = toHTML(stats, ['option', 'votes']);
 			res.set('Content-Type', 'text/html');
 			res.status(200).send(htmlBody);
 		}
