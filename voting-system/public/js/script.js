@@ -106,45 +106,9 @@ const handleVoteSubmit = async (event) => {
 // 	}
 // };
 
-// Fetch results in JSON / XML / HTML formats
-const fetchResults = async (format) => {
-	try {
-		const response = await fetch('/api/v1/stat', {
-			method: 'POST',
-			headers: { Accept: getAcceptHeader(format) },
-		});
-
-		if (format === 'json') {
-			const { status, data } = await response.json();
-			if (status === 'success') {
-				displayPopup('success', 'Check console for JSON results😉');
-				console.log(data);
-			} else {
-				console.error('Failed to load statistics');
-				displayPopup('error', 'Failed to load statistics🤯');
-			}
-		} else if (format === 'xml') {
-			const textResponse = await response.text();
-			const parser = new DOMParser();
-			const xmlDoc = parser.parseFromString(textResponse, 'application/xml');
-			console.log(xmlDoc);
-			displayPopup('success', 'Check console for XML results😉');
-		} else if (format === 'html') {
-			const htmlResponse = await response.text();
-			statisticsList.innerHTML = '';
-			statisticsList.insertAdjacentHTML('beforeend', htmlResponse);
-			displayPopup('success', 'HTML results added to the list😉');
-		} else {
-			throw new Error('Unsupported format🤯');
-		}
-	} catch (error) {
-		console.error(`Error fetching ${format.toUpperCase()} results:`, error);
-		displayPopup('error', `Failed to fetch ${format.toUpperCase()} results!🤯`);
-	}
-};
-
 const getAcceptHeader = (format) => {
-	switch (format) {
+	const sanitizedFormat = format.toLowerCase().trim();
+	switch (sanitizedFormat) {
 		case 'json':
 			return 'application/json';
 		case 'xml':
@@ -156,32 +120,82 @@ const getAcceptHeader = (format) => {
 	}
 };
 
-// Function to trigger download of results in JSON / XML formats
-const downloadResults = async (format) => {
+// Fetch results in JSON / XML / HTML formats
+const fetchResults = async (format) => {
 	try {
+		const sanitizedFormat = format.toLowerCase().trim();
 		const response = await fetch('/api/v1/stat', {
 			method: 'POST',
-			headers: { Accept: `application/${format}` },
+			headers: { Accept: getAcceptHeader(sanitizedFormat) },
+		});
+
+		if (sanitizedFormat === 'json') {
+			const { status, data } = await response.json();
+			if (status === 'success') {
+				displayPopup('success', 'Check console for JSON results😉');
+				console.log(data);
+			} else {
+				console.error('Failed to load statistics');
+				displayPopup('error', 'Failed to load statistics🤯');
+			}
+		} else if (sanitizedFormat === 'xml') {
+			const textResponse = await response.text();
+			const parser = new DOMParser();
+			const xmlDoc = parser.parseFromString(textResponse, 'application/xml');
+			console.log(xmlDoc);
+			displayPopup('success', 'Check console for XML results😉');
+		} else if (sanitizedFormat === 'html') {
+			const htmlResponse = await response.text();
+			statisticsList.innerHTML = '';
+			statisticsList.insertAdjacentHTML('beforeend', htmlResponse);
+			displayPopup('success', 'HTML results added to the list😉');
+		} else {
+			throw new Error('Unsupported format🤯');
+		}
+	} catch (error) {
+		console.error(
+			`Error fetching ${sanitizedFormat.toUpperCase()} results:`,
+			error,
+		);
+		displayPopup(
+			'error',
+			`Failed to fetch ${sanitizedFormat.toUpperCase()} results!🤯`,
+		);
+	}
+};
+
+// Download results in JSON / XML / HTML formats
+const downloadResults = async (format) => {
+	try {
+		const sanitizedFormat = format.toLowerCase().trim();
+		const response = await fetch('/api/v1/stat', {
+			method: 'POST',
+			headers: { Accept: getAcceptHeader(sanitizedFormat) },
 		});
 		const blob = await response.blob();
 		const url = window.URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.style.display = 'none';
 		a.href = url;
-		a.download = `statistics.${format}`;
+		a.download = `statistics.${sanitizedFormat}`;
 		document.body.appendChild(a);
 		a.click();
 		window.URL.revokeObjectURL(url);
-		displayPopup('success', `Downloading ${format.toUpperCase()} results...😉`);
+		displayPopup(
+			'success',
+			`Downloading ${sanitizedFormat.toUpperCase()} results...😉`,
+		);
 	} catch (error) {
-		console.error(`Error downloading ${format.toUpperCase()} results:`, error);
+		console.error(
+			`Error downloading ${sanitizedFormat.toUpperCase()} results:`,
+			error,
+		);
 		displayPopup(
 			'error',
-			`Failed to download ${format.toUpperCase()} results!🤯`,
+			`Failed to download ${sanitizedFormat.toUpperCase()} results!🤯`,
 		);
 	}
 };
-
 
 // Initialize Event Listeners
 if (voteForm) {
@@ -189,10 +203,15 @@ if (voteForm) {
 	voteForm.addEventListener('submit', handleVoteSubmit);
 }
 
+if (jsonBtn) jsonBtn.addEventListener('click', () => downloadResults('json'));
+if (xmlBtn) xmlBtn.addEventListener('click', () => downloadResults('xml'));
+if (htmlBtn) htmlBtn.addEventListener('click', () => downloadResults('html'));
+
+
 // if (statisticsList) {
 // 	document.addEventListener('DOMContentLoaded', loadStatistics);
 // }
 
-if (jsonBtn) jsonBtn.addEventListener('click', () => downloadResults('json'));
-if (xmlBtn) xmlBtn.addEventListener('click', () => downloadResults('xml'));
-if (htmlBtn) htmlBtn.addEventListener('click', () => fetchResults('html'));
+// if (jsonBtn) jsonBtn.addEventListener('click', () => fetchResults('json'));
+// if (xmlBtn) xmlBtn.addEventListener('click', () => fetchResults('xml'));
+// if (htmlBtn) htmlBtn.addEventListener('click', () => fetchResults('html'));
