@@ -20,7 +20,6 @@ const statFilePath = path.resolve('data', statFileName);
 const logFileName = '_server.log';
 const logFilePath = path.resolve('logs', logFileName);
 const variants = require('./data/variants');
-const { statSync } = require('fs');
 
 const webserver = express();
 const port = 7180 || 7181;
