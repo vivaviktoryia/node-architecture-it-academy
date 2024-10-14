@@ -106,108 +106,79 @@ const handleVoteSubmit = async (event) => {
 // 	}
 // };
 
-// Fetch results in JSON format
-const fetchJSONResults = async () => {
+// Fetch results in JSON / XML / HTML formats
+const fetchResults = async (format) => {
 	try {
 		const response = await fetch('/api/v1/stat', {
 			method: 'POST',
-			headers: { Accept: 'application/json' },
+			headers: { Accept: getAcceptHeader(format) },
 		});
 
-		const { status, data } = await response.json();
-		if (status === 'success') {
-			displayPopup('success', 'Check console for JSON results.');
-			console.log(data);
+		if (format === 'json') {
+			const { status, data } = await response.json();
+			if (status === 'success') {
+				displayPopup('success', 'Check console for JSON results😉');
+				console.log(data);
+			} else {
+				console.error('Failed to load statistics');
+				displayPopup('error', 'Failed to load statistics🤯');
+			}
+		} else if (format === 'xml') {
+			const textResponse = await response.text();
+			const parser = new DOMParser();
+			const xmlDoc = parser.parseFromString(textResponse, 'application/xml');
+			console.log(xmlDoc);
+			displayPopup('success', 'Check console for XML results😉');
+		} else if (format === 'html') {
+			const htmlResponse = await response.text();
+			statisticsList.innerHTML = '';
+			statisticsList.insertAdjacentHTML('beforeend', htmlResponse);
+			displayPopup('success', 'HTML results added to the list😉');
 		} else {
-			console.error('Failed to load statistics');
-			displayPopup('error', 'Failed to load statistics');
+			throw new Error('Unsupported format🤯');
 		}
 	} catch (error) {
-		console.error('Error loading statistics:', error);
-		displayPopup('error', 'Something Went Wrong!💥 Please Try Again Later!');
+		console.error(`Error fetching ${format.toUpperCase()} results:`, error);
+		displayPopup('error', `Failed to fetch ${format.toUpperCase()} results!🤯`);
 	}
 };
 
-// Fetch results in XML format
-const fetchXMLResults = async () => {
-	try {
-		const response = await fetch('/api/v1/stat', {
-			method: 'POST',
-			headers: { Accept: 'application/xml' },
-		});
-		const textResponse = await response.text();
-		const parser = new DOMParser();
-		const xmlDoc = parser.parseFromString(textResponse, 'application/xml');
-		console.log(xmlDoc);
-		displayPopup('success', 'Check console for XML results.');
-	} catch (error) {
-		console.error('Error fetching XML results:', error);
-		displayPopup('error', 'Failed to fetch XML results!');
+const getAcceptHeader = (format) => {
+	switch (format) {
+		case 'json':
+			return 'application/json';
+		case 'xml':
+			return 'application/xml';
+		case 'html':
+			return 'text/html';
+		default:
+			throw new Error('Invalid format🤯');
 	}
 };
 
-// Fetch results in HTML format
-const fetchHTMLResults = async () => {
+// Function to trigger download of results in JSON / XML formats
+const downloadResults = async (format) => {
 	try {
 		const response = await fetch('/api/v1/stat', {
 			method: 'POST',
-			headers: { Accept: 'text/html' },
-		});
-		const htmlResponse = await response.text();
-
-		statisticsList.innerHTML = '';
-
-		statisticsList.insertAdjacentHTML('beforeend', htmlResponse);
-		displayPopup('success', 'HTML results added to the list.');
-	} catch (error) {
-		console.error('Error fetching HTML results:', error);
-		displayPopup('error', 'Failed to fetch HTML results!');
-	}
-};
-
-// Function to trigger download of results in JSON format
-const downloadJSONResults = async () => {
-	try {
-		const response = await fetch('/api/v1/stat', {
-			method: 'POST',
-			headers: { Accept: 'application/json' },
+			headers: { Accept: `application/${format}` },
 		});
 		const blob = await response.blob();
 		const url = window.URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.style.display = 'none';
 		a.href = url;
-		a.download = 'statistics.json';
+		a.download = `statistics.${format}`;
 		document.body.appendChild(a);
 		a.click();
 		window.URL.revokeObjectURL(url);
-		displayPopup('success', 'Downloading JSON results...');
+		displayPopup('success', `Downloading ${format.toUpperCase()} results...😉`);
 	} catch (error) {
-		console.error('Error downloading JSON results:', error);
-		displayPopup('error', 'Failed to download JSON results!');
-	}
-};
-
-// Function to trigger download of results in XML format
-const downloadXMLResults = async () => {
-	try {
-		const response = await fetch('/api/v1/stat', {
-			method: 'POST',
-			headers: { Accept: 'application/xml' },
-		});
-		const blob = await response.blob();
-		const url = window.URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.style.display = 'none';
-		a.href = url;
-		a.download = 'statistics.xml';
-		document.body.appendChild(a);
-		a.click();
-		window.URL.revokeObjectURL(url);
-		displayPopup('success', 'Downloading XML results...');
-	} catch (error) {
-		console.error('Error downloading XML results:', error);
-		displayPopup('error', 'Failed to download XML results!');
+		console.error(`Error downloading ${format.toUpperCase()} results:`, error);
+		displayPopup(
+			'error',
+			`Failed to download ${format.toUpperCase()} results!🤯`,
+		);
 	}
 };
 
@@ -222,6 +193,6 @@ if (voteForm) {
 // 	document.addEventListener('DOMContentLoaded', loadStatistics);
 // }
 
-if (jsonBtn) jsonBtn.addEventListener('click', downloadJSONResults);
-if (xmlBtn) xmlBtn.addEventListener('click', downloadXMLResults);
-if (htmlBtn) htmlBtn.addEventListener('click', fetchHTMLResults);
+if (jsonBtn) jsonBtn.addEventListener('click', () => downloadResults('json'));
+if (xmlBtn) xmlBtn.addEventListener('click', () => downloadResults('xml'));
+if (htmlBtn) htmlBtn.addEventListener('click', () => fetchResults('html'));
