@@ -55,7 +55,25 @@ function toHTML(data, keysToShow = []) {
 	return html;
 }
 
+// Parse req.body in case of content-type: application/xml
+function xmlBodyParser(req, res, next) {
+	const contentType = req.headers['content-type'];
+	if (contentType === 'application/xml') {
+		let data = '';
+		req.setEncoding('utf8');
+		req.on('data', function (chunk) {
+			data += chunk;
+		});
+		req.on('end', function () {
+			req.rawBody = data;
+			next();
+		});
+	} else next(); 
+}
+
+
 module.exports = {
-	toXML,
 	toHTML,
+	toXML,
+	xmlBodyParser,
 };
