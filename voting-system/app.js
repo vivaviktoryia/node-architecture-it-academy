@@ -1,6 +1,9 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
 const { xss } = require('express-xss-sanitizer'); // Data sanitization - XSS
+
+dotenv.config({ path: `${__dirname}/config.env` });
 
 const {
 	logLineSync,
@@ -22,7 +25,7 @@ const logFilePath = path.resolve('logs', logFileName);
 const variants = require('./data/variants');
 
 const webserver = express();
-const port = 7180 || 7181;
+const port = process.env.PORT || 7181;
 
 webserver.set('view engine', 'pug');
 webserver.set('views', path.join(__dirname, 'views'));
@@ -48,12 +51,17 @@ webserver.get(
 	catchAsync(async (req, res, next) => {
 		if (!variants)
 			return next(new AppError('Variants were not provided!', 400));
-		res.status(200).json({
-			status: 'success',
-			data: {
-				data: variants,
-			},
-		});
+		res
+			.set({
+				'Content-Type': 'application/json',
+			})
+			.status(200)
+			.json({
+				status: 'success',
+				data: {
+					data: variants,
+				},
+			});
 	}),
 );
 
@@ -75,25 +83,34 @@ webserver.post(
 		const acceptHeader = req.headers.accept;
 
 		if (acceptHeader === 'application/json') {
-			res.set({
-				'Content-Type': 'application/json',
-				'Content-Disposition': 'attachment; filename="statistics.json"',
-			});
-			res.status(200).json({
-				status: 'success',
-				data: stats,
-			});
+			res
+				.set({
+					'Content-Type': 'application/json',
+					'Content-Disposition': 'attachment; filename="statistics.json"',
+				})
+				.status(200)
+				.json({
+					status: 'success',
+					data: stats,
+				});
 		} else if (acceptHeader === 'application/xml') {
 			const xmlBody = toXML(stats);
-			res.set({
-				'Content-Type': 'application/xml',
-				'Content-Disposition': 'attachment; filename="statistics.xml"',
-			});
-			res.status(200).send(xmlBody);
+			res
+				.set({
+					'Content-Type': 'application/xml',
+					'Content-Disposition': 'attachment; filename="statistics.xml"',
+				})
+				.status(200)
+				.send(xmlBody);
 		} else {
 			const htmlBody = toHTML(stats, ['option', 'votes']);
-			res.set('Content-Type', 'text/html');
-			res.status(200).send(htmlBody);
+			res
+				.set({
+					'Content-Type': 'text/html',
+					'Content-Disposition': 'attachment; filename="statistics.html"',
+				})
+				.status(200)
+				.send(htmlBody);
 		}
 	}),
 );
@@ -118,19 +135,29 @@ webserver.post(
 
 			const totalVotes = stats.reduce((acc, curr) => acc + curr.votes, 0);
 
-			res.status(200).json({
-				status: 'success',
-				message: 'Vote Accepted!😊',
-				data: {
-					votedData: stats.find((stat) => stat.code === +code),
-					totalVotes,
-				},
-			});
+			res
+				.set({
+					'Content-Type': 'application/json',
+				})
+				.status(200)
+				.json({
+					status: 'success',
+					message: 'Vote Accepted!😊',
+					data: {
+						votedData: stats.find((stat) => stat.code === +code),
+						totalVotes,
+					},
+				});
 		} else {
-			res.status(400).json({
-				status: 'error',
-				message: 'Vote Not Accepted! Please Try Again Later!😉',
-			});
+			res
+				.set({
+					'Content-Type': 'application/json',
+				})
+				.status(400)
+				.json({
+					status: 'error',
+					message: 'Vote Not Accepted! Please Try Again Later!😉',
+				});
 		}
 	}),
 );
