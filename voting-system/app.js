@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
 const { xss } = require('express-xss-sanitizer'); // Data sanitization - XSS
-
+const { xmlBodyParser } = require('./utils/parseData');
 dotenv.config({ path: `${__dirname}/config.env` });
 
 const {
@@ -30,9 +30,11 @@ const port = process.env.PORT || 7181;
 webserver.set('view engine', 'pug');
 webserver.set('views', path.join(__dirname, 'views'));
 
-// Body parser
-webserver.use(express.json({ limit: '10kb' })); // content-type: application/json
+// Request Body Parser
+webserver.use(express.json({ limit: '10kb' })); // content-type: application/json -> JSON.parse(req.body)
 webserver.use(express.urlencoded({ extended: true, limit: '10kb' })); // content-type: application/x-www-form-urlencoded
+webserver.use(xmlBodyParser); // content-type: application/xml
+webserver.use(express.text()); // content-type: text/plain
 
 // Data sanitization against XSS
 webserver.use(xss());
