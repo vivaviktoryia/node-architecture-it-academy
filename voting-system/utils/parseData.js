@@ -66,6 +66,9 @@ function xmlBodyParser(req, res, next) {
 		});
 		req.on('end', function () {
 			req.rawBody = data;
+			res.locals.xmlBodyComment =
+				'xml->rawBody done, ' + data.length + ' bytes';
+			console.log(res.locals.xmlBodyComment);
 			next();
 		});
 	} else next(); 
