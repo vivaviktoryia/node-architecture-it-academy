@@ -172,6 +172,9 @@ const downloadResults = async (format) => {
 			method: 'POST',
 			headers: { Accept: getAcceptHeader(sanitizedFormat) },
 		});
+		if (!response.ok) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		}
 		const data = await response.blob();
 		const url = window.URL.createObjectURL(data);
 		const fakeBtn = document.createElement('a');
@@ -180,6 +183,7 @@ const downloadResults = async (format) => {
 		fakeBtn.download = `statistics.${sanitizedFormat}`;
 		document.body.appendChild(fakeBtn);
 		fakeBtn.click();
+		document.body.removeChild(fakeBtn);
 		window.URL.revokeObjectURL(url);
 		displayPopup(
 			'success',
@@ -206,7 +210,6 @@ if (voteForm) {
 if (jsonBtn) jsonBtn.addEventListener('click', () => downloadResults('json'));
 if (xmlBtn) xmlBtn.addEventListener('click', () => downloadResults('xml'));
 if (htmlBtn) htmlBtn.addEventListener('click', () => downloadResults('html'));
-
 
 // if (statisticsList) {
 // 	document.addEventListener('DOMContentLoaded', loadStatistics);

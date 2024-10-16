@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const { xss } = require('express-xss-sanitizer'); // Data sanitization - XSS
 const { xmlBodyParser } = require('./utils/parseData');
+
 dotenv.config({ path: `${__dirname}/config.env` });
 
 const {
@@ -12,6 +13,8 @@ const {
 } = require('./utils/logger');
 
 const { loadStatistics, saveStatistics } = require('./utils/statistics');
+const { streamDataToResponse } = require('./utils/streamData');
+const { getHeaderByFormat } = require('./utils/getHeaders');
 const { toXML, toHTML } = require('./utils/parseData');
 
 const { catchAsync } = require('./utils/catchAsync');
@@ -67,6 +70,7 @@ webserver.get(
 	}),
 );
 
+// Send stats directly
 webserver.post(
 	'/api/v1/stat',
 	catchAsync(async (req, res, next) => {
@@ -116,6 +120,45 @@ webserver.post(
 		}
 	}),
 );
+
+// Use streams
+// webserver.post(
+// 	'/api/v1/stat',
+// 	catchAsync(async (req, res, next) => {
+// 		const statistics = await loadStatistics(statFilePath);
+// 		if (!statistics || !variants) {
+// 			return next(
+// 				new AppError('Statistics or variants were not provided!', 400),
+// 			);
+// 		}
+
+// 		const stats = variants.map((variant) => ({
+// 			code: variant.code,
+// 			option: variant.option,
+// 			votes: statistics[variant.code] || 0,
+// 		}));
+
+// 		const acceptHeader = req.headers.accept.toLowerCase();
+
+// 		let formattedData;
+// 		let format;
+
+// 		if (acceptHeader.includes('application/json')) {
+// 			format = 'json';
+// 			formattedData = JSON.stringify({ status: 'success', data: stats });
+// 		} else if (acceptHeader.includes('application/xml')) {
+// 			format = 'xml';
+// 			formattedData = toXML(stats);
+// 		} else if (acceptHeader.includes('text/html')) {
+// 			format = 'html';
+// 			formattedData = toHTML(stats, ['option', 'votes']);
+// 		} else {
+// 			return next(new AppError('Not Acceptable Format', 406));
+// 		}
+       
+// 		streamDataToResponse(res, formattedData, format, 'statistics');
+// 	}),
+// );
 
 webserver.post(
 	'/api/v1/vote',
