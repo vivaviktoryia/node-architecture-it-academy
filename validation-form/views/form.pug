@@ -1,0 +1,13 @@
+extends base
+
+block content 
+    if error
+        p(style="color: red")= error
+    form(method="get" action="/submit")
+        label(for="name") Name:            
+        input(type="text" name="name", value=name || '')
+        br
+        label(for="email") Email:       
+        input(type="email" name="email", value=email || '')
+        br
+        input(type="submit" value="Submit")

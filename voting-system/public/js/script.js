@@ -172,14 +172,14 @@ const downloadResults = async (format) => {
 			method: 'POST',
 			headers: { Accept: getAcceptHeader(sanitizedFormat) },
 		});
-		const blob = await response.blob();
-		const url = window.URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.style.display = 'none';
-		a.href = url;
-		a.download = `statistics.${sanitizedFormat}`;
-		document.body.appendChild(a);
-		a.click();
+		const data = await response.blob();
+		const url = window.URL.createObjectURL(data);
+		const fakeBtn = document.createElement('a');
+		fakeBtn.style.display = 'none';
+		fakeBtn.href = url;
+		fakeBtn.download = `statistics.${sanitizedFormat}`;
+		document.body.appendChild(fakeBtn);
+		fakeBtn.click();
 		window.URL.revokeObjectURL(url);
 		displayPopup(
 			'success',
