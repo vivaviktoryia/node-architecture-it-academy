@@ -1,6 +1,10 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
-const xss = require('xss-clean'); // Data sanitization - XSS
+const { xss } = require('express-xss-sanitizer'); // Data sanitization - XSS
+const { xmlBodyParser } = require('./utils/parseData');
+
+dotenv.config({ path: `${__dirname}/config.env` });
 
 const {
 	logLineSync,
@@ -9,6 +13,10 @@ const {
 } = require('./utils/logger');
 
 const { loadStatistics, saveStatistics } = require('./utils/statistics');
+const { streamDataToResponse } = require('./utils/streamData');
+const { getHeaderByFormat } = require('./utils/getHeaders');
+const { toXML, toHTML } = require('./utils/parseData');
+
 const { catchAsync } = require('./utils/catchAsync');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./utils/globalErrorHandler');
@@ -20,14 +28,16 @@ const logFilePath = path.resolve('logs', logFileName);
 const variants = require('./data/variants');
 
 const webserver = express();
-const port = 7180 || 7181;
+const port = process.env.PORT || 7181;
 
 webserver.set('view engine', 'pug');
 webserver.set('views', path.join(__dirname, 'views'));
 
-// Body parser
-webserver.use(express.json({ limit: '10kb' })); // content-type: application/json
+// Request Body Parser
+webserver.use(express.json({ limit: '10kb' })); // content-type: application/json -> JSON.parse(req.body)
 webserver.use(express.urlencoded({ extended: true, limit: '10kb' })); // content-type: application/x-www-form-urlencoded
+webserver.use(xmlBodyParser); // content-type: application/xml
+webserver.use(express.text()); // content-type: text/plain
 
 // Data sanitization against XSS
 webserver.use(xss());
@@ -42,70 +52,157 @@ process.on('uncaughtException', (err) => {
 });
 
 webserver.get(
-	'/variants',
+	'/api/v1/variants',
 	catchAsync(async (req, res, next) => {
 		if (!variants)
 			return next(new AppError('Variants were not provided!', 400));
-		res.status(200).json({
-			status: 'success',
-			data: {
-				data: variants,
-			},
-		});
+		res
+			.set({
+				'Content-Type': 'application/json',
+			})
+			.status(200)
+			.json({
+				status: 'success',
+				data: {
+					data: variants,
+				},
+			});
 	}),
 );
 
+// Send stats directly
 webserver.post(
-	'/stat',
+	'/api/v1/stat',
 	catchAsync(async (req, res, next) => {
 		const statistics = await loadStatistics(statFilePath);
 		if (!statistics || !variants)
 			return next(
 				new AppError('Statistics or variants were not provided!', 400),
 			);
+
 		const stats = variants.map((variant) => ({
 			code: variant.code,
 			option: variant.option,
 			votes: statistics[variant.code] || 0,
 		}));
-		res.status(200).json({
-			status: 'success',
-			data: {
-				data: stats,
-			},
-		});
+
+		const acceptHeader = req.headers.accept;
+
+		if (acceptHeader === 'application/json') {
+			res
+				.set({
+					'Content-Type': 'application/json',
+					'Content-Disposition': 'attachment; filename="statistics.json"',
+				})
+				.status(200)
+				.json({
+					status: 'success',
+					data: stats,
+				});
+		} else if (acceptHeader === 'application/xml') {
+			const xmlBody = toXML(stats);
+			res
+				.set({
+					'Content-Type': 'application/xml',
+					'Content-Disposition': 'attachment; filename="statistics.xml"',
+				})
+				.status(200)
+				.send(xmlBody);
+		} else {
+			const htmlBody = toHTML(stats, ['option', 'votes']);
+			res
+				.set({
+					'Content-Type': 'text/html',
+					'Content-Disposition': 'attachment; filename="statistics.html"',
+				})
+				.status(200)
+				.send(htmlBody);
+		}
 	}),
 );
 
+// Use streams
+// webserver.post(
+// 	'/api/v1/stat',
+// 	catchAsync(async (req, res, next) => {
+// 		const statistics = await loadStatistics(statFilePath);
+// 		if (!statistics || !variants) {
+// 			return next(
+// 				new AppError('Statistics or variants were not provided!', 400),
+// 			);
+// 		}
+
+// 		const stats = variants.map((variant) => ({
+// 			code: variant.code,
+// 			option: variant.option,
+// 			votes: statistics[variant.code] || 0,
+// 		}));
+
+// 		const acceptHeader = req.headers.accept.toLowerCase();
+
+// 		let formattedData;
+// 		let format;
+
+// 		if (acceptHeader.includes('application/json')) {
+// 			format = 'json';
+// 			formattedData = JSON.stringify({ status: 'success', data: stats });
+// 		} else if (acceptHeader.includes('application/xml')) {
+// 			format = 'xml';
+// 			formattedData = toXML(stats);
+// 		} else if (acceptHeader.includes('text/html')) {
+// 			format = 'html';
+// 			formattedData = toHTML(stats, ['option', 'votes']);
+// 		} else {
+// 			return next(new AppError('Not Acceptable Format', 406));
+// 		}
+       
+// 		streamDataToResponse(res, formattedData, format, 'statistics');
+// 	}),
+// );
+
 webserver.post(
-	'/vote',
+	'/api/v1/vote',
 	catchAsync(async (req, res, next) => {
 		const { code } = req.body;
 		if (!code) return next(new AppError('Code was not provided!', 400));
 		const statistics = await loadStatistics(statFilePath);
 		if (!statistics)
-			return next(new AppError('statistics were not provided!', 400));
+			return next(new AppError('Statistics were not provided!', 400));
 		if (statistics[code] !== undefined) {
 			statistics[code]++;
 			await saveStatistics(statistics, statFilePath);
 
 			const stats = variants.map((variant) => ({
+				code: variant.code,
 				option: variant.option,
 				votes: statistics[variant.code] || 0,
 			}));
 
-			res.status(200).json({
-				status: 'success',
-				message: 'Vote Accepted!😊',
-				data: {
-					data: stats,
-				},
-			});
+			const totalVotes = stats.reduce((acc, curr) => acc + curr.votes, 0);
+
+			res
+				.set({
+					'Content-Type': 'application/json',
+				})
+				.status(200)
+				.json({
+					status: 'success',
+					message: 'Vote Accepted!😊',
+					data: {
+						votedData: stats.find((stat) => stat.code === +code),
+						totalVotes,
+					},
+				});
 		} else {
-			res.status(400).json({
-				status: 'error',
-				message: 'Vote Not Accepted! Please Try Again Later!😉',
-			});
+			res
+				.set({
+					'Content-Type': 'application/json',
+				})
+				.status(400)
+				.json({
+					status: 'error',
+					message: 'Vote Not Accepted! Please Try Again Later!😉',
+				});
 		}
 	}),
 );
@@ -120,20 +217,20 @@ webserver.get(
 );
 
 webserver.get(
-	'/statistics',
+	'/results',
 	catchAsync(async (req, res, next) => {
-		const statistics = await loadStatistics(statFilePath);
-		if (!statistics || !variants)
+		const { votedOption } = req.query;
+		if (!votedOption)
 			return next(
-				new AppError('Statistics or variants were not provided!', 400),
+				new AppError('Vote Not Accepted! Please Try Again Later!😉', 400),
 			);
-		const stats = variants.map((variant) => ({
-			option: variant.option,
-			votes: statistics[variant.code] || 0,
-		}));
-		res.render('statistics', { stats });
+		res.render('results', { votedOption });
 	}),
 );
+
+webserver.get('/statistics', (req, res, next) => {
+	res.render('statistics');
+});
 
 // 404 error
 webserver.all('*', (req, res, next) => {
@@ -144,6 +241,7 @@ webserver.use(globalErrorHandler);
 
 webserver.listen(port, () => {
 	const logLine = `Web server running on port  ${port}, process.pid = ${process.pid}`;
+	// console.log(process.env.NODE_ENV);
 	logLineAsync(logFilePath, logLine);
 });
 

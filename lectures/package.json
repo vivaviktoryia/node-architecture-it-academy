@@ -1,0 +1,16 @@
+{
+  "name": "lectures-it-academy",
+  "version": "1.0.0",
+  "description": "lectures - IT Academy - course Node.js",
+  "main": "index.js",
+  "scripts": {
+    "server3570": "nodemon server3570/server3570.js"
+  },
+  "author": "Viktoryia Antonchyk",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "nodemon": "^3.1.7",
+    "pug": "^3.0.3"
+  }
+}

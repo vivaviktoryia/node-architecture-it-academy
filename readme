@@ -1,0 +1,12 @@
+C:\Windows\System32\drivers\etc\hosts - can be managed
+# localhost name resolution is handled within DNS itself.
+127.0.0.1       localhost
+127.0.0.2       voting
+127.0.0.3       validation
+::1             localhost
+
+
+// Request Body Parser - Middleware
+express.json({ limit: '10kb' }); // content-type: application/json -> JSON.parse(req.body)
+express.text(); // content-type: text/plain -> parse req.body
+xmlBodyParser // content-type: application/xml -> parse req.body (see in utils/parseData.js)
