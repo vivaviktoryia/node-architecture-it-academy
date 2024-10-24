@@ -8,11 +8,6 @@ body {
     margin: 0;
 }
 
-h1 {
-    color: #333;
-    margin-top: 20px;
-}
-
 .container {
     margin-top: 20px;
     background-color: #fff;
@@ -22,43 +17,33 @@ h1 {
     width: 400px;
 }
 
-label {
-    display: block;
+.method-url-row, .headers-row, .query-params-row, .body-options-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 10px;
-    font-weight: bold;
-    color: #555;
 }
 
-input, select, textarea {
-    width: 100%;            /* All fields will have equal initial width */
-    max-width: 100%;         /* Maximum width remains 100% of the container */
+.url-input {
+    flex: 1;
     padding: 10px;
-    margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    font-size: 14px;
-    box-sizing: border-box;  /* Ensures padding is included in the width */
+    margin-left: 10px; /* Space between dropdown and URL input */
 }
 
-textarea {
-    min-height: 60px;        /* Set an initial height for the textarea */
-    resize: vertical;        /* Allow users to extend the textarea vertically */
-    overflow: auto;          /* Enable scrolling if the content exceeds height */
-}
-
-button {
-    width: 100%;
-    background-color: #4CAF50;
+.add-header-btn, .add-query-btn {
+    width: 40px; /* Size of the add button */
+    height: 40px; /* Size of the add button */
+    border-radius: 50%; /* Circular button */
+    background-color: #4CAF50; /* Add button color */
     color: white;
-    padding: 10px;
     border: none;
-    border-radius: 5px;
-    font-size: 16px;
     cursor: pointer;
 }
 
-button:hover {
-    background-color: #45a049;
+.add-header-btn:hover, .add-query-btn:hover {
+    background-color: #45a049; /* Darker shade on hover */
 }
 
 pre {
@@ -67,27 +52,4 @@ pre {
     border-radius: 5px;
     overflow: auto;
     font-size: 14px;
-    max-height: 200px;
-}
-.header-row, .query-param-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
-input[type="text"] {
-    width: 45%; /* Adjust width to fit inside flex container */
-}
-
-button.remove-header-btn, button.remove-query-param-btn {
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-}
-
-button.remove-header-btn:hover, button.remove-query-param-btn:hover {
-    background-color: #ff1a1a;
 }
