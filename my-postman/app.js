@@ -33,10 +33,69 @@ process.on('uncaughtException', (err) => {
 	process.exit(1);
 });
 
-webserver.get('/', (req, res, next) => {
-	res.status(200).render('base');
-	// .send('<h1> Hi! From MyPostman! </h1>');
+// webserver.get('/', (req, res, next) => {
+// 	res.status(200).render('base');
+// 	// .send('<h1> Hi! From MyPostman! </h1>');
+// });
+
+webserver.get('/', (req, res) => {
+	res.render('base', { response: null });
 });
+
+webserver.post('/request', async (req, res) => {
+	const { url, method, headers, query, bodyFormat, body } = req.body;
+
+	// Формирование query параметров
+	let urlWithQuery = url;
+	if (query) {
+		const queryParams = query
+			.map((param) => `${param.key}=${encodeURIComponent(param.value)}`)
+			.join('&');
+		urlWithQuery += `?${queryParams}`;
+	}
+
+	// Парсинг заголовков
+	const parsedHeaders = headers ? headers : {};
+
+	// Опции для запроса
+	const options = {
+		method,
+		headers: parsedHeaders,
+	};
+
+	// Обработка разных типов тела запроса
+	if (['POST', 'PUT'].includes(method)) {
+		if (bodyFormat === 'json') {
+			options.body = body;
+		} else if (bodyFormat === 'urlencoded') {
+			options.body = new URLSearchParams(body).toString();
+			options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+		} else if (bodyFormat === 'formdata') {
+			const formData = new FormData();
+			Object.entries(req.body.formdata).forEach(([key, value]) => {
+				formData.append(key, value);
+			});
+			options.body = formData;
+		}
+	}
+
+	try {
+		const response = await fetch(urlWithQuery, options);
+		const responseBody = await response.text();
+
+		// Отправка результата на клиент
+		res.render('base', {
+			response: {
+				status: response.status,
+				headers: JSON.stringify([...response.headers.entries()], null, 2),
+				body: responseBody,
+			},
+		});
+	} catch (error) {
+		res.render('base', { response: { error: error.message } });
+	}
+});
+
 
 // 404 error
 webserver.all('*', (req, res, next) => {

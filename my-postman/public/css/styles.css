@@ -69,3 +69,25 @@ pre {
     font-size: 14px;
     max-height: 200px;
 }
+.header-row, .query-param-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+input[type="text"] {
+    width: 45%; /* Adjust width to fit inside flex container */
+}
+
+button.remove-header-btn, button.remove-query-param-btn {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+button.remove-header-btn:hover, button.remove-query-param-btn:hover {
+    background-color: #ff1a1a;
+}
