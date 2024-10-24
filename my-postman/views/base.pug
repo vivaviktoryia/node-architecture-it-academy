@@ -3,6 +3,7 @@ html
     head
         title My Postman
         link(rel="stylesheet" href="/css/styles.css")
+        script(src="/js/script.js")
     body
         h1 My Postman
 
@@ -18,14 +19,35 @@ html
                     option(value="PUT") PUT
                     option(value="DELETE") DELETE
 
-                label(for="headers") Headers (JSON format):
-                textarea(name="headers")
+                // Headers section
+                h3 Headers
+                div#headers-container
+                    button(type="button" id="add-header-btn") Add Header
 
-                label(for="body") Body (for POST/PUT requests, JSON format):
+                // Query Params section
+                h3 Query Parameters
+                div#query-params-container
+                    button(type="button" id="add-query-param-btn") Add Query Param
+
+                // Body section
+                label(for="body") Body (for POST/PUT requests, JSON/text/html/urlencoded):
+                select(name="bodyFormat" id="bodyFormat")
+                    option(value="json") JSON
+                    option(value="text") Text
+                    option(value="html") HTML
+                    option(value="urlencoded") URL Encoded
+                    option(value="form-data") Form Data
                 textarea(name="body")
 
                 button(type="submit") Send Request
 
-            if response
-                h2 Response
-                pre= response
+        // Response Section
+        if response
+            h2 Response
+            pre Status: #{response.status}
+            pre Headers: #{response.headers}
+            pre Body: #{response.body}
+
+        if response && response.error
+            h2 Error
+            pre= response.error

@@ -1,0 +1,95 @@
+doctype html
+html
+    head
+        title My Postman
+        link(rel="stylesheet" href="/css/styles.css")
+    body
+        h1 My Postman
+
+        div.container
+            form(action="/request" method="post")
+                label(for="url") URL:
+                input(type="text" name="url" required)
+
+                label(for="method") Method:
+                select(name="method")
+                    option(value="GET") GET
+                    option(value="POST") POST
+                    option(value="PUT") PUT
+                    option(value="DELETE") DELETE
+
+                h3 Headers
+                each header in ['Accept', 'Content-Type', 'Accept-Encoding', 'Authorization', 'User-Agent']
+                    label(for=header)= header
+                    if header === 'Accept'
+                        select(name=`headers[${header}]`)
+                            option(value="application/json") application/json
+                            option(value="application/xml") application/xml
+                            option(value="text/html") text/html
+                            option(value="*/*") */*
+                    else if header === 'Content-Type'
+                        select(name=`headers[${header}]`)
+                            option(value="application/json") application/json
+                            option(value="application/x-www-form-urlencoded") application/x-www-form-urlencoded
+                            option(value="multipart/form-data") multipart/form-data
+                            option(value="text/plain") text/plain
+                    else if header === 'Accept-Encoding'
+                        select(name=`headers[${header}]`)
+                            option(value="gzip") gzip
+                            option(value="deflate") deflate
+                            option(value="br") br
+                            option(value="identity") identity
+                    else
+                        input(type="text" name=`headers[${header}]` placeholder=`Enter ${header}`)
+
+                h3 Query Parameters
+                each i in [1, 2, 3]
+                    div
+                        label Query Key #{i}:
+                        input(type="text" name=`query[${i}][key]`)
+                        label Value:
+                        input(type="text" name=`query[${i}][value]`)
+
+                h3 Body
+                label(for="bodyFormat") Body Format:
+                select(id="bodyFormat" name="bodyFormat" onchange="toggleBodyFormat(this.value)")
+                    option(value="json") JSON
+                    option(value="text") Text
+                    option(value="html") HTML
+                    option(value="urlencoded") URL Encoded
+                    option(value="formdata") Form-Data
+
+                div(id="bodyJson" class="bodySection")
+                    label(for="body") Body (JSON):
+                    textarea(name="body" rows="4" cols="50")
+
+                div(id="bodyFormdata" class="bodySection" style="display:none")
+                    each i in [1, 2]
+                        div
+                            label Form Key #{i}:
+                            input(type="text" name=`formdata[${i}][key]`)
+                            label Value (file):
+                            input(type="file" name=`formdata[${i}][value]`)
+
+                button(type="submit") Send Request
+
+            if response
+                h2 Response
+                pre Status: #{response.status}
+                pre Headers: #{response.headers}
+                pre Body: #{response.body}
+
+            if response && response.error
+                h2 Error
+                pre= response.error
+
+        script.
+            function toggleBodyFormat(format) {
+                const formats = ['bodyJson', 'bodyFormdata'];
+                formats.forEach(f => document.getElementById(f).style.display = 'none');
+                if (format === 'json' || format === 'text' || format === 'html' || format === 'urlencoded') {
+                    document.getElementById('bodyJson').style.display = 'block';
+                } else if (format === 'formdata') {
+                    document.getElementById('bodyFormdata').style.display = 'block';
+                }
+            }
