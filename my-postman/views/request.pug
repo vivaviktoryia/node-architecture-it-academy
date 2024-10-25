@@ -1,0 +1,70 @@
+extends base
+
+block content
+    div.container
+        form(action="/request" method="post" id="requestForm")
+            div.form-row
+                div.input-group
+                    select(name="method" id="method-select" required)
+                        option(value="GET") GET
+                        option(value="POST") POST
+                        option(value="PUT") PUT
+                        option(value="DELETE") DELETE
+                    input(type="text" name="url" class="url-input" placeholder="Enter URL" required)
+
+            div.form-row
+                label Query Parameters
+                button(type="button" id="add-param" class="add-circle") 
+                    span.circle +                
+                div#params-container
+
+            div.form-row
+                label Headers
+                button(type="button" id="add-header" class="add-circle") 
+                    span.circle + 
+                div#dynamic-headers-container
+
+
+            div.form-row
+                label(for="contentType") Body Content-Type:
+                select(name="contentType" id="contentType")
+                    option(value="application/json") JSON
+                    option(value="application/x-www-form-urlencoded") URL-encoded
+                    option(value="text/plain") Text
+                    option(value="text/html") HTML
+
+            div.form-row
+                label(for="body") Body:
+                textarea(name="body" placeholder="Request body")
+
+            div.form-row.center-button
+                button(type="submit") Send Request
+
+        h1 Response
+        div.response-container(style="display: none;")
+            if error
+                p.error= error
+            else if status
+                div.tab
+                    button(type="button" class="tablinks active" onclick="openTab('headers')") Headers
+                    button(type="button" class="tablinks" onclick="openTab('body')") Body
+
+                div#headers.tab-content(style="display: block;")
+                    p.bold Status: #{status}
+                    table
+                        thead
+                            tr
+                                th(style="width: 30%;") Key
+                                th(style="width: 70%;") Value
+                        tbody
+                            each value, key in headers
+                                tr
+                                    td #{key}
+                                    td #{value}
+
+                div#body.tab-content(style="display: none;")
+                    p.bold Body:
+                    pre= JSON.stringify(data, null, 2)
+
+            else
+                p No response yet.

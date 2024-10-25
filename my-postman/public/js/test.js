@@ -10,15 +10,16 @@ document.addEventListener('DOMContentLoaded', () => {
 		container.appendChild(paramDiv);
 	});
 
-	const selectedHeaders = new Set();
+	const selectedHeaders = new Set(); 
 
 	document.getElementById('add-header').addEventListener('click', () => {
 		const headersContainer = document.getElementById(
 			'dynamic-headers-container',
 		);
 		const headerDiv = document.createElement('div');
-		headerDiv.className = 'header-row';
+		headerDiv.className = 'header-row'; 
 
+		
 		const headerSelect = document.createElement('select');
 		headerSelect.name = 'headerType';
 		headerSelect.className = 'header-dropdown';
@@ -32,10 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		const headerValueSelect = document.createElement('select');
 		headerValueSelect.name = 'headerValue';
 		headerValueSelect.className = 'header-dropdown';
-		headerValueSelect.innerHTML = `<option value="">Select Value</option>`;
+		headerValueSelect.innerHTML = `<option value="">Select Value</option>`; 
 
 		headerSelect.addEventListener('change', function () {
 			headerValueSelect.innerHTML = '';
+
 			addHeaderOptions(headerValueSelect, this.value);
 
 			if (this.value) {
@@ -49,13 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		headerDiv.appendChild(headerValueSelect);
 		headerDiv.appendChild(
 			createRemoveButton(() => {
-				selectedHeaders.delete(headerSelect.value);
-				headerDiv.remove();
-				updateHeaderOptions();
+				selectedHeaders.delete(headerSelect.value); 
+				headerDiv.remove(); 
+				updateHeaderOptions(); 
 			}),
 		);
 
 		headersContainer.appendChild(headerDiv);
+
 		updateHeaderOptions();
 	});
 
@@ -125,91 +128,4 @@ document.addEventListener('DOMContentLoaded', () => {
 			});
 		});
 	}
-
-	// Function to open tabs
-	window.openTab = function (tabName) {
-		const tabs = document.querySelectorAll('.tab-content');
-		const tabLinks = document.querySelectorAll('.tablinks');
-
-		// Hide all tab contents
-		tabs.forEach((tab) => {
-			tab.style.display = 'none';
-		});
-
-		// Remove active class from all tab links
-		tabLinks.forEach((link) => {
-			link.classList.remove('active');
-		});
-
-		// Show the selected tab
-		document.getElementById(tabName).style.display = 'block';
-
-		// Add active class to the clicked tab link
-		const activeLink = document.querySelector(
-			`.tablinks[onclick*="${tabName}"]`,
-		);
-		if (activeLink) {
-			activeLink.classList.add('active');
-		}
-	};
-
-	document
-		.getElementById('requestForm')
-		.addEventListener('submit', async (event) => {
-			event.preventDefault(); // Prevent the default form submission
-
-			const url = document.querySelector('input[name="url"]').value;
-			const method = document.getElementById('method-select').value;
-
-			// Gather headers and body
-			const headers = Array.from(
-				document.querySelectorAll('.header-row'),
-			).reduce((acc, row) => {
-				const headerType = row.querySelector('select[name="headerType"]').value;
-				const headerValue = row.querySelector(
-					'select[name="headerValue"]',
-				).value;
-				if (headerType && headerValue) {
-					acc[headerType] = headerValue;
-				}
-				return acc;
-			}, {});
-
-			const body = document.querySelector('textarea[name="body"]').value;
-
-			try {
-				const response = await fetch('/request', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						url,
-						method,
-						headers,
-						body,
-					}),
-				});
-
-				if (!response.ok) {
-					throw new Error('Network response was not ok');
-				}
-
-				const responseData = await response.json();
-
-				// Update response display
-				document.querySelector('.response-container').style.display = 'block';
-				document.getElementById('status').innerText =
-					responseData.status || 'No Status';
-				document.getElementById('headers').innerText =
-					JSON.stringify(responseData.headers, null, 2) || 'No Headers';
-				document.getElementById('body').innerText =
-					responseData.body || 'No Body';
-			} catch (error) {
-				console.error('Error:', error);
-				document.querySelector('.response-container').style.display = 'block';
-				document.getElementById('error').innerText =
-					'Error occurred while sending the request.';
-			}
-		});
 });

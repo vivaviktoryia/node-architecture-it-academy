@@ -1,55 +1,195 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+	font-family: Arial, sans-serif;
+	background-color: #f4f4f4;
+	margin: 0;
+	padding: 20px;
 }
 
 .container {
-    margin-top: 20px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 400px;
+	max-width: 600px;
+	margin: 0 auto;
+	background-color: #fff;
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	border-radius: 8px;
 }
 
-.method-url-row, .headers-row, .query-params-row, .body-options-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
+h1 {
+	text-align: center;
+	color: #333;
 }
 
-.url-input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-left: 10px; /* Space between dropdown and URL input */
+.form-row {
+	display: flex;
+	align-items: center;
+	margin-bottom: 15px;
 }
 
-.add-header-btn, .add-query-btn {
-    width: 40px; /* Size of the add button */
-    height: 40px; /* Size of the add button */
-    border-radius: 50%; /* Circular button */
-    background-color: #4CAF50; /* Add button color */
-    color: white;
-    border: none;
-    cursor: pointer;
+.input-group {
+	display: flex;
+	gap: 10px;
+	flex-grow: 1;
 }
 
-.add-header-btn:hover, .add-query-btn:hover {
-    background-color: #45a049; /* Darker shade on hover */
+select,
+input,
+textarea,
+button {
+	padding: 8px;
+	font-size: 1em;
+	border: 1px solid #ccc;
+	border-radius: 6px;
 }
 
-pre {
-    background-color: #f0f0f0;
-    padding: 10px;
-    border-radius: 5px;
-    overflow: auto;
-    font-size: 14px;
+select#method-select {
+	width: 80px;
 }
+
+input.url-input {
+	flex-grow: 1;
+}
+
+textarea {
+	width: 100%;
+	resize: vertical;
+}
+
+.center-button {
+	justify-content: center;
+}
+
+button[type='submit'] {
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	cursor: pointer;
+	padding: 10px 20px;
+	font-size: 1em;
+	border-radius: 6px;
+}
+
+button[type='submit']:hover {
+	background-color: #45a049;
+}
+
+button#add-param,
+button#add-header {
+	background-color: #007bff;
+	border: none;
+	cursor: pointer;
+	margin-left: 10px;
+}
+
+button#add-param:hover,
+button#add-header:hover {
+	opacity: 0.7;
+}
+
+.add-circle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background-color: #007bff;
+	color: white;
+	font-size: 1.2em;
+	line-height: 24px;
+	margin-left: 5px;
+	transition: background-color 0.3s ease;
+}
+
+.add-circle:hover {
+	background-color: #0056b3;
+}
+
+.circle {
+	text-align: center;
+	color: white;
+}
+
+input[type='text'],
+select.header-dropdown {
+	width: calc(50% - 10px);
+	border-radius: 5px;
+	padding: 8px;
+	margin-right: 10px;
+}
+
+.header-row {
+	display: flex;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.params-container,
+.dynamic-headers-container {
+	margin-top: 10px;
+}
+  .response-container {
+        border: 1px solid #ccc;
+        padding: 16px;
+        margin-top: 20px;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden; 
+    }
+
+    .tab {
+        margin-bottom: 10px; 
+    }
+
+    .tablinks {
+        background-color: #f1f1f1;
+        border: none;
+        color: black;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 4px 4px 0 0;
+        transition: background-color 0.3s;
+    }
+
+    .tablinks:hover {
+        background-color: #ddd;
+    }
+
+    .active {
+        background-color: #fff; 
+        border-bottom: 2px solid #ccc; 
+    }
+
+    .tabcontent {
+        border: 1px solid #ccc; 
+        border-top: none; 
+        padding: 10px; 
+        background-color: #fff; 
+        border-radius: 0 0 4px 4px; 
+        overflow: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        table-layout: fixed;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    th {
+        background-color: #f1f1f1;
+    }
+
+    strong {
+        font-weight: bold;
+    }

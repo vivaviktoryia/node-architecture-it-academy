@@ -1,60 +1,12 @@
 doctype html
 html
-    head
-        title My Postman
-        link(rel="stylesheet" href="/css/styles.css")
-        script(src="/js/script.js")
-    body
-        h1 My Postman
+  head
+    title My Postman 
+    link(rel='stylesheet' href='/css/styles.css')
+    link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
 
-        div.container
-            form(action="/request" method="post" id="requestForm") 
-                // First Line: Method and URL
-                div.method-url-row
-                    select(name="method" id="method-select" onchange="alignMethodWithUrl()")
-                        option(value="GET") GET
-                        option(value="POST") POST
-                        option(value="PUT") PUT
-                        option(value="DELETE") DELETE
+  body
+    h1 My Postman
+    block content
 
-                    input(type="text" name="url" class="url-input" placeholder="Enter URL" required)
-
-                // Second Line: Headers and Plus Button
-                div.headers-row
-                    h3 Headers
-                    button(type="button" class="add-header-btn") +  
-
-                // Placeholder for headers
-                div#headersContainer
-
-                // Third Line: Query Parameters
-                div.query-params-row
-                    h3 Query Parameters
-                    button(type="button" class="add-query-btn") +  
-
-                // Placeholder for query parameters
-                div#queryParamsContainer
-
-                // Fourth Line: Body Options
-                div.body-options-row
-                    h3 Body
-                    select(name="bodyFormat" id="bodyFormat" onchange="toggleBodyFormat(this.value)")
-                        option(value="json") JSON
-                        option(value="text") Text
-                        option(value="html") HTML
-                        option(value="urlencoded") URL Encoded
-                        option(value="formdata") Form Data
-
-                // Placeholder for body content based on selected format
-                div#bodyContent
-                    div#bodyJson(style="display:none")
-                        label(for="jsonBody") JSON Body:
-                        textarea(name="jsonBody" placeholder="Enter JSON Body Here")
-                    div#formDataFields(style="display:none")
-                        // This will be populated with form data fields dynamically
-
-                button(type="submit") Send Request
-
-            if response
-                h2 Response
-                pre= response
+    script(src='/js/script.js')

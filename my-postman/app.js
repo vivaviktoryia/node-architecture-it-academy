@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 const express = require('express');
+const axios = require('axios');
 const path = require('path');
 
 dotenv.config({ path: `${__dirname}/config.env` });
@@ -15,6 +16,18 @@ const logFilePath = path.resolve('logs', logFileName);
 
 const webserver = express();
 const port = process.env.PORT || 7181;
+
+const customCors = (req, res, next) => {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header(
+		'Access-Control-Allow-Headers',
+		'Origin, X-Requested-With, Content-Type, Accept',
+	);
+	res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+	next();
+};
+
+webserver.use(customCors);
 
 webserver.set('view engine', 'pug');
 webserver.set('views', path.join(__dirname, 'views'));
@@ -33,69 +46,50 @@ process.on('uncaughtException', (err) => {
 	process.exit(1);
 });
 
-// webserver.get('/', (req, res, next) => {
-// 	res.status(200).render('base');
-// 	// .send('<h1> Hi! From MyPostman! </h1>');
-// });
-
-webserver.get('/', (req, res) => {
-	res.render('base', { response: null });
-});
-
 webserver.post('/request', async (req, res) => {
-	const { url, method, headers, query, bodyFormat, body } = req.body;
-
-	// Формирование query параметров
-	let urlWithQuery = url;
-	if (query) {
-		const queryParams = query
-			.map((param) => `${param.key}=${encodeURIComponent(param.value)}`)
-			.join('&');
-		urlWithQuery += `?${queryParams}`;
-	}
-
-	// Парсинг заголовков
-	const parsedHeaders = headers ? headers : {};
-
-	// Опции для запроса
-	const options = {
-		method,
-		headers: parsedHeaders,
-	};
-
-	// Обработка разных типов тела запроса
-	if (['POST', 'PUT'].includes(method)) {
-		if (bodyFormat === 'json') {
-			options.body = body;
-		} else if (bodyFormat === 'urlencoded') {
-			options.body = new URLSearchParams(body).toString();
-			options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-		} else if (bodyFormat === 'formdata') {
-			const formData = new FormData();
-			Object.entries(req.body.formdata).forEach(([key, value]) => {
-				formData.append(key, value);
-			});
-			options.body = formData;
-		}
-	}
+	const { url, method, headers, body } = req.body;
 
 	try {
-		const response = await fetch(urlWithQuery, options);
-		const responseBody = await response.text();
-
-		// Отправка результата на клиент
-		res.render('base', {
-			response: {
-				status: response.status,
-				headers: JSON.stringify([...response.headers.entries()], null, 2),
-				body: responseBody,
-			},
+		const response = await axios({
+			method: method,
+			url: url,
+			headers: headers,
+			data: body,
 		});
+
+
+		res.render('request', {
+			status: response.status,
+			contentType: response.headers['content-type'],
+			headers: response.headers,
+			data: response.data,
+			error: null,
+		});
+
 	} catch (error) {
-		res.render('base', { response: { error: error.message } });
+		if (error.response) {
+			res.render('request', {
+				status: error.response.status,
+				contentType: error.response.headers['content-type'],
+				headers: error.response.headers,
+				data: error.response.data,
+				error: error.message,
+			});
+		} else {
+			res.render('request', {
+				status: 500,
+				contentType: null,
+				headers: {},
+				data: null,
+				error: 'Something went wrong',
+			});
+		}
 	}
 });
 
+webserver.get('/', (req, res) => {
+	res.render('request');
+});
 
 // 404 error
 webserver.all('*', (req, res, next) => {
