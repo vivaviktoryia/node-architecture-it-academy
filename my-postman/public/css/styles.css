@@ -127,69 +127,46 @@ select.header-dropdown {
 .dynamic-headers-container {
 	margin-top: 10px;
 }
-  .response-container {
-        border: 1px solid #ccc;
-        padding: 16px;
-        margin-top: 20px;
-        background-color: #f9f9f9;
-        border-radius: 4px;
-        width: 100%;
-        box-sizing: border-box;
-        overflow: hidden; 
-    }
+.response-container {
+	border: 1px solid #ccc;
+	padding: 16px;
+	margin-top: 20px;
+	background-color: #f9f9f9;
+	border-radius: 4px;
+	width: 100%;
+	overflow-wrap: break-word;
+}
 
-    .tab {
-        margin-bottom: 10px; 
-    }
+.tabs button.active {
+	background-color: #4caf50;
+	color: white;
+}
+p strong {
+	font-weight: bold;
+}
 
-    .tablinks {
-        background-color: #f1f1f1;
-        border: none;
-        color: black;
-        padding: 10px 15px;
-        cursor: pointer;
-        border-radius: 4px 4px 0 0;
-        transition: background-color 0.3s;
-    }
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 10px;
+	table-layout: fixed;
+	font-size: 0.9em;
+}
 
-    .tablinks:hover {
-        background-color: #ddd;
-    }
+th,
+td {
+	border: 1px solid #ccc;
+	padding: 8px;
+	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: break-spaces;
+}
 
-    .active {
-        background-color: #fff; 
-        border-bottom: 2px solid #ccc; 
-    }
-
-    .tabcontent {
-        border: 1px solid #ccc; 
-        border-top: none; 
-        padding: 10px; 
-        background-color: #fff; 
-        border-radius: 0 0 4px 4px; 
-        overflow: auto;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-        table-layout: fixed;
-    }
-
-    th, td {
-        border: 1px solid #ccc;
-        padding: 8px;
-        text-align: left;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    th {
-        background-color: #f1f1f1;
-    }
-
-    strong {
-        font-weight: bold;
-    }
+th {
+	background-color: #f1f1f1;
+}
+pre#body {
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
