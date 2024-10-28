@@ -40,31 +40,19 @@ block content
             div.form-row.center-button
                 button(type="submit") Send Request
 
-        h1 Response
-        div.response-container(style="display: none;")
-            if error
-                p.error= error
-            else if status
-                div.tab
-                    button(type="button" class="tablinks active" onclick="openTab('headers')") Headers
-                    button(type="button" class="tablinks" onclick="openTab('body')") Body
+        div.response-container(style='display: none;')
+            h1 Response
+                h2 Response Details
+                p(id='error', style='color: red;')
+                p Status: 
+                span#status No Status
+                h3 Headers
+                table
+                    thead
+                    tr
+                        th Header
+                        th Value
+                    tbody#headers
 
-                div#headers.tab-content(style="display: block;")
-                    p.bold Status: #{status}
-                    table
-                        thead
-                            tr
-                                th(style="width: 30%;") Key
-                                th(style="width: 70%;") Value
-                        tbody
-                            each value, key in headers
-                                tr
-                                    td #{key}
-                                    td #{value}
-
-                div#body.tab-content(style="display: none;")
-                    p.bold Body:
-                    pre= JSON.stringify(data, null, 2)
-
-            else
-                p No response yet.
+                h3 Body
+                pre#body No Body
