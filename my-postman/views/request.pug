@@ -15,7 +15,7 @@ block content
             div.form-row
                 label Query Parameters
                 button(type="button" id="add-param" class="add-circle") 
-                    span.circle +                
+                    span.circle +                 
                 div#params-container
 
             div.form-row
@@ -39,20 +39,32 @@ block content
 
             div.form-row.center-button
                 button(type="submit") Send Request
+      
+        
+
+            h1 Response
+            div.message#responseMessage Click <strong>Send Request</strong> to get a response😉
 
         div.response-container(style='display: none;')
-            h1 Response
-                h2 Response Details
-                p(id='error', style='color: red;')
-                p Status: 
-                span#status No Status
-                h3 Headers
-                table
-                    thead
-                    tr
-                        th Header
-                        th Value
-                    tbody#headers
 
-                h3 Body
-                pre#body No Body
+            p <strong> Status: </strong>
+                span#status No Status
+
+            div.tabs
+                button.tablink#tabBody(type="button" class="active") Body
+                button.tablink#tabHeader(type="button") Headers
+            
+            div.tab-content
+                div#headersTab(class="tab-content-item" style="display: none;")
+                    h3 Headers
+                    table
+                        thead
+                            tr
+                                th Header
+                                th Value
+                        tbody#headers
+                div#bodyTab(class="tab-content-item")
+                    h3 Body
+                    pre#body No Body
+        
+        

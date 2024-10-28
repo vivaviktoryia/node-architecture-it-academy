@@ -126,42 +126,45 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	window.openTab = function (tabName) {
-		const tabs = document.querySelectorAll('.tab-content');
-		const tabLinks = document.querySelectorAll('.tablinks');
+	const tabBody = document.getElementById('tabBody');
+	const tabHeader = document.getElementById('tabHeader');
+	const bodyTabContent = document.getElementById('bodyTab');
+	const headersTabContent = document.getElementById('headersTab');
+	const responseMessage = document.getElementById('responseMessage');
+	const responseContainer = document.querySelector('.response-container');
 
-		tabs.forEach((tab) => {
-			tab.style.display = 'none';
-		});
-
-		tabLinks.forEach((link) => {
-			link.classList.remove('active');
-		});
-
-		document.getElementById(tabName).style.display = 'block';
-
-		const activeLink = document.querySelector(
-			`.tablinks[onclick*="${tabName}"]`,
-		);
-		if (activeLink) {
-			activeLink.classList.add('active');
+	// Toggle tab content and active class
+	function showTabContent(tabName) {
+		if (tabName === 'Body') {
+			bodyTabContent.style.display = 'block';
+			headersTabContent.style.display = 'none';
+			tabBody.classList.add('active');
+			tabHeader.classList.remove('active');
+		} else {
+			bodyTabContent.style.display = 'none';
+			headersTabContent.style.display = 'block';
+			tabHeader.classList.add('active');
+			tabBody.classList.remove('active');
 		}
-	};
+	}
+
+	tabBody.addEventListener('click', () => showTabContent('Body'));
+	tabHeader.addEventListener('click', () => showTabContent('Headers'));
 
 	document
 		.getElementById('requestForm')
 		.addEventListener('submit', async (event) => {
 			event.preventDefault();
 
-			document.querySelector('.response-container').style.display = 'none';
-			document.getElementById('error').innerText = '';
+			// Reset response container for new request
+			responseContainer.style.display = 'none';
+			responseMessage.style.display = 'block';
 			document.getElementById('status').innerText = 'No Status';
 			document.getElementById('headers').innerHTML = '';
 			document.getElementById('body').innerText = 'No Body';
 
 			const url = document.querySelector('input[name="url"]').value;
 			const method = document.getElementById('method-select').value;
-
 			const headers = Array.from(
 				document.querySelectorAll('.header-row'),
 			).reduce((acc, row) => {
@@ -184,13 +187,12 @@ document.addEventListener('DOMContentLoaded', () => {
 					body: JSON.stringify({ url, method, headers, body }),
 				});
 
-
 				const responseData = await response.json();
-
+				console.log('!!!!!!!!!',responseData);
 				document.getElementById('status').innerText =
 					responseData.status || 'No Status';
 
-
+				// Populate headers
 				const headersTableBody = document.getElementById('headers');
 				headersTableBody.innerHTML = '';
 				Object.entries(responseData.headers || {}).forEach(([key, value]) => {
@@ -204,15 +206,21 @@ document.addEventListener('DOMContentLoaded', () => {
 					headersTableBody.appendChild(row);
 				});
 
+				// Display body
 				document.getElementById('body').innerText =
 					JSON.stringify(responseData.data, null, 2) || 'No Body';
-				document.querySelector('.response-container').style.display = 'block';
+
+				// Show response container and hide initial message
+				responseContainer.style.display = 'block';
+				responseMessage.style.display = 'none';
 			} catch (error) {
 				console.error('Error:', error);
-				document.querySelector('.response-container').style.display = 'block';
+				document.getElementById('status').innerText = 'Error';
 				document.getElementById(
-					'error',
-				).innerText = `Error occurred while sending the request: ${error.message}`;
+					'body',
+				).innerText = `Error occurred: ${error.message}`;
+				responseContainer.style.display = 'block';
+				responseMessage.style.display = 'none';
 			}
 		});
 });
