@@ -126,25 +126,20 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	// Function to open tabs
 	window.openTab = function (tabName) {
 		const tabs = document.querySelectorAll('.tab-content');
 		const tabLinks = document.querySelectorAll('.tablinks');
 
-		// Hide all tab contents
 		tabs.forEach((tab) => {
 			tab.style.display = 'none';
 		});
 
-		// Remove active class from all tab links
 		tabLinks.forEach((link) => {
 			link.classList.remove('active');
 		});
 
-		// Show the selected tab
 		document.getElementById(tabName).style.display = 'block';
 
-		// Add active class to the clicked tab link
 		const activeLink = document.querySelector(
 			`.tablinks[onclick*="${tabName}"]`,
 		);
@@ -156,12 +151,17 @@ document.addEventListener('DOMContentLoaded', () => {
 	document
 		.getElementById('requestForm')
 		.addEventListener('submit', async (event) => {
-			event.preventDefault(); // Prevent the default form submission
+			event.preventDefault();
+
+			document.querySelector('.response-container').style.display = 'none';
+			document.getElementById('error').innerText = '';
+			document.getElementById('status').innerText = 'No Status';
+			document.getElementById('headers').innerHTML = '';
+			document.getElementById('body').innerText = 'No Body';
 
 			const url = document.querySelector('input[name="url"]').value;
 			const method = document.getElementById('method-select').value;
 
-			// Gather headers and body
 			const headers = Array.from(
 				document.querySelectorAll('.header-row'),
 			).reduce((acc, row) => {
@@ -180,36 +180,39 @@ document.addEventListener('DOMContentLoaded', () => {
 			try {
 				const response = await fetch('/request', {
 					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						url,
-						method,
-						headers,
-						body,
-					}),
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ url, method, headers, body }),
 				});
 
-				if (!response.ok) {
-					throw new Error('Network response was not ok');
-				}
 
 				const responseData = await response.json();
 
-				// Update response display
-				document.querySelector('.response-container').style.display = 'block';
 				document.getElementById('status').innerText =
 					responseData.status || 'No Status';
-				document.getElementById('headers').innerText =
-					JSON.stringify(responseData.headers, null, 2) || 'No Headers';
+
+
+				const headersTableBody = document.getElementById('headers');
+				headersTableBody.innerHTML = '';
+				Object.entries(responseData.headers || {}).forEach(([key, value]) => {
+					const row = document.createElement('tr');
+					const keyCell = document.createElement('td');
+					const valueCell = document.createElement('td');
+					keyCell.innerText = key;
+					valueCell.innerText = value;
+					row.appendChild(keyCell);
+					row.appendChild(valueCell);
+					headersTableBody.appendChild(row);
+				});
+
 				document.getElementById('body').innerText =
-					responseData.body || 'No Body';
+					JSON.stringify(responseData.data, null, 2) || 'No Body';
+				document.querySelector('.response-container').style.display = 'block';
 			} catch (error) {
 				console.error('Error:', error);
 				document.querySelector('.response-container').style.display = 'block';
-				document.getElementById('error').innerText =
-					'Error occurred while sending the request.';
+				document.getElementById(
+					'error',
+				).innerText = `Error occurred while sending the request: ${error.message}`;
 			}
 		});
 });

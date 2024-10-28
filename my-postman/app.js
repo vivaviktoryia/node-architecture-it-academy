@@ -57,18 +57,16 @@ webserver.post('/request', async (req, res) => {
 			data: body,
 		});
 
-
-		res.render('request', {
+		res.status(200).json({
 			status: response.status,
 			contentType: response.headers['content-type'],
 			headers: response.headers,
 			data: response.data,
 			error: null,
 		});
-
 	} catch (error) {
 		if (error.response) {
-			res.render('request', {
+			res.status(400).json({
 				status: error.response.status,
 				contentType: error.response.headers['content-type'],
 				headers: error.response.headers,
@@ -76,7 +74,7 @@ webserver.post('/request', async (req, res) => {
 				error: error.message,
 			});
 		} else {
-			res.render('request', {
+			res.status(500).json({
 				status: 500,
 				contentType: null,
 				headers: {},
