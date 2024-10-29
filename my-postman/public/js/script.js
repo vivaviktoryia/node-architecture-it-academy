@@ -1,21 +1,42 @@
 document.addEventListener('DOMContentLoaded', () => {
-	document.getElementById('add-param').addEventListener('click', () => {
-		const container = document.getElementById('params-container');
+	// REQUEST
+	const requestForm = document.getElementById('requestForm');
+	const selectedMethod = document.getElementById('selectedMethod');
+	const urlInput = document.querySelector('input[name="url"]');
+
+	const addParamButton = document.getElementById('add-param');
+	const paramsContainer = document.getElementById('params-container');
+	const addHeaderButton = document.getElementById('add-header');
+	const requestHeaders = document.getElementById('dynamic-headers-container');
+	const requestBody = document.getElementById('requestBody');
+
+	// RESPONSE
+	const responseContainer = document.querySelector('.response-container');
+	const responseMessage = document.getElementById('responseMessage');
+	const statusElement = document.getElementById('status');
+	const statusTextElement = document.getElementById('statusText');
+
+	const tabBody = document.getElementById('tabBody');
+	const bodyTabContent = document.getElementById('bodyTab');
+	const tabHeader = document.getElementById('tabHeader');
+	const headersTabContent = document.getElementById('headersTab');
+
+	const responseHeadersTable = document.getElementById('responseHeaders');
+	const responseBody = document.getElementById('responseBody');
+
+	const selectedHeaders = new Set();
+
+	addParamButton.addEventListener('click', () => {
 		const paramDiv = document.createElement('div');
 		paramDiv.innerHTML = `
             <input type="text" name="queryParams[key]" placeholder="Key" required>
             <input type="text" name="queryParams[value]" placeholder="Value" required>
             <button type="button" onclick="this.parentNode.remove()">Remove</button>
         `;
-		container.appendChild(paramDiv);
+		paramsContainer.appendChild(paramDiv);
 	});
 
-	const selectedHeaders = new Set();
-
-	document.getElementById('add-header').addEventListener('click', () => {
-		const headersContainer = document.getElementById(
-			'dynamic-headers-container',
-		);
+	addHeaderButton.addEventListener('click', () => {
 		const headerDiv = document.createElement('div');
 		headerDiv.className = 'header-row';
 
@@ -55,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			}),
 		);
 
-		headersContainer.appendChild(headerDiv);
+		requestHeaders.appendChild(headerDiv);
 		updateHeaderOptions();
 	});
 
@@ -96,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			],
 		};
 
-		options[headerType].forEach((option) => {
+		options[headerType]?.forEach((option) => {
 			const opt = document.createElement('option');
 			opt.value = option.value;
 			opt.textContent = option.text;
@@ -126,14 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	const tabBody = document.getElementById('tabBody');
-	const tabHeader = document.getElementById('tabHeader');
-	const bodyTabContent = document.getElementById('bodyTab');
-	const headersTabContent = document.getElementById('headersTab');
-	const responseMessage = document.getElementById('responseMessage');
-	const responseContainer = document.querySelector('.response-container');
-
-	// Toggle tab content and active class
 	function showTabContent(tabName) {
 		if (tabName === 'Body') {
 			bodyTabContent.style.display = 'block';
@@ -151,23 +164,20 @@ document.addEventListener('DOMContentLoaded', () => {
 	tabBody.addEventListener('click', () => showTabContent('Body'));
 	tabHeader.addEventListener('click', () => showTabContent('Headers'));
 
-	document
-		.getElementById('requestForm')
-		.addEventListener('submit', async (event) => {
-			event.preventDefault();
+	requestForm.addEventListener('submit', async (event) => {
+		event.preventDefault();
 
-			// Reset response container for new request
-			responseContainer.style.display = 'none';
-			responseMessage.style.display = 'block';
-			document.getElementById('status').innerText = 'No Status';
-			document.getElementById('headers').innerHTML = '';
-			document.getElementById('body').innerText = 'No Body';
+		responseContainer.style.display = 'none';
+		responseMessage.style.display = 'block';
+		statusElement.innerText = 'No Status';
+		statusTextElement.innerText = '';
+		responseHeadersTable.innerHTML = '';
+		responseBody.innerText = 'No Body';
 
-			const url = document.querySelector('input[name="url"]').value;
-			const method = document.getElementById('method-select').value;
-			const headers = Array.from(
-				document.querySelectorAll('.header-row'),
-			).reduce((acc, row) => {
+		const url = urlInput.value;
+		const method = selectedMethod.value;
+		const headers = Array.from(document.querySelectorAll('.header-row')).reduce(
+			(acc, row) => {
 				const headerType = row.querySelector('select[name="headerType"]').value;
 				const headerValue = row.querySelector(
 					'select[name="headerValue"]',
@@ -176,51 +186,64 @@ document.addEventListener('DOMContentLoaded', () => {
 					acc[headerType] = headerValue;
 				}
 				return acc;
-			}, {});
+			},
+			{},
+		);
 
-			const body = document.querySelector('textarea[name="body"]').value;
+		const body = document.querySelector('textarea[name="body"]').value;
 
-			try {
-				const response = await fetch('/request', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ url, method, headers, body }),
-				});
+		try {
+			const response = await fetch('/request', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ url, method, headers, body }),
+			});
+			console.log(response);
 
-				const responseData = await response.json();
-				console.log('!!!!!!!!!',responseData);
-				document.getElementById('status').innerText =
-					responseData.status || 'No Status';
+			const responseData = await response.json();
+			const status = responseData.status;
+			statusElement.innerText = responseData.status || 'No Status';
+			statusTextElement.innerText = responseData.statusText || '';
 
-				// Populate headers
-				const headersTableBody = document.getElementById('headers');
-				headersTableBody.innerHTML = '';
-				Object.entries(responseData.headers || {}).forEach(([key, value]) => {
-					const row = document.createElement('tr');
-					const keyCell = document.createElement('td');
-					const valueCell = document.createElement('td');
-					keyCell.innerText = key;
-					valueCell.innerText = value;
-					row.appendChild(keyCell);
-					row.appendChild(valueCell);
-					headersTableBody.appendChild(row);
-				});
-
-				// Display body
-				document.getElementById('body').innerText =
-					JSON.stringify(responseData.data, null, 2) || 'No Body';
-
-				// Show response container and hide initial message
-				responseContainer.style.display = 'block';
-				responseMessage.style.display = 'none';
-			} catch (error) {
-				console.error('Error:', error);
-				document.getElementById('status').innerText = 'Error';
-				document.getElementById(
-					'body',
-				).innerText = `Error occurred: ${error.message}`;
-				responseContainer.style.display = 'block';
-				responseMessage.style.display = 'none';
+			if (status) {
+				if (status >= 200 && status < 300) {
+					statusElement.className = 'status-green';
+					statusTextElement.className = 'status-green';
+				} else if (status >= 300 && status < 400) {
+					statusElement.className = 'status-blue';
+					statusTextElement.className = 'status-blue';
+				} else if (status >= 400 && status < 600) {
+					statusElement.className = 'status-red';
+					statusTextElement.className = 'status-red';
+				} else {
+					statusElement.className = 'status-black';
+					statusTextElement.className = 'status-black';
+				}
 			}
-		});
+
+			responseHeadersTable.innerHTML = '';
+			Object.entries(responseData.headers || {}).forEach(([key, value]) => {
+				const row = document.createElement('tr');
+				const keyCell = document.createElement('td');
+				const valueCell = document.createElement('td');
+				keyCell.innerText = key;
+				valueCell.innerText = value;
+				row.appendChild(keyCell);
+				row.appendChild(valueCell);
+				responseHeadersTable.appendChild(row);
+			});
+
+			responseBody.innerText =
+				JSON.stringify(responseData.data, null, 2) || 'No Body';
+
+			responseContainer.style.display = 'block';
+			responseMessage.style.display = 'none';
+		} catch (error) {
+			console.error('Error:', error);
+			statusElement.innerText = 'Error';
+			responseBody.innerText = `Error occurred: ${error.message}`;
+			responseContainer.style.display = 'block';
+			responseMessage.style.display = 'none';
+		}
+	});
 });

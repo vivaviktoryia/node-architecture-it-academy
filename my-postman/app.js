@@ -51,23 +51,35 @@ process.on('uncaughtException', (err) => {
 webserver.post(
 	'/request',
 	[
-		check('url').trim().isString().notEmpty().withMessage('A URL is required.'),
+		check('url')
+			.trim()
+			.isString()
+			.notEmpty()
+			.withMessage('A URL is required.')
+			.matches(/^(https?:\/\/)[\w\-._~:/?#[\]@!$&'()*+,;=%]+$/)
+			.withMessage(
+				'URL should start with http:// or https:// and contain only valid symbols.',
+			),
 		check('method')
 			.customSanitizer((value) => value.toUpperCase())
 			.trim()
 			.isIn(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 			.withMessage('A valid HTTP method is required.'),
 	],
-	async (req, res) => {
+	async (req, res, next) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
 			return res.status(400).json({
 				status: 400,
-				error: 'Validation failed',
-				details: errors.array().map((err) => ({
-					field: err.param,
-					message: err.msg,
-				})),
+				statusText: 'Bad request',
+				data: null,
+				error: {
+					message: 'Validation failed',
+					details: errors.array().map((err) => ({
+						field: err.param,
+						message: err.msg,
+					})),
+				},
 			});
 		}
 
@@ -78,38 +90,46 @@ webserver.post(
 				method,
 				url,
 				headers,
-				data: body || {},
+				data: method === 'GET' ? undefined : body || {},
 				maxRedirects: 0,
 				validateStatus: (status) => status < 500,
 			});
 
-
-			res.status(response.status).json({
+			
+			res.status(200).json({
 				status: response.status,
+				statusText: response.statusText,
 				headers: response.headers,
-				data: response.data, 
+				data: response.data || null,
+				error: null,
 			});
 		} catch (error) {
+			let status = 500;
+			let statusText = 'Internal server error';
+			let errorData = null;
+
 			if (error.response) {
-				console.error('Error Response:', error.response.data);
-				
-				res.status(error.response.status).json({
-					status: error.response.status,
-					headers: error.response.headers,
-					data: error.response.data, 
-				});
+				status = error.response.status;
+				statusText = error.response.statusText || 'Request failed';
+				errorData = error.response.data;
 			} else if (error.request) {
-				res
-					.status(502)
-					.json({ error: 'Bad Gateway - Unable to reach the target server' });
+				status = 502;
+				statusText = 'Bad Gateway - Unable to reach the target server';
 			} else {
 				console.error('Error Message:', error.message);
-				res.status(500).json({ error: 'Internal server error' });
 			}
+
+			res.status(status).json({
+				status,
+				statusText,
+				data: null,
+				error: {
+					details: errorData,
+				},
+			});
 		}
 	},
 );
-
 
 webserver.get('/', (req, res) => {
 	res.render('request');

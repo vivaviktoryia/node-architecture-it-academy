@@ -6,7 +6,7 @@ body {
 }
 
 .container {
-	max-width: 600px;
+	max-width: 700px;
 	margin: 0 auto;
 	background-color: #fff;
 	padding: 20px;
@@ -41,8 +41,8 @@ button {
 	border-radius: 6px;
 }
 
-select#method-select {
-	width: 80px;
+select#selectedMethod {
+	width: 120px;
 }
 
 input.url-input {
@@ -128,13 +128,21 @@ select.header-dropdown {
 	margin-top: 10px;
 }
 .response-container {
+	display: none;
 	border: 1px solid #ccc;
 	padding: 16px;
 	margin-top: 20px;
 	background-color: #f9f9f9;
 	border-radius: 4px;
 	width: 100%;
+	max-width: 700px;
+	box-sizing: border-box;
 	overflow-wrap: break-word;
+	word-wrap: break-word;
+	overflow: auto;
+}
+.response-container span {
+	margin-left: 5px;
 }
 
 .tabs button.active {
@@ -166,7 +174,22 @@ td {
 th {
 	background-color: #f1f1f1;
 }
-pre#body {
+pre#responseBody {
 	white-space: pre-wrap;
 	word-wrap: break-word;
+}
+.status-green {
+	color: green;
+}
+
+.status-blue {
+	color: blue;
+}
+
+.status-red {
+	color: red;
+}
+
+.status-black {
+	color: black;
 }
