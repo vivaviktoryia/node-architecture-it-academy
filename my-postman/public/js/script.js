@@ -113,7 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				{ value: 'gzip', text: 'gzip' },
 				{ value: 'deflate', text: 'deflate' },
 				{ value: 'br', text: 'br' },
-				{ value: '*', text: 'all' },
+				{ value: 'gzip, deflate, br', text: 'gzip,deflate,br' },
+				{ value: '*', text: '*' },
 			],
 		};
 
@@ -174,8 +175,25 @@ document.addEventListener('DOMContentLoaded', () => {
 		responseHeadersTable.innerHTML = '';
 		responseBody.innerText = 'No Body';
 
-		const url = urlInput.value;
+		// URL
+		const baseUrl = urlInput.value;
+		const url = new URL(baseUrl);
+		Array.from(paramsContainer.children).forEach((paramDiv) => {
+			const key = paramDiv.querySelector(
+				'input[name="queryParams[key]"]',
+			).value;
+			const value = paramDiv.querySelector(
+				'input[name="queryParams[value]"]',
+			).value;
+			if (key && value) {
+				url.searchParams.append(key, value);
+			}
+		});
+
+		// METHOD
 		const method = selectedMethod.value;
+
+		// HEADERS
 		const headers = Array.from(document.querySelectorAll('.header-row')).reduce(
 			(acc, row) => {
 				const headerType = row.querySelector('select[name="headerType"]').value;

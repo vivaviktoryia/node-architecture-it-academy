@@ -56,7 +56,9 @@ webserver.post(
 			.isString()
 			.notEmpty()
 			.withMessage('A URL is required.')
-			.matches(/^(https?:\/\/)[\w\-._~:/?#[\]@!$&'()*+,;=%]+$/)
+			.matches(
+				/^(https?:\/\/)([a-zA-Z0-9.-]+|\d{1,3}(\.\d{1,3}){3})(:\d+)?(\/.*)?$/,
+			)
 			.withMessage(
 				'URL should start with http:// or https:// and contain only valid symbols.',
 			),
@@ -92,10 +94,10 @@ webserver.post(
 				headers,
 				data: method === 'GET' ? undefined : body || {},
 				maxRedirects: 0,
+				timeout: 1000,
 				validateStatus: (status) => status < 500,
 			});
 
-			
 			res.status(200).json({
 				status: response.status,
 				statusText: response.statusText,
@@ -124,6 +126,7 @@ webserver.post(
 				statusText,
 				data: null,
 				error: {
+					message: error.message,
 					details: errorData,
 				},
 			});
