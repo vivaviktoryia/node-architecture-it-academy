@@ -1,3 +1,15 @@
+const hidePopup = () => {
+	const el = document.querySelector('.popup');
+	if (el) el.parentElement.removeChild(el);
+};
+
+const displayPopup = (type, msg) => {
+	hidePopup();
+	const markup = `<div class="popup popup--${type}">${msg}</div>`;
+	document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
+	window.setTimeout(hidePopup, 5000);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
 	// REQUEST
 	const requestForm = document.getElementById('requestForm');
@@ -8,6 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	const paramsContainer = document.getElementById('params-container');
 	const addHeaderButton = document.getElementById('add-header');
 	const requestHeaders = document.getElementById('dynamic-headers-container');
+	const requestBodyContentType = document.getElementById(
+		'requestBodyContentType',
+	);
 	const requestBody = document.getElementById('requestBody');
 
 	// RESPONSE
@@ -208,15 +223,73 @@ document.addEventListener('DOMContentLoaded', () => {
 			{},
 		);
 
-		const body = document.querySelector('textarea[name="body"]').value;
+		// BODY
+		const requestBodyContentTypeValue = requestBodyContentType.value;
+		let body;
+
+		if (requestBodyContentTypeValue === 'application/json') {
+			const trimmedBody = requestBody.value.trim();
+			if (trimmedBody === '') {
+				body = {};
+			} else {
+				try {
+					body = JSON.parse(trimmedBody);
+				} catch (error) {
+					displayPopup('error', `Invalid JSON format: ${error}`);
+					console.error('Invalid JSON format:', error);
+					return;
+				}
+			}
+		} else if (
+			requestBodyContentTypeValue === 'application/x-www-form-urlencoded'
+		) {
+			const params = new URLSearchParams();
+			const requestBodyLines = requestBody.value.split('\n');
+			requestBodyLines.forEach((line) => {
+				const [key, value] = line.split('=');
+				if (key && value) {
+					params.append(key.trim(), value.trim());
+				}
+			});
+			body = params.toString();
+		} else if (
+			requestBodyContentTypeValue === 'text/plain' ||
+			requestBodyContentTypeValue === 'text/html'
+		) {
+			body = requestBody.value;
+		} else if (requestBodyContentTypeValue === 'application/xml') {
+			const trimmedBody = requestBody.value.trim();
+			if (trimmedBody === '') {
+				body = '';
+			} else {
+				try {
+					const parser = new DOMParser();
+					const xmlDoc = parser.parseFromString(trimmedBody, 'application/xml');
+					const parseError = xmlDoc.getElementsByTagName('parsererror');
+					if (parseError.length > 0) {
+						throw new Error('Invalid XML format');
+					}
+
+					body = trimmedBody;
+				} catch (error) {
+					displayPopup('error', `Invalid XML format: ${error}`);
+					console.error('Invalid XML format:', error);
+					return;
+				}
+			}
+		}
 
 		try {
 			const response = await fetch('/request', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ url, method, headers, body }),
+				body: JSON.stringify({
+					url: url.href,
+					method,
+					headers,
+					body,
+				}),
 			});
-			console.log(response);
 
 			const responseData = await response.json();
 			const status = responseData.status;
