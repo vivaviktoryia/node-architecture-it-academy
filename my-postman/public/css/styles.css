@@ -79,6 +79,12 @@ button[type='submit'] {
 button[type='submit']:hover {
 	background-color: #45a049;
 }
+.left-button {
+	justify-content: left;
+}
+button[type='button']:hover {
+	background-color: #ccc;
+}
 
 button#add-param,
 button#add-header {

@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		'requestBodyContentType',
 	);
 	const requestBody = document.getElementById('requestBody');
+	const clearFormButton = document.getElementById('clearForm');
 
 	// RESPONSE
 	const responseContainer = document.querySelector('.response-container');
@@ -162,6 +163,13 @@ document.addEventListener('DOMContentLoaded', () => {
 			});
 		});
 	}
+
+	clearFormButton.addEventListener('click', () => {
+		requestForm.reset();
+		paramsContainer.innerHTML = '';
+		requestHeaders.innerHTML = '';
+		displayPopup('success', 'Form cleared successfully!');
+	});
 
 	function showTabContent(tabName) {
 		if (tabName === 'Body') {
