@@ -83,7 +83,7 @@ button[type='submit']:hover {
 	justify-content: left;
 }
 button[type='button']:hover {
-	background-color: #ccc;
+	background-color: #5eb8643f;
 }
 
 button#add-param,
@@ -224,7 +224,7 @@ pre#responseBody {
 	display: block;
 }
 .popup--success {
-	background-color: #20bf6b;
+	background-color: #4caf50;
 }
 .popup--error {
 	background-color: #eb4d4b;

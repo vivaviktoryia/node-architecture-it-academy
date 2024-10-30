@@ -7,10 +7,18 @@ const path = require('path');
 dotenv.config({ path: `${__dirname}/config.env` });
 
 const {
+	saveRequest,
+	loadRequests,
+	removeRequest,
+} = require('./utils/requestStorage');
+
+const {
 	logLineSync,
 	logLineAsync,
 	loggerMiddleware,
 } = require('./utils/logger');
+
+const requestsFilePath = path.resolve('data', 'savedRequests.json');
 
 const logFileName = '_server.log';
 const logFilePath = path.resolve('logs', logFileName);
@@ -48,6 +56,160 @@ process.on('uncaughtException', (err) => {
 	process.exit(1);
 });
 
+webserver.get('/requests', async (req, res, next) => {
+	const savedRequests = await loadRequests(requestsFilePath);
+	res.status(200).json({
+		status: 'success',
+		data: savedRequests,
+	});
+});
+
+webserver.get('/requests/:requestId', async (req, res, next) => {
+	try {
+		const savedRequests = await loadRequests(requestsFilePath);
+		const requestId = req.params.requestId;
+		
+		const request = savedRequests.find((req) => req.id === requestId);
+
+		if (!request) {
+			return res.status(404).json({
+				status: 404,
+				statusText: 'Not Found',
+				data: null,
+				error: {
+					message: 'Request not found.',
+				},
+			});
+		}
+		
+		res.status(200).json({
+			status: 200,
+			statusText: 'OK',
+			data: request,
+			error: null,
+		});
+	} catch (error) {
+		console.error('Error retrieving request:', error);
+		res.status(500).json({
+			status: 500,
+			statusText: 'Internal Server Error',
+			data: null,
+			error: {
+				message: 'An error occurred while retrieving the request.',
+			},
+		});
+	}
+});
+
+// DELETE REQUEST BY ID
+webserver.delete('/requests/:requestId', async (req, res, next) => {
+    try {
+        const requestId = req.params.requestId;
+        const savedRequests = await loadRequests(requestsFilePath);
+        
+        const requestIndex = savedRequests.findIndex(req => req.id === requestId);
+        
+        if (requestIndex === -1) {
+            return res.status(404).json({
+                status: 404,
+                statusText: 'Not Found',
+                data: null,
+                error: {
+                    message: 'Request not found.',
+                },
+            });
+        }
+                 
+        await removeRequest(requestIndex, requestsFilePath); 
+
+        res.status(204).send(); 
+    } catch (error) {
+        console.error('Error deleting request:', error);
+        res.status(500).json({
+            status: 500,
+            statusText: 'Internal Server Error',
+            data: null,
+            error: {
+                message: 'An error occurred while deleting the request.',
+            },
+        });
+    }
+});
+
+
+// CREATE / SAVE REQUEST
+webserver.post(
+	'/requests',
+	[
+		check('url')
+			.trim()
+			.isString()
+			.notEmpty()
+			.withMessage('A URL is required.')
+			.matches(
+				/^(https?:\/\/)([a-zA-Z0-9.-]+|\d{1,3}(\.\d{1,3}){3})(:\d+)?(\/.*)?$/,
+			)
+			.withMessage(
+				'URL should start with http:// or https:// and contain only valid symbols.',
+			),
+		check('method')
+			.customSanitizer((value) => value.toUpperCase())
+			.trim()
+			.isIn(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
+			.withMessage('A valid HTTP method is required.'),
+	],
+	async (req, res, next) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).json({
+				status: 400,
+				statusText: 'Bad request',
+				data: null,
+				error: {
+					message: 'Validation failed',
+					details: errors.array().map((err) => ({
+						field: err.param,
+						message: err.msg,
+					})),
+				},
+			});
+		}
+		
+		const { url, method, headers = {}, body } = req.body;
+
+		try {
+			  const newRequest = {
+					id: new Date().getTime().toString(),
+					url,
+					method,
+					headers,
+					body,
+				};
+
+
+			await saveRequest(newRequest, requestsFilePath);
+
+			res.status(201).json({
+				status: 201,
+				statusText: 'Created',
+				data: newRequest,
+				error: null,
+			});
+		} catch (error) {
+			console.error('Error saving request:', error);
+			res.status(500).json({
+				status: 500,
+				statusText: 'Internal Server Error',
+				data: null,
+				error: {
+					message: 'An error occurred while saving the request🤯',
+				},
+			});
+		}
+	},
+);
+
+// SEND REQUEST
 webserver.post(
 	'/request',
 	[
@@ -134,8 +296,9 @@ webserver.post(
 	},
 );
 
-webserver.get('/', (req, res) => {
-	res.render('request');
+webserver.get('/', async (req, res, next) => {
+	const savedRequests = await loadRequests(requestsFilePath);
+	res.render('request', { savedRequests });
 });
 
 // 404 error
