@@ -5,11 +5,12 @@ block content
         form(action="/request" method="post" id="requestForm")
             div.form-row
                 div.input-group
-                    select(name="method" id="method-select" required)
+                    select(name="method" id="selectedMethod" required)
                         option(value="GET") GET
                         option(value="POST") POST
                         option(value="PUT") PUT
                         option(value="DELETE") DELETE
+                        option(value="OPTIONS") OPTIONS
                     input(type="text" name="url" class="url-input" placeholder="Enter URL" required)
 
             div.form-row
@@ -27,28 +28,32 @@ block content
 
             div.form-row
                 label(for="contentType") Body Content-Type:
-                select(name="contentType" id="contentType")
+                select(name="contentType" id="requestBodyContentType")
                     option(value="application/json") JSON
+                    option(value="application/xml") XML
                     option(value="application/x-www-form-urlencoded") URL-encoded
                     option(value="text/plain") Text
                     option(value="text/html") HTML
 
             div.form-row
                 label(for="body") Body:
-                textarea(name="body" placeholder="Request body")
+                textarea(name="body" class="request-body" id="requestBody" placeholder="Request body")
 
             div.form-row.center-button
                 button(type="submit") Send Request
-      
-        
+            div.form-row.left-button
+                button(type="button" id="saveRequest") Save Request
+                button(type="button" id="clearForm") Clear Form
 
+            
             h1 Response
             div.message#responseMessage Click <strong>Send Request</strong> to get a response😉
 
-        div.response-container(style='display: none;')
+        div.response-container
 
             p <strong> Status: </strong>
-                span#status No Status
+                span#status No Status 
+                span#statusText 
 
             div.tabs
                 button.tablink#tabBody(type="button" class="active") Body
@@ -62,9 +67,9 @@ block content
                             tr
                                 th Header
                                 th Value
-                        tbody#headers
+                        tbody#responseHeaders
                 div#bodyTab(class="tab-content-item")
                     h3 Body
-                    pre#body No Body
+                    pre#responseBody No Body
         
         
