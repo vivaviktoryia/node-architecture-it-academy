@@ -1,58 +1,28 @@
 [
   {
-    "id": "1730291715869",
+    "id": "1730302752128",
+    "url": "https://jsonplaceholder.typicode.com/posts?userId=1&id=10",
+    "method": "GET",
+    "headers": {},
+    "body": {}
+  },
+  {
+    "id": "1730302795328",
     "url": "https://jsonplaceholder.typicode.com/posts",
     "method": "POST",
-    "headers": {
-      "Content-Type": "application/json",
-      "Accept": "application/json"
-    },
+    "headers": {},
     "body": {
-      "title": "foo",
-      "body": "bar",
-      "userId": 1
+      "id": "test",
+      "userId": 101
     }
   },
   {
-    "id": "1730291900825",
-    "url": "https://www.w3schools.com/xml/note.xml",
-    "method": "GET",
-    "headers": {},
-    "body": ""
-  },
-  {
-    "id": "1730291924882",
-    "url": "https://jsonplaceholder.typicode.com/aaaaaaaaaaaaa?userId=1&id=10",
-    "method": "GET",
-    "headers": {
-      "content-type": "application/json; charset=utf-8"
-    },
-    "body": ""
-  },
-  {
-    "id": "1730291951438",
-    "url": "http://nodearch.e-learning.by:4052/main1.html",
-    "method": "GET",
-    "headers": {
-      "content-type": "application/json; charset=utf-8"
-    },
-    "body": ""
-  },
-  {
-    "id": "1730296379110",
-    "url": "http://nodearch.e-learning.by:4052/main1.html",
-    "method": "GET",
-    "headers": {
-      "content-type": "application/json; charset=utf-8"
-    },
-    "body": ""
-  },
-  {
-    "id": "1730297565851",
+    "id": "1730302828182",
     "url": "https://jsonplaceholder.typicode.com/posts",
     "method": "POST",
     "headers": {
-      "Content-Type": "application/json"
+      "accept": "application/json",
+      "content-type": "application/json"
     },
     "body": {
       "id": "test",
@@ -60,12 +30,16 @@
     }
   },
   {
-    "id": "1730299804696",
-    "url": "http://nodearch.e-learning.by:4052/main1.html",
-    "method": "GET",
+    "id": "1730302849611",
+    "url": "https://jsonplaceholder.typicode.com/posts?userId=1",
+    "method": "POST",
     "headers": {
-      "content-type": "application/json; charset=utf-8"
+      "accept": "application/json",
+      "content-type": "application/json"
     },
-    "body": ""
+    "body": {
+      "id": "test",
+      "userId": 101
+    }
   }
 ]

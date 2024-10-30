@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	);
 	const requestBody = document.getElementById('requestBody');
 	const clearFormButton = document.getElementById('clearForm');
+	const saveRequestButton = document.getElementById('saveRequest');
 
 	// RESPONSE
 	const responseContainer = document.querySelector('.response-container');
@@ -41,6 +42,106 @@ document.addEventListener('DOMContentLoaded', () => {
 	const responseBody = document.getElementById('responseBody');
 
 	const selectedHeaders = new Set();
+
+	function collectValidatedRequestData() {
+		// URL
+		const baseUrl = urlInput.value.trim();
+		if (!baseUrl) {
+			displayPopup('error', 'URL cannot be empty.');
+			return null;
+		}
+		const url = new URL(baseUrl);
+		Array.from(paramsContainer.children).forEach((paramDiv) => {
+			const key = paramDiv.querySelector(
+				'input[name="queryParams[key]"]',
+			).value;
+			const value = paramDiv.querySelector(
+				'input[name="queryParams[value]"]',
+			).value;
+			if (key && value) {
+				url.searchParams.append(key, value);
+			}
+		});
+
+		// METHOD
+		const method = selectedMethod.value;
+
+		// HEADERS
+		const headers = Array.from(document.querySelectorAll('.header-row')).reduce(
+			(acc, row) => {
+				const headerType = row.querySelector('select[name="headerType"]').value;
+				const headerValue = row.querySelector(
+					'select[name="headerValue"]',
+				).value;
+				if (headerType && headerValue) {
+					acc[headerType] = headerValue;
+				}
+				return acc;
+			},
+			{},
+		);
+
+		// BODY
+		const requestBodyContentTypeValue = requestBodyContentType.value;
+		let body;
+		if (requestBodyContentTypeValue === 'application/json') {
+			const trimmedBody = requestBody.value.trim();
+			if (trimmedBody === '') {
+				body = {};
+			} else {
+				try {
+					body = JSON.parse(trimmedBody);
+				} catch (error) {
+					displayPopup('error', `Invalid JSON format: ${error}`);
+					console.error('Invalid JSON format:', error);
+					return;
+				}
+			}
+		} else if (
+			requestBodyContentTypeValue === 'application/x-www-form-urlencoded'
+		) {
+			const params = new URLSearchParams();
+			const requestBodyLines = requestBody.value.split('\n');
+			requestBodyLines.forEach((line) => {
+				const [key, value] = line.split('=');
+				if (key && value) {
+					params.append(key.trim(), value.trim());
+				}
+			});
+			body = params.toString();
+		} else if (
+			requestBodyContentTypeValue === 'text/plain' ||
+			requestBodyContentTypeValue === 'text/html'
+		) {
+			body = requestBody.value;
+		} else if (requestBodyContentTypeValue === 'application/xml') {
+			const trimmedBody = requestBody.value.trim();
+			if (trimmedBody === '') {
+				body = '';
+			} else {
+				try {
+					const parser = new DOMParser();
+					const xmlDoc = parser.parseFromString(trimmedBody, 'application/xml');
+					const parseError = xmlDoc.getElementsByTagName('parsererror');
+					if (parseError.length > 0) {
+						throw new Error('Invalid XML format');
+					}
+
+					body = trimmedBody;
+				} catch (error) {
+					displayPopup('error', `Invalid XML format: ${error}`);
+					console.error('Invalid XML format:', error);
+					return;
+				}
+			}
+		}
+		return {
+			url: url.href,
+			method,
+			headers,
+			body,
+		};
+	}
 
 	addParamButton.addEventListener('click', () => {
 		const paramDiv = document.createElement('div');
@@ -168,6 +269,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		requestForm.reset();
 		paramsContainer.innerHTML = '';
 		requestHeaders.innerHTML = '';
+		responseContainer.style.display = 'none';
+		responseMessage.style.display = 'block';
+		responseHeadersTable.innerHTML = '';
+		responseBody.innerText = 'No Body';
+		statusElement.innerText = 'No Status';
+		statusTextElement.innerText = '';
 		displayPopup('success', 'Form cleared successfully!');
 	});
 
@@ -198,105 +305,16 @@ document.addEventListener('DOMContentLoaded', () => {
 		responseHeadersTable.innerHTML = '';
 		responseBody.innerText = 'No Body';
 
-		// URL
-		const baseUrl = urlInput.value;
-		const url = new URL(baseUrl);
-		Array.from(paramsContainer.children).forEach((paramDiv) => {
-			const key = paramDiv.querySelector(
-				'input[name="queryParams[key]"]',
-			).value;
-			const value = paramDiv.querySelector(
-				'input[name="queryParams[value]"]',
-			).value;
-			if (key && value) {
-				url.searchParams.append(key, value);
-			}
-		});
-
-		// METHOD
-		const method = selectedMethod.value;
-
-		// HEADERS
-		const headers = Array.from(document.querySelectorAll('.header-row')).reduce(
-			(acc, row) => {
-				const headerType = row.querySelector('select[name="headerType"]').value;
-				const headerValue = row.querySelector(
-					'select[name="headerValue"]',
-				).value;
-				if (headerType && headerValue) {
-					acc[headerType] = headerValue;
-				}
-				return acc;
-			},
-			{},
-		);
-
-		// BODY
-		const requestBodyContentTypeValue = requestBodyContentType.value;
-		let body;
-
-		if (requestBodyContentTypeValue === 'application/json') {
-			const trimmedBody = requestBody.value.trim();
-			if (trimmedBody === '') {
-				body = {};
-			} else {
-				try {
-					body = JSON.parse(trimmedBody);
-				} catch (error) {
-					displayPopup('error', `Invalid JSON format: ${error}`);
-					console.error('Invalid JSON format:', error);
-					return;
-				}
-			}
-		} else if (
-			requestBodyContentTypeValue === 'application/x-www-form-urlencoded'
-		) {
-			const params = new URLSearchParams();
-			const requestBodyLines = requestBody.value.split('\n');
-			requestBodyLines.forEach((line) => {
-				const [key, value] = line.split('=');
-				if (key && value) {
-					params.append(key.trim(), value.trim());
-				}
-			});
-			body = params.toString();
-		} else if (
-			requestBodyContentTypeValue === 'text/plain' ||
-			requestBodyContentTypeValue === 'text/html'
-		) {
-			body = requestBody.value;
-		} else if (requestBodyContentTypeValue === 'application/xml') {
-			const trimmedBody = requestBody.value.trim();
-			if (trimmedBody === '') {
-				body = '';
-			} else {
-				try {
-					const parser = new DOMParser();
-					const xmlDoc = parser.parseFromString(trimmedBody, 'application/xml');
-					const parseError = xmlDoc.getElementsByTagName('parsererror');
-					if (parseError.length > 0) {
-						throw new Error('Invalid XML format');
-					}
-
-					body = trimmedBody;
-				} catch (error) {
-					displayPopup('error', `Invalid XML format: ${error}`);
-					console.error('Invalid XML format:', error);
-					return;
-				}
-			}
+		const requestData = collectValidatedRequestData();
+		if (!requestData) {
+			displayPopup('error', `Smth went wrong!🤯 ${error}`);
+			return;
 		}
-
 		try {
 			const response = await fetch('/api/v1/request/review', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					url: url.href,
-					method,
-					headers,
-					body,
-				}),
+				body: JSON.stringify(requestData),
 			});
 
 			const responseData = await response.json();
@@ -343,6 +361,39 @@ document.addEventListener('DOMContentLoaded', () => {
 			responseBody.innerText = `Error occurred: ${error.message}`;
 			responseContainer.style.display = 'block';
 			responseMessage.style.display = 'none';
+		}
+	});
+
+	saveRequestButton.addEventListener('click', async () => {
+		const requestData = collectValidatedRequestData();
+		console.log(requestData);
+		if (!requestData) {
+			displayPopup('error', 'Smth went wrong during saving!!!!!!🤯');
+			return;
+		}
+
+		try {
+			const response = await fetch('/api/v1/requests', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(requestData),
+			});
+
+			if (response.ok) {
+				displayPopup('success', 'Request saved successfully!');
+			} else {
+				const errorResponse = await response.json();
+				displayPopup(
+					'error',
+					`Failed to save request: ${errorResponse.message}`,
+				);
+			}
+		} catch (error) {
+			console.error('Error saving request:', error);
+			displayPopup(
+				'error',
+				`Error occurred while saving request: ${error.message}`,
+			);
 		}
 	});
 });
