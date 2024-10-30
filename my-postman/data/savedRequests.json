@@ -37,5 +37,35 @@
       "content-type": "application/json; charset=utf-8"
     },
     "body": ""
+  },
+  {
+    "id": "1730296379110",
+    "url": "http://nodearch.e-learning.by:4052/main1.html",
+    "method": "GET",
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": ""
+  },
+  {
+    "id": "1730297565851",
+    "url": "https://jsonplaceholder.typicode.com/posts",
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "id": "test",
+      "userId": 101
+    }
+  },
+  {
+    "id": "1730299804696",
+    "url": "http://nodearch.e-learning.by:4052/main1.html",
+    "method": "GET",
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": ""
   }
 ]

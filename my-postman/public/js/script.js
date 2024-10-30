@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		try {
-			const response = await fetch('/request', {
+			const response = await fetch('/api/v1/request/review', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
