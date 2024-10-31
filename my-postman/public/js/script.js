@@ -1,14 +1,4 @@
-const hidePopup = () => {
-	const el = document.querySelector('.popup');
-	if (el) el.parentElement.removeChild(el);
-};
-
-const displayPopup = (type, msg) => {
-	hidePopup();
-	const markup = `<div class="popup popup--${type}">${msg}</div>`;
-	document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
-	window.setTimeout(hidePopup, 5000);
-};
+import { displayPopup } from './popup.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 	// REQUEST
@@ -41,17 +31,21 @@ document.addEventListener('DOMContentLoaded', () => {
 	const responseHeadersTable = document.getElementById('responseHeaders');
 	const responseBody = document.getElementById('responseBody');
 
+	//SAVED REQUESTS
+	const savedRequestsList = document.getElementById('savedRequestsList');
+	const refreshRequestsButton = document.getElementById('refreshRequests');
+	
 	const selectedHeaders = new Set();
 
-	function collectValidatedRequestData() {
-		// URL
-		const baseUrl = urlInput.value.trim();
+	const collectUrl = (urlInputEl, paramsContainerEl) => {
+		const baseUrl = urlInputEl.value.trim();
 		if (!baseUrl) {
 			displayPopup('error', 'URL cannot be empty.');
 			return null;
 		}
+
 		const url = new URL(baseUrl);
-		Array.from(paramsContainer.children).forEach((paramDiv) => {
+		Array.from(paramsContainerEl.children).forEach((paramDiv) => {
 			const key = paramDiv.querySelector(
 				'input[name="queryParams[key]"]',
 			).value;
@@ -62,12 +56,15 @@ document.addEventListener('DOMContentLoaded', () => {
 				url.searchParams.append(key, value);
 			}
 		});
+		return url.href;
+	};
 
-		// METHOD
-		const method = selectedMethod.value;
+	const collectMethod = (selectedMethodEl) => {
+		return selectedMethodEl.value;
+	};
 
-		// HEADERS
-		const headers = Array.from(document.querySelectorAll('.header-row')).reduce(
+	const collectHeaders = () => {
+		return Array.from(document.querySelectorAll('.header-row')).reduce(
 			(acc, row) => {
 				const headerType = row.querySelector('select[name="headerType"]').value;
 				const headerValue = row.querySelector(
@@ -80,66 +77,69 @@ document.addEventListener('DOMContentLoaded', () => {
 			},
 			{},
 		);
+	};
 
-		// BODY
-		const requestBodyContentTypeValue = requestBodyContentType.value;
-		let body;
+	const collectBody = (contentTypeEl, requestBodyEl) => {
+		const requestBodyContentTypeValue = contentTypeEl.value;
+		const trimmedBody = requestBodyEl.value.trim();
+
 		if (requestBodyContentTypeValue === 'application/json') {
-			const trimmedBody = requestBody.value.trim();
-			if (trimmedBody === '') {
-				body = {};
-			} else {
-				try {
-					body = JSON.parse(trimmedBody);
-				} catch (error) {
-					displayPopup('error', `Invalid JSON format: ${error}`);
-					console.error('Invalid JSON format:', error);
-					return;
-				}
+			if (trimmedBody === '') return {};
+			try {
+				return JSON.parse(trimmedBody);
+			} catch (error) {
+				displayPopup('error', `Invalid JSON format: ${error}`);
+				console.error('Invalid JSON format:', error);
+				return;
 			}
-		} else if (
-			requestBodyContentTypeValue === 'application/x-www-form-urlencoded'
-		) {
+		}
+
+		if (requestBodyContentTypeValue === 'application/x-www-form-urlencoded') {
 			const params = new URLSearchParams();
-			const requestBodyLines = requestBody.value.split('\n');
+			const requestBodyLines = trimmedBody.split('\n');
 			requestBodyLines.forEach((line) => {
 				const [key, value] = line.split('=');
-				if (key && value) {
-					params.append(key.trim(), value.trim());
-				}
+				if (key && value) params.append(key.trim(), value.trim());
 			});
-			body = params.toString();
-		} else if (
+			return params.toString();
+		}
+
+		if (
 			requestBodyContentTypeValue === 'text/plain' ||
 			requestBodyContentTypeValue === 'text/html'
 		) {
-			body = requestBody.value;
-		} else if (requestBodyContentTypeValue === 'application/xml') {
-			const trimmedBody = requestBody.value.trim();
-			if (trimmedBody === '') {
-				body = '';
-			} else {
-				try {
-					const parser = new DOMParser();
-					const xmlDoc = parser.parseFromString(trimmedBody, 'application/xml');
-					const parseError = xmlDoc.getElementsByTagName('parsererror');
-					if (parseError.length > 0) {
-						throw new Error('Invalid XML format');
-					}
+			return requestBodyEl.value;
+		}
 
-					body = trimmedBody;
-				} catch (error) {
-					displayPopup('error', `Invalid XML format: ${error}`);
-					console.error('Invalid XML format:', error);
-					return;
+		if (requestBodyContentTypeValue === 'application/xml') {
+			if (trimmedBody === '') return '';
+			try {
+				const parser = new DOMParser();
+				const xmlDoc = parser.parseFromString(trimmedBody, 'application/xml');
+				if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
+					throw new Error('Invalid XML format');
 				}
+				return trimmedBody;
+			} catch (error) {
+				displayPopup('error', `Invalid XML format: ${error}`);
+				console.error('Invalid XML format:', error);
+				return;
 			}
 		}
+	};
+
+	function collectValidatedRequestData(
+		urlInputEl,
+		paramsContainerEl,
+		selectedMethodEl,
+		requestBodyContentTypeEl,
+		requestBodyEl,
+	) {
 		return {
-			url: url.href,
-			method,
-			headers,
-			body,
+			url: collectUrl(urlInputEl, paramsContainerEl),
+			method: collectMethod(selectedMethodEl),
+			headers: collectHeaders(),
+			body: collectBody(requestBodyContentTypeEl, requestBodyEl),
 		};
 	}
 
@@ -305,7 +305,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		responseHeadersTable.innerHTML = '';
 		responseBody.innerText = 'No Body';
 
-		const requestData = collectValidatedRequestData();
+		const requestData = collectValidatedRequestData(
+			urlInput,
+			paramsContainer,
+			selectedMethod,
+			requestBodyContentType,
+			requestBody,
+		);
 		if (!requestData) {
 			displayPopup('error', `Smth went wrong!🤯 ${error}`);
 			return;
@@ -365,8 +371,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	saveRequestButton.addEventListener('click', async () => {
-		const requestData = collectValidatedRequestData();
-		console.log(requestData);
+		const requestData = collectValidatedRequestData(
+			urlInput,
+			paramsContainer,
+			selectedMethod,
+			requestBodyContentType,
+			requestBody,
+		);
 		if (!requestData) {
 			displayPopup('error', 'Smth went wrong during saving!!!!!!🤯');
 			return;
