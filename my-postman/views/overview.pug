@@ -2,52 +2,61 @@ extends base
 
 block content
     div.container
-        form(action="/request" method="post" id="requestForm")
-            div.form-row
-                div.input-group
-                    select(name="method" id="selectedMethod" required)
-                        option(value="GET") GET
-                        option(value="POST") POST
-                        option(value="PUT") PUT
-                        option(value="DELETE") DELETE
-                        option(value="OPTIONS") OPTIONS
-                    input(type="text" name="url" class="url-input" placeholder="Enter URL" required)
+        div.main-content
+            div.saved-requests
+                div#savedRequestsList
+                    button(type="button") Loading saved requests...
 
-            div.form-row
-                label Query Parameters
-                button(type="button" id="add-param" class="add-circle") 
-                    span.circle +                 
-                div#params-container
+                div.center-button
+                    button(type="button" id="refreshRequests") Refresh Requests        
 
-            div.form-row
-                label Headers
-                button(type="button" id="add-header" class="add-circle") 
-                    span.circle + 
-                div#dynamic-headers-container
+            div.request-form        
+                form(action="/request" method="post" id="requestForm")
+                    div.form-row
+                        div.input-group
+                            select(name="method" id="selectedMethod" required)
+                                option(value="GET") GET
+                                option(value="POST") POST
+                                option(value="PUT") PUT
+                                option(value="DELETE") DELETE
+                                option(value="OPTIONS") OPTIONS
+                            input(type="text" name="url" class="url-input" placeholder="Enter URL" required)
+
+                    div.form-row
+                        label Query Parameters
+                        button(type="button" id="add-param" class="add-circle") 
+                            span.circle +                 
+                        div#params-container
+
+                    div.form-row
+                        label Headers
+                        button(type="button" id="add-header" class="add-circle") 
+                            span.circle + 
+                        div#dynamic-headers-container
 
 
-            div.form-row
-                label(for="contentType") Body Content-Type:
-                select(name="contentType" id="requestBodyContentType")
-                    option(value="application/json") JSON
-                    option(value="application/xml") XML
-                    option(value="application/x-www-form-urlencoded") URL-encoded
-                    option(value="text/plain") Text
-                    option(value="text/html") HTML
+                    div.form-row
+                        label(for="contentType") Body Content-Type:
+                        select(name="contentType" id="requestBodyContentType")
+                            option(value="application/json") JSON
+                            option(value="application/xml") XML
+                            option(value="application/x-www-form-urlencoded") URL-encoded
+                            option(value="text/plain") Text
+                            option(value="text/html") HTML
 
-            div.form-row
-                label(for="body") Body:
-                textarea(name="body" class="request-body" id="requestBody" placeholder="Request body")
+                    div.form-row
+                        label(for="body") Body:
+                        textarea(name="body" class="request-body" id="requestBody" placeholder="Request body")
 
-            div.form-row.center-button
-                button(type="submit") Send Request
-            div.form-row.left-button
-                button(type="button" id="saveRequest") Save Request
-                button(type="button" id="clearForm") Clear Form
+                    div.form-row.center-button
+                        button(type="submit") Send Request
+                    div.form-row.left-button
+                        button(type="button" id="saveRequest") Save Request
+                        button(type="button" id="clearForm") Clear Form
 
-            
-            h1 Response
-            div.message#responseMessage Click <strong>Send Request</strong> to get a response😉
+
+                h1 Response
+                div.message#responseMessage Click <strong>Send Request</strong> to get a response😉
 
         div.response-container
 
@@ -58,7 +67,7 @@ block content
             div.tabs
                 button.tablink#tabBody(type="button" class="active") Body
                 button.tablink#tabHeader(type="button") Headers
-            
+
             div.tab-content
                 div#headersTab(class="tab-content-item" style="display: none;")
                     h3 Headers
@@ -71,5 +80,3 @@ block content
                 div#bodyTab(class="tab-content-item")
                     h3 Body
                     pre#responseBody No Body
-        
-        
