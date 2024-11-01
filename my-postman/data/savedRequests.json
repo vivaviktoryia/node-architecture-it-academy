@@ -1,16 +1,7 @@
 [
   {
-    "id": "1730447379862",
-    "url": "https://jsonplaceholder.typicode.com/posts?id=1",
-    "method": "GET",
-    "headers": {
-      "accept": "application/json"
-    },
-    "body": {}
-  },
-  {
-    "id": "1730447423942",
-    "url": "https://httpbin.org/post",
+    "id": "1730479980072",
+    "url": "https://jsonplaceholder.typicode.com/posts",
     "method": "POST",
     "headers": {
       "content-type": "application/json"
@@ -21,75 +12,24 @@
     }
   },
   {
-    "id": "1730447448866",
-    "url": "https://httpbin.org/post",
-    "method": "POST",
-    "headers": {
-      "content-type": "application/json"
-    },
-    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<qwerty>\n    <body>test</body>\n    <userId>101</userId>\n</qwerty>"
-  },
-  {
-    "id": "1730447770547",
-    "url": "https://jsonplaceholder.typicode.com/posts?userId=1&id=10&id=1",
+    "id": "1730480023809",
+    "url": "https://httpstat.us/500",
     "method": "GET",
     "headers": {},
     "body": {}
   },
   {
-    "id": "1730450566652",
-    "url": "https://httpbin.org/post",
-    "method": "POST",
-    "headers": {},
-    "body": "texst"
-  },
-  {
-    "id": "1730451840444",
-    "url": "https://jsonplaceholder.typicode.com/posts?userId=1&id=10&id=1",
+    "id": "1730480038691",
+    "url": "http://nodearch.e-learning.by:4052/main1.html",
     "method": "GET",
     "headers": {},
     "body": {}
   },
   {
-    "id": "1730452905096",
-    "url": "https://httpbin.org/post",
-    "method": "POST",
-    "headers": {
-      "accept": "application/xml",
-      "content-type": "application/xml",
-      "accept-encoding": "gzip, deflate, br"
-    },
-    "body": {}
-  },
-  {
-    "id": "1730453359689",
-    "url": "https://httpbin.org/post?userId=g",
-    "method": "GET",
-    "headers": {
-      "accept": "application/xml",
-      "content-type": "application/x-www-form-urlencoded"
-    },
-    "body": {}
-  },
-  {
-    "id": "1730453907495",
+    "id": "1730480124052",
     "url": "https://jsonplaceholder.typicode.com/posts?userId=1&id=10",
     "method": "GET",
     "headers": {},
     "body": {}
-  },
-  {
-    "id": "1730454015085",
-    "url": "https://jsonplaceholder.typicode.com/posts?userId=1&id=10",
-    "method": "GET",
-    "headers": {},
-    "body": {}
-  },
-  {
-    "id": "1730455062488",
-    "url": "https://jsonplaceholder.typicode.com/posts",
-    "method": "POST",
-    "headers": {},
-    "body": "ydty"
   }
 ]
