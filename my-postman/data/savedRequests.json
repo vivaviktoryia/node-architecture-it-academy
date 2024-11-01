@@ -1,29 +1,95 @@
 [
   {
-    "id": "1730364265577",
-    "url": "https://www.w3schools.com/xml/note.xml?userId=1",
+    "id": "1730447379862",
+    "url": "https://jsonplaceholder.typicode.com/posts?id=1",
     "method": "GET",
     "headers": {
-      "accept": "application/xml"
+      "accept": "application/json"
     },
-    "body": ""
+    "body": {}
   },
   {
-    "id": "1730364317931",
+    "id": "1730447423942",
     "url": "https://httpbin.org/post",
     "method": "POST",
     "headers": {
-      "accept-encoding": "gzip, deflate, br"
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "test",
+      "userId": 101
+    }
+  },
+  {
+    "id": "1730447448866",
+    "url": "https://httpbin.org/post",
+    "method": "POST",
+    "headers": {
+      "content-type": "application/json"
     },
     "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<qwerty>\n    <body>test</body>\n    <userId>101</userId>\n</qwerty>"
   },
   {
-    "id": "1730364669931",
-    "url": "https://jsonplaceholder.typicode.com/posts?userId=1",
+    "id": "1730447770547",
+    "url": "https://jsonplaceholder.typicode.com/posts?userId=1&id=10&id=1",
+    "method": "GET",
+    "headers": {},
+    "body": {}
+  },
+  {
+    "id": "1730450566652",
+    "url": "https://httpbin.org/post",
+    "method": "POST",
+    "headers": {},
+    "body": "texst"
+  },
+  {
+    "id": "1730451840444",
+    "url": "https://jsonplaceholder.typicode.com/posts?userId=1&id=10&id=1",
+    "method": "GET",
+    "headers": {},
+    "body": {}
+  },
+  {
+    "id": "1730452905096",
+    "url": "https://httpbin.org/post",
     "method": "POST",
     "headers": {
-      "accept": "text/html"
+      "accept": "application/xml",
+      "content-type": "application/xml",
+      "accept-encoding": "gzip, deflate, br"
     },
-    "body": "test"
+    "body": {}
+  },
+  {
+    "id": "1730453359689",
+    "url": "https://httpbin.org/post?userId=g",
+    "method": "GET",
+    "headers": {
+      "accept": "application/xml",
+      "content-type": "application/x-www-form-urlencoded"
+    },
+    "body": {}
+  },
+  {
+    "id": "1730453907495",
+    "url": "https://jsonplaceholder.typicode.com/posts?userId=1&id=10",
+    "method": "GET",
+    "headers": {},
+    "body": {}
+  },
+  {
+    "id": "1730454015085",
+    "url": "https://jsonplaceholder.typicode.com/posts?userId=1&id=10",
+    "method": "GET",
+    "headers": {},
+    "body": {}
+  },
+  {
+    "id": "1730455062488",
+    "url": "https://jsonplaceholder.typicode.com/posts",
+    "method": "POST",
+    "headers": {},
+    "body": "ydty"
   }
 ]

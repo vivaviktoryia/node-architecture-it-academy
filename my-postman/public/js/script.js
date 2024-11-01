@@ -1,4 +1,16 @@
-import { displayPopup } from './popup.js';
+import { addQueryParam } from './components/queryParams.js';
+import { addHeader } from './components/reqHeaders.js';
+import {
+	saveRequest,
+	clearForm,
+	clearResponse,
+	sendRequest,
+	handleError,
+	renderResponse,
+} from './utils/formUtils.js';
+
+import { showTabContent } from './components/resTabManager.js';
+import { displayPopup } from './utils/popup.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 	// REQUEST
@@ -19,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// RESPONSE
 	const responseContainer = document.querySelector('.response-container');
-	const responseMessage = document.getElementById('responseMessage');
+	const responseMessage = document.querySelector('.responseMessage');
 	const statusElement = document.getElementById('status');
 	const statusTextElement = document.getElementById('statusText');
 
@@ -34,377 +46,99 @@ document.addEventListener('DOMContentLoaded', () => {
 	//SAVED REQUESTS
 	const savedRequestsList = document.getElementById('savedRequestsList');
 	const refreshRequestsButton = document.getElementById('refreshRequests');
-	
-	const selectedHeaders = new Set();
 
-	const collectUrl = (urlInputEl, paramsContainerEl) => {
-		const baseUrl = urlInputEl.value.trim();
-		if (!baseUrl) {
-			displayPopup('error', 'URL cannot be empty.');
-			return null;
-		}
+	////////////////////////////
+	addParamButton.addEventListener('click', () =>
+		addQueryParam(paramsContainer),
+	);
 
-		const url = new URL(baseUrl);
-		Array.from(paramsContainerEl.children).forEach((paramDiv) => {
-			const key = paramDiv.querySelector(
-				'input[name="queryParams[key]"]',
-			).value;
-			const value = paramDiv.querySelector(
-				'input[name="queryParams[value]"]',
-			).value;
-			if (key && value) {
-				url.searchParams.append(key, value);
-			}
-		});
-		return url.href;
-	};
+	addHeaderButton.addEventListener('click', () => addHeader(requestHeaders));
 
-	const collectMethod = (selectedMethodEl) => {
-		return selectedMethodEl.value;
-	};
-
-	const collectHeaders = () => {
-		return Array.from(document.querySelectorAll('.header-row')).reduce(
-			(acc, row) => {
-				const headerType = row.querySelector('select[name="headerType"]').value;
-				const headerValue = row.querySelector(
-					'select[name="headerValue"]',
-				).value;
-				if (headerType && headerValue) {
-					acc[headerType] = headerValue;
-				}
-				return acc;
-			},
-			{},
+	// SAVE REQUEST
+	saveRequestButton.addEventListener('click', async () => {
+		await saveRequest(
+			urlInput,
+			paramsContainer,
+			selectedMethod,
+			requestBodyContentType,
+			requestBody,
 		);
-	};
-
-	const collectBody = (contentTypeEl, requestBodyEl) => {
-		const requestBodyContentTypeValue = contentTypeEl.value;
-		const trimmedBody = requestBodyEl.value.trim();
-
-		if (requestBodyContentTypeValue === 'application/json') {
-			if (trimmedBody === '') return {};
-			try {
-				return JSON.parse(trimmedBody);
-			} catch (error) {
-				displayPopup('error', `Invalid JSON format: ${error}`);
-				console.error('Invalid JSON format:', error);
-				return;
-			}
-		}
-
-		if (requestBodyContentTypeValue === 'application/x-www-form-urlencoded') {
-			const params = new URLSearchParams();
-			const requestBodyLines = trimmedBody.split('\n');
-			requestBodyLines.forEach((line) => {
-				const [key, value] = line.split('=');
-				if (key && value) params.append(key.trim(), value.trim());
-			});
-			return params.toString();
-		}
-
-		if (
-			requestBodyContentTypeValue === 'text/plain' ||
-			requestBodyContentTypeValue === 'text/html'
-		) {
-			return requestBodyEl.value;
-		}
-
-		if (requestBodyContentTypeValue === 'application/xml') {
-			if (trimmedBody === '') return '';
-			try {
-				const parser = new DOMParser();
-				const xmlDoc = parser.parseFromString(trimmedBody, 'application/xml');
-				if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
-					throw new Error('Invalid XML format');
-				}
-				return trimmedBody;
-			} catch (error) {
-				displayPopup('error', `Invalid XML format: ${error}`);
-				console.error('Invalid XML format:', error);
-				return;
-			}
-		}
-	};
-
-	function collectValidatedRequestData(
-		urlInputEl,
-		paramsContainerEl,
-		selectedMethodEl,
-		requestBodyContentTypeEl,
-		requestBodyEl,
-	) {
-		return {
-			url: collectUrl(urlInputEl, paramsContainerEl),
-			method: collectMethod(selectedMethodEl),
-			headers: collectHeaders(),
-			body: collectBody(requestBodyContentTypeEl, requestBodyEl),
-		};
-	}
-
-	addParamButton.addEventListener('click', () => {
-		const paramDiv = document.createElement('div');
-		paramDiv.innerHTML = `
-            <input type="text" name="queryParams[key]" placeholder="Key" required>
-            <input type="text" name="queryParams[value]" placeholder="Value" required>
-            <button type="button" onclick="this.parentNode.remove()">Remove</button>
-        `;
-		paramsContainer.appendChild(paramDiv);
 	});
 
-	addHeaderButton.addEventListener('click', () => {
-		const headerDiv = document.createElement('div');
-		headerDiv.className = 'header-row';
-
-		const headerSelect = document.createElement('select');
-		headerSelect.name = 'headerType';
-		headerSelect.className = 'header-dropdown';
-		headerSelect.innerHTML = `
-            <option value="">Select Header</option>
-            <option value="accept">Accept</option>
-            <option value="content-type">Content-Type</option>
-            <option value="accept-encoding">Accept-Encoding</option>
-        `;
-
-		const headerValueSelect = document.createElement('select');
-		headerValueSelect.name = 'headerValue';
-		headerValueSelect.className = 'header-dropdown';
-		headerValueSelect.innerHTML = `<option value="">Select Value</option>`;
-
-		headerSelect.addEventListener('change', function () {
-			headerValueSelect.innerHTML = '';
-			addHeaderOptions(headerValueSelect, this.value);
-
-			if (this.value) {
-				selectedHeaders.add(this.value);
-			}
-
-			updateHeaderOptions();
-		});
-
-		headerDiv.appendChild(headerSelect);
-		headerDiv.appendChild(headerValueSelect);
-		headerDiv.appendChild(
-			createRemoveButton(() => {
-				selectedHeaders.delete(headerSelect.value);
-				headerDiv.remove();
-				updateHeaderOptions();
-			}),
-		);
-
-		requestHeaders.appendChild(headerDiv);
-		updateHeaderOptions();
-	});
-
-	function createRemoveButton(removeCallback) {
-		const button = document.createElement('button');
-		button.type = 'button';
-		button.textContent = 'Remove';
-		button.onclick = removeCallback;
-		return button;
-	}
-
-	function addHeaderOptions(select, headerType) {
-		const options = {
-			accept: [
-				{ value: 'text/html', text: 'text/html' },
-				{ value: 'text/plain', text: 'text/plain' },
-				{ value: 'application/xml', text: 'application/xml' },
-				{ value: 'application/json', text: 'application/json' },
-				{ value: 'image/*', text: 'image/*' },
-				{ value: '*/*', text: '*/*' },
-			],
-			'content-type': [
-				{ value: 'text/html', text: 'text/html' },
-				{ value: 'text/plain', text: 'text/plain' },
-				{ value: 'application/xml', text: 'application/xml' },
-				{ value: 'application/json', text: 'application/json' },
-				{
-					value: 'application/x-www-form-urlencoded',
-					text: 'application/x-www-form-urlencoded',
-				},
-				{ value: 'multipart/form-data', text: 'multipart/form-data' },
-			],
-			'accept-encoding': [
-				{ value: 'gzip', text: 'gzip' },
-				{ value: 'deflate', text: 'deflate' },
-				{ value: 'br', text: 'br' },
-				{ value: 'gzip, deflate, br', text: 'gzip,deflate,br' },
-				{ value: '*', text: '*' },
-			],
-		};
-
-		options[headerType]?.forEach((option) => {
-			const opt = document.createElement('option');
-			opt.value = option.value;
-			opt.textContent = option.text;
-			select.appendChild(opt);
-		});
-	}
-
-	function updateHeaderOptions() {
-		const headerSelects = document.querySelectorAll(
-			'.header-dropdown[name="headerType"]',
-		);
-		headerSelects.forEach((select) => {
-			const currentSelectedValue = select.value;
-
-			Array.from(select.options).forEach((option) => {
-				option.disabled = false;
-			});
-
-			selectedHeaders.forEach((header) => {
-				if (header && header !== currentSelectedValue) {
-					const option = select.querySelector(`option[value="${header}"]`);
-					if (option) {
-						option.disabled = true;
-					}
-				}
-			});
-		});
-	}
-
+	// CLEAR FORM
 	clearFormButton.addEventListener('click', () => {
-		requestForm.reset();
-		paramsContainer.innerHTML = '';
-		requestHeaders.innerHTML = '';
-		responseContainer.style.display = 'none';
-		responseMessage.style.display = 'block';
-		responseHeadersTable.innerHTML = '';
-		responseBody.innerText = 'No Body';
-		statusElement.innerText = 'No Status';
-		statusTextElement.innerText = '';
-		displayPopup('success', 'Form cleared successfully!');
+		clearForm(
+			requestForm,
+			paramsContainer,
+			requestHeaders,
+			responseContainer,
+			responseMessage,
+			statusElement,
+			statusTextElement,
+			responseHeadersTable,
+			responseBody,
+		);
 	});
 
-	function showTabContent(tabName) {
-		if (tabName === 'Body') {
-			bodyTabContent.style.display = 'block';
-			headersTabContent.style.display = 'none';
-			tabBody.classList.add('active');
-			tabHeader.classList.remove('active');
-		} else {
-			bodyTabContent.style.display = 'none';
-			headersTabContent.style.display = 'block';
-			tabHeader.classList.add('active');
-			tabBody.classList.remove('active');
-		}
-	}
-
-	tabBody.addEventListener('click', () => showTabContent('Body'));
-	tabHeader.addEventListener('click', () => showTabContent('Headers'));
-
+	// SEND REQUEST
 	requestForm.addEventListener('submit', async (event) => {
 		event.preventDefault();
 
-		responseContainer.style.display = 'none';
-		responseMessage.style.display = 'block';
-		statusElement.innerText = 'No Status';
-		statusTextElement.innerText = '';
-		responseHeadersTable.innerHTML = '';
-		responseBody.innerText = 'No Body';
+		clearResponse(
+			responseContainer,
+			responseMessage,
+			statusElement,
+			statusTextElement,
+			responseHeadersTable,
+			responseBody,
+		);
 
-		const requestData = collectValidatedRequestData(
+		const { responseData, error } = await sendRequest(
 			urlInput,
 			paramsContainer,
 			selectedMethod,
 			requestBodyContentType,
 			requestBody,
 		);
-		if (!requestData) {
-			displayPopup('error', `Smth went wrong!🤯 ${error}`);
-			return;
-		}
-		try {
-			const response = await fetch('/api/v1/request/review', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(requestData),
-			});
 
-			const responseData = await response.json();
-			const status = responseData.status;
-			statusElement.innerText = responseData.status || 'No Status';
-			statusTextElement.innerText = responseData.statusText || '';
-
-			if (status) {
-				if (status >= 200 && status < 300) {
-					statusElement.className = 'status-green';
-					statusTextElement.className = 'status-green';
-				} else if (status >= 300 && status < 400) {
-					statusElement.className = 'status-blue';
-					statusTextElement.className = 'status-blue';
-				} else if (status >= 400 && status < 600) {
-					statusElement.className = 'status-red';
-					statusTextElement.className = 'status-red';
-				} else {
-					statusElement.className = 'status-black';
-					statusTextElement.className = 'status-black';
-				}
-			}
-
-			responseHeadersTable.innerHTML = '';
-			Object.entries(responseData.headers || {}).forEach(([key, value]) => {
-				const row = document.createElement('tr');
-				const keyCell = document.createElement('td');
-				const valueCell = document.createElement('td');
-				keyCell.innerText = key;
-				valueCell.innerText = value;
-				row.appendChild(keyCell);
-				row.appendChild(valueCell);
-				responseHeadersTable.appendChild(row);
-			});
-
-			responseBody.innerText =
-				JSON.stringify(responseData.data, null, 2) || 'No Body';
-
-			responseContainer.style.display = 'block';
-			responseMessage.style.display = 'none';
-		} catch (error) {
-			console.error('Error:', error);
-			statusElement.innerText = 'Error';
-			responseBody.innerText = `Error occurred: ${error.message}`;
-			responseContainer.style.display = 'block';
-			responseMessage.style.display = 'none';
-		}
-	});
-
-	saveRequestButton.addEventListener('click', async () => {
-		const requestData = collectValidatedRequestData(
-			urlInput,
-			paramsContainer,
-			selectedMethod,
-			requestBodyContentType,
-			requestBody,
-		);
-		if (!requestData) {
-			displayPopup('error', 'Smth went wrong during saving!!!!!!🤯');
-			return;
-		}
-
-		try {
-			const response = await fetch('/api/v1/requests', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(requestData),
-			});
-
-			if (response.ok) {
-				displayPopup('success', 'Request saved successfully!');
-			} else {
-				const errorResponse = await response.json();
-				displayPopup(
-					'error',
-					`Failed to save request: ${errorResponse.message}`,
-				);
-			}
-		} catch (error) {
-			console.error('Error saving request:', error);
-			displayPopup(
-				'error',
-				`Error occurred while saving request: ${error.message}`,
+		if (error) {
+			handleError(
+				error,
+				responseContainer,
+				responseMessage,
+				statusElement,
+				responseBody,
+			);
+		} else {
+			renderResponse(
+				responseData,
+				responseContainer,
+				responseMessage,
+				statusElement,
+				statusTextElement,
+				responseHeadersTable,
+				responseBody,
 			);
 		}
 	});
+
+	// RESPONSE - tab logic
+	tabBody.addEventListener('click', () =>
+		showTabContent(
+			'Body',
+			bodyTabContent,
+			headersTabContent,
+			tabBody,
+			tabHeader,
+		),
+	);
+	tabHeader.addEventListener('click', () =>
+		showTabContent(
+			'Headers',
+			bodyTabContent,
+			headersTabContent,
+			tabBody,
+			tabHeader,
+		),
+	);
 });
