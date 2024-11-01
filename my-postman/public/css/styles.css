@@ -26,7 +26,8 @@ body {
 .saved-requests {
 	display: flex;
 	flex-direction: column;
-	width: 250px;
+	width: 350px;
+	max-width: 100%;
 }
 
 .saved-requests #savedRequestsList {
@@ -38,30 +39,64 @@ body {
 	padding: 10px;
 	border-radius: 8px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-	overflow: hidden;
+	overflow-y: auto;
 	max-height: 400px;
 }
 
 #savedRequestsList {
 	flex-grow: 1;
 	overflow-y: auto;
+	max-height: 500px;
 }
 
 #savedRequestsList button {
 	width: 100%;
-	padding: 8px;
+	padding: 12px;
 	margin-top: 10px;
-	background-color: #007bff;
-	color: #fff;
-	border: none;
+	background-color: #d4f8d4;
+	color: #333;
+	border: 1px solid #a3e3a3;
 	border-radius: 5px;
 	cursor: pointer;
 	text-align: left;
-	font-size: 0.9rem;
+	font-size: 0.95rem;
+	word-wrap: break-word;
+	white-space: normal;
+	overflow: hidden;
+	line-height: 1.2;
 }
 
 #savedRequestsList button:hover {
-	background-color: #0056b3;
+	background-color: #b8e6b8;
+}
+
+
+.request-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    position: relative;
+}
+
+.delete-cross {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: black;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: none; 
+}
+
+.request-item:hover .delete-cross {
+    display: block; 
+}
+
+.request-item p {
+	margin: 5px 0;
 }
 
 #refreshRequests {
@@ -72,7 +107,7 @@ body {
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
-	font-size: 0.9rem;
+	font-size: 1em;
 	text-align: center;
 }
 
@@ -221,7 +256,7 @@ select.header-dropdown {
 	display: none;
 	border: 1px solid #ccc;
 	padding: 16px;
-	margin-top:  auto;
+	margin-top: auto;
 	background-color: #f9f9f9;
 	border-radius: 4px;
 	width: 100%;

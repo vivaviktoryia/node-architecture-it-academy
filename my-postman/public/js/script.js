@@ -2,11 +2,15 @@ import { addQueryParam } from './components/queryParams.js';
 import { addHeader } from './components/reqHeaders.js';
 import {
 	saveRequest,
+	sendRequest,
+	fetchSavedRequests,
+	deleteRequest,
 	clearForm,
 	clearResponse,
-	sendRequest,
-	handleError,
 	renderResponse,
+	renderResponseError,
+	renderSavedRequests,
+	renderSavedRequestsError,
 } from './utils/formUtils.js';
 
 import { showTabContent } from './components/resTabManager.js';
@@ -48,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	const refreshRequestsButton = document.getElementById('refreshRequests');
 
 	////////////////////////////
-
 	const responseElemObj = {
 		responseContainer,
 		responseMessage,
@@ -66,13 +69,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// SAVE REQUEST
 	saveRequestButton.addEventListener('click', async () => {
-		await saveRequest(
+		await  saveRequest(
 			urlInput,
 			paramsContainer,
 			selectedMethod,
 			requestBodyContentType,
 			requestBody,
 		);
+		
+		const { responseData, error } = await fetchSavedRequests();
+		if (error) {
+			renderSavedRequestsError(error.message, savedRequestsList);
+		} else {
+			renderSavedRequests(responseData.data, savedRequestsList);
+		}
 	});
 
 	// CLEAR FORM
@@ -95,11 +105,31 @@ document.addEventListener('DOMContentLoaded', () => {
 		);
 
 		if (error) {
-			handleError(error, responseElemObj);
+			renderResponseError(error, responseElemObj);
 		} else {
 			renderResponse(responseData, responseElemObj);
 		}
 	});
+
+	//SAVED REQUESTS: Initial load of saved requests and REFRESH button
+	(async () => {
+		const { responseData, error } = await fetchSavedRequests();
+		if (error) {
+			renderSavedRequestsError(error.message, savedRequestsList);
+		} else {
+			renderSavedRequests(responseData.data, savedRequestsList);
+		}
+	})();
+
+	refreshRequestsButton.addEventListener('click', async () => {
+		const { responseData, error } = await fetchSavedRequests();
+		if (error) {
+			renderSavedRequestsError(error.message, savedRequestsList);
+		} else {
+			renderSavedRequests(responseData.data, savedRequestsList);
+		}
+	});
+
 
 	// RESPONSE - tab logic
 	tabBody.addEventListener('click', () =>

@@ -34,6 +34,141 @@ export async function sendRequest(
 	}
 }
 
+export async function saveRequest(
+	urlInput,
+	paramsContainer,
+	selectedMethod,
+	requestBodyContentType,
+	requestBody,
+) {
+	const requestData = collectValidatedRequestData(
+		urlInput,
+		paramsContainer,
+		selectedMethod,
+		requestBodyContentType,
+		requestBody,
+	);
+	if (!requestData) {
+		displayPopup('error', 'Smth went wrong during saving!!!!!!🤯');
+		return;
+	}
+
+	try {
+		const response = await fetch('/api/v1/requests', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(requestData),
+		});
+
+		if (response.ok) {
+			displayPopup('success', 'Request saved successfully!');
+		} else {
+			const errorResponse = await response.json();
+			displayPopup(
+				'error',
+				`Failed to save request: ${errorResponse.error.message}`,
+			);
+		}
+	} catch (error) {
+		console.error('Error saving request:', error);
+		displayPopup(
+			'error',
+			`Error occurred while saving request: ${error.message}`,
+		);
+	}
+}
+
+export async function fetchSavedRequests() {
+	try {
+		const response = await fetch('/api/v1/requests');
+		const responseData = await response.json();
+		if (responseData.status !== 'success') {
+			console.error('Failed to load saved requests');
+			return {
+				responseData: null,
+				error: new Error('Failed to load saved requests.'),
+			};
+		}
+		return { responseData, error: null };
+	} catch (error) {
+		console.error('An error occurred while fetching saved requests:', error);
+		return { responseData: null, error };
+	}
+}
+
+export async function deleteRequest(requestId) {
+	try {
+		const response = await fetch(`/api/v1/requests/${requestId}`, {
+			method: 'DELETE',
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to delete request');
+		}
+		displayPopup('success', 'Request was deleted successfully!');
+		// await refreshSavedRequests(savedRequestsList);
+	} catch (error) {
+		console.error('Error deleting request:', error);
+		displayPopup('error', 'Error deleting request:', error);
+	}
+}
+
+export function addDeleteRequestListeners(savedRequestsList) {
+	const deleteCrosses = savedRequestsList.querySelectorAll('.delete-cross');
+	deleteCrosses.forEach((cross) => {
+		cross.addEventListener('click', async (event) => {
+			const requestId = event.target.getAttribute('data-id');
+			console.log('Attempting to delete request with ID:', requestId);
+			if (!requestId) {
+				console.error('No request ID found for deletion.');
+				return;
+			}
+			await deleteRequest(requestId);
+			const { responseData, error } = await fetchSavedRequests();
+			if (error) {
+				renderSavedRequestsError(error.message, savedRequestsList);
+			} else {
+				renderSavedRequests(responseData.data, savedRequestsList);
+			}
+		});
+	});
+}
+
+export async function refreshSavedRequests(savedRequestsList) {
+	const { responseData, error } = await fetchSavedRequests();
+	if (error) {
+		renderSavedRequestsError(error.message, savedRequestsList);
+	} else {
+		renderSavedRequests(responseData.data, savedRequestsList);
+	}
+}
+
+export function renderSavedRequests(requests, savedRequestsList) {
+	savedRequestsList.innerHTML = '';
+
+	if (!requests || requests.length === 0) {
+		savedRequestsList.innerHTML = '<p>No saved requests available🔍</p>';
+		return;
+	}
+
+	requests.forEach((request) => {
+		const requestDiv = document.createElement('div');
+		requestDiv.className = 'request-item';
+		requestDiv.style.position = 'relative';
+		requestDiv.innerHTML = `
+				<div class="delete-cross" data-id="${request.id}">&times;</div>
+                <p><strong>Method:</strong> ${request.method}</p>
+                <p><strong>URL:</strong> ${request.url}</p> 
+          `;
+		savedRequestsList.appendChild(requestDiv);
+	});
+	addDeleteRequestListeners(savedRequestsList);
+}
+
+export function renderSavedRequestsError(errorMessage, savedRequestsList) {
+	savedRequestsList.innerHTML = `<p>${errorMessage}</p>`;
+}
+
 export function renderResponse(responseData, responseElemObj) {
 	const { status, statusText, headers, data } = responseData;
 	const {
@@ -96,7 +231,7 @@ function populateBody(data, responseBody, responseContainer, responseMessage) {
 	responseMessage.style.display = 'none';
 }
 
-export function handleError(error, responseElemObj) {
+export function renderResponseError(error, responseElemObj) {
 	const {
 		responseContainer,
 		responseMessage,
@@ -139,50 +274,9 @@ export function clearForm(
 	headersContainer,
 	responseElemObj,
 ) {
-		requestForm.reset();
+	requestForm.reset();
 	paramsContainer.innerHTML = '';
 	headersContainer.innerHTML = '';
 	clearResponse(responseElemObj);
 	displayPopup('success', 'Form cleared successfully!');
-}
-
-export async function saveRequest(
-	urlInput,
-	paramsContainer,
-	selectedMethod,
-	requestBodyContentType,
-	requestBody,
-) {
-	const requestData = collectValidatedRequestData(
-		urlInput,
-		paramsContainer,
-		selectedMethod,
-		requestBodyContentType,
-		requestBody,
-	);
-	if (!requestData) {
-		displayPopup('error', 'Smth went wrong during saving!!!!!!🤯');
-		return;
-	}
-
-	try {
-		const response = await fetch('/api/v1/requests', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestData),
-		});
-
-		if (response.ok) {
-			displayPopup('success', 'Request saved successfully!');
-		} else {
-			const errorResponse = await response.json();
-			displayPopup('error', `Failed to save request: ${errorResponse.message}`);
-		}
-	} catch (error) {
-		console.error('Error saving request:', error);
-		displayPopup(
-			'error',
-			`Error occurred while saving request: ${error.message}`,
-		);
-	}
 }
