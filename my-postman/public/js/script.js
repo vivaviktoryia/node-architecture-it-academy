@@ -5,16 +5,23 @@ import {
 	sendRequest,
 	fetchSavedRequests,
 	deleteRequest,
-	clearForm,
-	clearResponse,
+	fetchAndPopulateRequest,
+} from './utils/formUtils.js';
+
+import {
 	renderResponse,
 	renderResponseError,
 	renderSavedRequests,
 	renderSavedRequestsError,
-} from './utils/formUtils.js';
+} from './utils/renderData.js';
+
+import {
+	clearForm,
+	clearResponse,
+	clearParamsAndHeaders,
+} from './utils/clearData.js';
 
 import { showTabContent } from './components/resTabManager.js';
-import { displayPopup } from './utils/popup.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 	// REQUEST
@@ -61,6 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		responseBody,
 	};
 
+	const requestElemObj = {
+		urlInput,
+		selectedMethod,
+		paramsContainer,
+		requestHeaders,
+		requestBodyContentType,
+		requestBody,
+	};
+
 	addParamButton.addEventListener('click', () =>
 		addQueryParam(paramsContainer),
 	);
@@ -69,19 +85,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// SAVE REQUEST
 	saveRequestButton.addEventListener('click', async () => {
-		await  saveRequest(
+		await saveRequest(
 			urlInput,
 			paramsContainer,
 			selectedMethod,
 			requestBodyContentType,
 			requestBody,
 		);
-		
+
 		const { responseData, error } = await fetchSavedRequests();
 		if (error) {
 			renderSavedRequestsError(error.message, savedRequestsList);
 		} else {
-			renderSavedRequests(responseData.data, savedRequestsList);
+			renderSavedRequests(responseData.data, savedRequestsList, requestElemObj);
 		}
 	});
 
@@ -117,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (error) {
 			renderSavedRequestsError(error.message, savedRequestsList);
 		} else {
-			renderSavedRequests(responseData.data, savedRequestsList);
+			renderSavedRequests(responseData.data, savedRequestsList, requestElemObj);
 		}
 	})();
 
@@ -126,10 +142,24 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (error) {
 			renderSavedRequestsError(error.message, savedRequestsList);
 		} else {
-			renderSavedRequests(responseData.data, savedRequestsList);
+			renderSavedRequests(responseData.data, savedRequestsList, requestElemObj);
 		}
 	});
 
+	// requestDiv.addEventListener('click', async () => {
+	// 	const { responseData, error } = await fetchAndPopulateRequest(requestId);
+	// 	if (responseData) {
+	// 		populateRequestForm(
+	// 			responseData.data,
+	// 			urlInput,
+	// 			selectedMethod,
+	// 			paramsContainer,
+	// 			requestHeaders,
+	// 			requestBodyContentType,
+	// 			requestBody,
+	// 		);
+	// 	}
+	// });
 
 	// RESPONSE - tab logic
 	tabBody.addEventListener('click', () =>
