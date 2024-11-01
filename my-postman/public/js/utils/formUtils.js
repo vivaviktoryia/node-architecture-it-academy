@@ -28,24 +28,22 @@ export async function sendRequest(
 
 		const responseData = await response.json();
 		return { responseData, error: null };
-		
 	} catch (error) {
 		console.error('Error:', error);
-		 return { responseData: null, error };
+		return { responseData: null, error };
 	}
 }
 
-export function renderResponse(
-	responseData,
-	responseContainer,
-	responseMessage,
-	statusElement,
-	statusTextElement,
-	responseHeadersTable,
-	responseBody,
-) {
+export function renderResponse(responseData, responseElemObj) {
 	const { status, statusText, headers, data } = responseData;
-
+	const {
+		responseContainer,
+		responseMessage,
+		statusElement,
+		statusTextElement,
+		responseHeadersTable,
+		responseBody,
+	} = responseElemObj;
 	updateStatusElements(status, statusText, statusElement, statusTextElement);
 	populateHeaders(headers, responseHeadersTable);
 	populateBody(data, responseBody, responseContainer, responseMessage);
@@ -98,28 +96,35 @@ function populateBody(data, responseBody, responseContainer, responseMessage) {
 	responseMessage.style.display = 'none';
 }
 
-export function handleError(
-	error,
-	responseContainer,
-	responseMessage,
-	statusElement,
-	responseBody,
-) {
+export function handleError(error, responseElemObj) {
+	const {
+		responseContainer,
+		responseMessage,
+		statusElement,
+		statusTextElement,
+		responseHeadersTable,
+		responseBody,
+	} = responseElemObj;
+
 	console.error('Error:', error);
 	responseContainer.style.display = 'block';
 	responseMessage.style.display = 'none';
+	responseHeadersTable.innerHTML = '';
+	responseBody.innerText = '';
 	statusElement.innerText = 'Error';
-	responseBody.innerText = `Error occurred: ${error.message}`;
+	statusTextElement.innerText = `Error occurred: ${error.message}`;
 }
 
-export function clearResponse(
-	responseContainer,
-	responseMessage,
-	statusElement,
-	statusTextElement,
-	responseHeadersTable,
-	responseBody,
-) {
+export function clearResponse(responseElemObj) {
+	const {
+		responseContainer,
+		responseMessage,
+		statusElement,
+		statusTextElement,
+		responseHeadersTable,
+		responseBody,
+	} = responseElemObj;
+
 	responseContainer.style.display = 'none';
 	responseMessage.style.display = 'block';
 	responseHeadersTable.innerHTML = '';
@@ -132,27 +137,14 @@ export function clearForm(
 	requestForm,
 	paramsContainer,
 	headersContainer,
-	responseContainer,
-	responseMessage,
-	statusElement,
-	statusTextElement,
-	responseHeadersTable,
-	responseBody,
+	responseElemObj,
 ) {
-	requestForm.reset();
+		requestForm.reset();
 	paramsContainer.innerHTML = '';
 	headersContainer.innerHTML = '';
-	clearResponse(
-		responseContainer,
-		responseMessage,
-		statusElement,
-		statusTextElement,
-		responseHeadersTable,
-		responseBody,
-	);
+	clearResponse(responseElemObj);
 	displayPopup('success', 'Form cleared successfully!');
 }
-
 
 export async function saveRequest(
 	urlInput,

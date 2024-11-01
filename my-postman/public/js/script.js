@@ -48,6 +48,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	const refreshRequestsButton = document.getElementById('refreshRequests');
 
 	////////////////////////////
+
+	const responseElemObj = {
+		responseContainer,
+		responseMessage,
+		statusElement,
+		statusTextElement,
+		responseHeadersTable,
+		responseBody,
+	};
+
 	addParamButton.addEventListener('click', () =>
 		addQueryParam(paramsContainer),
 	);
@@ -67,31 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// CLEAR FORM
 	clearFormButton.addEventListener('click', () => {
-		clearForm(
-			requestForm,
-			paramsContainer,
-			requestHeaders,
-			responseContainer,
-			responseMessage,
-			statusElement,
-			statusTextElement,
-			responseHeadersTable,
-			responseBody,
-		);
+		clearForm(requestForm, paramsContainer, requestHeaders, responseElemObj);
 	});
 
 	// SEND REQUEST
 	requestForm.addEventListener('submit', async (event) => {
 		event.preventDefault();
 
-		clearResponse(
-			responseContainer,
-			responseMessage,
-			statusElement,
-			statusTextElement,
-			responseHeadersTable,
-			responseBody,
-		);
+		clearResponse(responseElemObj);
 
 		const { responseData, error } = await sendRequest(
 			urlInput,
@@ -102,23 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		);
 
 		if (error) {
-			handleError(
-				error,
-				responseContainer,
-				responseMessage,
-				statusElement,
-				responseBody,
-			);
+			handleError(error, responseElemObj);
 		} else {
-			renderResponse(
-				responseData,
-				responseContainer,
-				responseMessage,
-				statusElement,
-				statusTextElement,
-				responseHeadersTable,
-				responseBody,
-			);
+			renderResponse(responseData, responseElemObj);
 		}
 	});
 
