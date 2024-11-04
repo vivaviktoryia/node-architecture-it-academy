@@ -1,0 +1,35 @@
+[
+  {
+    "id": "1730479980072",
+    "url": "https://jsonplaceholder.typicode.com/posts",
+    "method": "POST",
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "test",
+      "userId": 101
+    }
+  },
+  {
+    "id": "1730480023809",
+    "url": "https://httpstat.us/500",
+    "method": "GET",
+    "headers": {},
+    "body": {}
+  },
+  {
+    "id": "1730480038691",
+    "url": "http://nodearch.e-learning.by:4052/main1.html",
+    "method": "GET",
+    "headers": {},
+    "body": {}
+  },
+  {
+    "id": "1730480124052",
+    "url": "https://jsonplaceholder.typicode.com/posts?userId=1&id=10",
+    "method": "GET",
+    "headers": {},
+    "body": {}
+  }
+]
