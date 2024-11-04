@@ -41,7 +41,7 @@ webserver.get('/', (req, res, next) => {
 	res.render('form', { title: 'Form Page' });
 });
 
-webserver.get(
+webserver.post(
 	'/submit',
 	[
 		check('name')
@@ -71,12 +71,12 @@ webserver.get(
 					.array()
 					.map((err) => err.msg)
 					.join(', '),
-				name: req.query.name || '',
-				email: req.query.email || '',
+				name: req.body.name || '',
+				email: req.body.email || '',
 			});
 		}
 
-		const { name, email } = req.query;
+		const { name, email } = req.body;
 		res.render('result', { name, email, title: 'Form Result' });
 	},
 );
