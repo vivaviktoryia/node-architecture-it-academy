@@ -62,7 +62,7 @@ function composeForm(values, errors) {
 										? `<p style="color: red;">${errorMessage}</p>`
 										: ''
 								}
-                <form method="post" action="/submit">
+                <form method="post" action="/forms">
                     <label for="name">Name:</label>
                     <input type="text" placeholder="Enter your name" name="name" value="${
 											values.name || ''
@@ -73,7 +73,7 @@ function composeForm(values, errors) {
 											values.email || ''
 										}">
                     <br>
-                    <input type="submit" value="Submit">
+                    <input type="submit" value="Submit 😉">
                 </form>
             </div>
         `;
