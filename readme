@@ -11,13 +11,20 @@ express.json({ limit: '10kb' }); // content-type: application/json -> JSON.parse
 express.text(); // content-type: text/plain -> parse req.body
 xmlBodyParser // content-type: application/xml -> parse req.body (see in utils/parseData.js)
 
+// maridb flow - docker
+mysql -u root -p
+CREATE USER 'strapi_user'@'%' IDENTIFIED BY 'qwerty123456';
+CREATE DATABASE strapi_db;
+GRANT ALL PRIVILEGES ON strapi_db.* TO 'strapi_user'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
 
-// maridb flow
+
+// maridb flow - locally
 mysql -u root -p
 
 CREATE USER 'strapi_user'@'localhost' IDENTIFIED BY 'qwerty123456';
 CREATE DATABASE strapi_db;
-GRANT ALL PRIVILEGES ON strapi.* TO 'strapi_user'@'localhost';
+GRANT ALL PRIVILEGES ON strapi_db.* TO 'strapi_user'@'localhost';
 FLUSH PRIVILEGES;
 
 SHOW GRANTS FOR 'strapi_user'@'localhost';
@@ -26,6 +33,9 @@ EXIT;
 // display all users
 SELECT User, Host FROM mysql.user;
 USE strapi_db;
+
+// remove grants
+REVOKE GRANT OPTION ON *.* FROM 'strapi_user'@'%';
 
 # Certificate
 openssl version

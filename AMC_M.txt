@@ -1,0 +1,19 @@
+MariaDB	10.6
+Node.js v20
+npm@10.9.0
+
+npx create-strapi@latest
+
+
+//  npm install strapi-plugin-io 
+npm error peer @strapi/strapi@"^4.14.6" from strapi-plugin-io@2.0.6
+
+// npm install strapi-stripe
+The Stripe Payments plugin is designed for Strapi v4.x.
+
+
+mysql> SELECT VERSION();
++-----------------+
+| VERSION()       |
++-----------------+
+| 10.6.20-MariaDB |
