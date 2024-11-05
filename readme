@@ -10,3 +10,42 @@ C:\Windows\System32\drivers\etc\hosts - can be managed
 express.json({ limit: '10kb' }); // content-type: application/json -> JSON.parse(req.body)
 express.text(); // content-type: text/plain -> parse req.body
 xmlBodyParser // content-type: application/xml -> parse req.body (see in utils/parseData.js)
+
+
+// maridb flow
+mysql -u root -p
+
+CREATE USER 'strapi_user'@'localhost' IDENTIFIED BY 'qwerty123456';
+CREATE DATABASE strapi_db;
+GRANT ALL PRIVILEGES ON strapi.* TO 'strapi_user'@'localhost';
+FLUSH PRIVILEGES;
+
+SHOW GRANTS FOR 'strapi_user'@'localhost';
+EXIT;
+
+// display all users
+SELECT User, Host FROM mysql.user;
+USE strapi_db;
+
+# Certificate
+openssl version
+
+# Root Certificate (CA): ssl-ca
+openssl genrsa 2048 > ca-key.pem
+openssl req -new -x509 -days 365 -key ca-key.pem -out ca-cert.pem
+
+# server certificate: ssl-cert: ssl-key:
+openssl genrsa 2048 > server-key.pem
+openssl req -new -key server-key.pem -out server-req.pem
+openssl x509 -req -in server-req.pem -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -out server-cert.pem -days 365
+
+# client certificate
+openssl genrsa 2048 > client-key.pem
+openssl req -new -key client-key.pem -out client-req.pem
+openssl x509 -req -in client-req.pem -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -out client-cert.pem -days 365
+
+# mariadb
+[mysqld]
+ssl-ca=/path/to/ca-cert.pem 
+ssl-cert=/path/to/server-cert.pem
+ssl-key=/path/to/server-key.pem
