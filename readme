@@ -13,12 +13,12 @@ xmlBodyParser // content-type: application/xml -> parse req.body (see in utils/p
 
 // maridb flow - docker
 mysql -u root -p
-CREATE USER 'strapi_user'@'%' IDENTIFIED BY 'qwerty123456';
-CREATE DATABASE strapi_db;
-GRANT ALL PRIVILEGES ON strapi_db.* TO 'strapi_user'@'%' WITH GRANT OPTION;
+CREATE USER 'amcm_user'@'%' IDENTIFIED BY 'qwerty123456';
+CREATE DATABASE amcm_db;
+GRANT ALL PRIVILEGES ON amcm_db.* TO 'amcm_user'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 
-
+select user, host from mysql.user;
 // maridb flow - locally
 mysql -u root -p
 

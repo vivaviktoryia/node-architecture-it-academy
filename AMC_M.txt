@@ -2,6 +2,13 @@ MariaDB	10.6
 Node.js v20
 npm@10.9.0
 
+// create db and user, grant PRIVILEGES to created user
+mysql -u root -p
+CREATE USER 'amcm_user'@'%' IDENTIFIED BY 'qwerty123456';
+CREATE DATABASE amcm_db;
+GRANT ALL PRIVILEGES ON amcm_db.* TO 'amcm_user'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
 npx create-strapi@latest
 
 
