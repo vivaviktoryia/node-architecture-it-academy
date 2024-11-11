@@ -1,3 +1,2 @@
-2. Add preview fow rawData
 3. Add bodyContentType in req.body
 4. Fix req.headers behaviour

@@ -107,7 +107,8 @@ export function renderResponse(responseData, responseElemObj) {
 		statusElement,
 		statusTextElement,
 		responseHeadersTable,
-		responseBody,
+		responseRawBody,
+		responsePrettyBody,
 	} = responseElemObj;
 
 	updateStatusElements(status, statusText, statusElement, statusTextElement);
@@ -115,7 +116,8 @@ export function renderResponse(responseData, responseElemObj) {
 	populateBody(
 		headers,
 		responseContent,
-		responseBody,
+		responsePrettyBody,
+		responseRawBody,
 		responseContainer,
 		responseMessage,
 	);
@@ -208,60 +210,52 @@ function populateHeaders(headers, responseHeadersTable) {
 	});
 }
 
-// function populateRawBody(data, responseBody, responseContainer, responseMessage) {
-// 	responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
-
-// 	responseContainer.style.display = 'block';
-// 	responseMessage.style.display = 'none';
-// }
-
 function populateBody(
 	headers,
 	data,
-	responseBody,
+	responsePrettyBody,
+	responseRawBody,
 	responseContainer,
 	responseMessage,
 ) {
+	responseRawBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
 	if (isBase64(data)) {
-		handleBinaryData(headers, data, responseBody);
+		handleBinaryData(headers, data, responsePrettyBody);
 	} else {
-		handleTextData(headers, data, responseBody);
+		handleTextData(headers, data, responsePrettyBody);
 	}
 
 	responseContainer.style.display = 'block';
 	responseMessage.style.display = 'none';
 }
 
-function handleBinaryData(headers, data, responseBody) {
+function handleBinaryData(headers, data, responsePrettyBody) {
 	const contentType = headers['content-type'] || '';
 
 	if (contentType.includes('image')) {
-		renderImage(data, contentType, responseBody);
+		renderImage(data, contentType, responsePrettyBody);
 	} else if (contentType.includes('pdf')) {
-		renderPDF(data, contentType, responseBody);
+		renderPDF(data, contentType, responsePrettyBody);
 	} else {
-		renderGenericFile(data, contentType, responseBody);
+		renderGenericFile(data, contentType, responsePrettyBody);
 	}
 }
 
-function renderImage(data, contentType, responseBody) {
-	responseBody.innerHTML = `<img src="data:${contentType};base64,${data}" alt="image" />`;
+function renderImage(data, contentType, responsePrettyBody) {
+	responsePrettyBody.innerHTML = `<img src="data:${contentType};base64,${data}" alt="image" />`;
 }
 
 // function renderPDF(data, contentType, responseBody) {
 // 	responseBody.innerHTML = `<a href="data:${contentType};base64,${data}" download="file.pdf">Download PDF</a>`;
 // }
 
-// function renderPDF(data, contentType, responseBody) {
-// 	responseBody.innerHTML = `<object data="data:${contentType};base64,${data}" type="${contentType}" width="100%" height="600px"></object>`;
-// }
 
-function renderPDF(data, contentType, responseBody) {
-	responseBody.innerHTML = `<iframe src="data:${contentType};base64,${data}" width="100%" height="600px"></iframe>`;
+function renderPDF(data, contentType, responsePrettyBody) {
+	responsePrettyBody.innerHTML = `<iframe src="data:${contentType};base64,${data}" width="100%" height="600px"></iframe>`;
 }
 
-function renderGenericFile(data, contentType, responseBody) {
-	responseBody.innerHTML = `<a href="data:${contentType};base64,${data}" download="file">Download File</a>`;
+function renderGenericFile(data, contentType, responsePrettyBody) {
+	responsePrettyBody.innerHTML = `<a href="data:${contentType};base64,${data}" download="file">Download File</a>`;
 }
 
 // RAW DATA
@@ -269,11 +263,11 @@ function renderGenericFile(data, contentType, responseBody) {
 // 	responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
 // }
 
-function handleTextData(headers, data, responseBody) {
+function handleTextData(headers, data, responsePrettyBody) {
 	if (isHtmlContentType(headers)) {
-		responseBody.innerHTML = data;
+		responsePrettyBody.innerHTML = data;
 	} else {
-		responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
+		responsePrettyBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
 	}
 }
 

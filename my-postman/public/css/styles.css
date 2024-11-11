@@ -298,7 +298,11 @@ td {
 th {
 	background-color: #f1f1f1;
 }
-pre#responseBody {
+pre#responsePrettyBody {
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+pre#responseRawBody {
 	white-space: pre-wrap;
 	word-wrap: break-word;
 }
