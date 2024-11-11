@@ -31,5 +31,26 @@
     "method": "GET",
     "headers": {},
     "body": {}
+  },
+  {
+    "id": "1731334720818",
+    "url": "http://fe.it-academy.by/images/logo3.png",
+    "method": "GET",
+    "headers": {},
+    "body": {}
+  },
+  {
+    "id": "1731340381026",
+    "url": "https://pdfobject.com/pdf/sample.pdf",
+    "method": "GET",
+    "headers": {},
+    "body": {}
+  },
+  {
+    "id": "1731341261730",
+    "url": "https://www.w3.org/WAI/WCAG21/quickref/files/Images/sample.pdf?userId=1&id=10",
+    "method": "GET",
+    "headers": {},
+    "body": {}
   }
 ]

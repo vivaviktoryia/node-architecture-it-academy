@@ -102,7 +102,7 @@ export function renderResponse(responseData, responseElemObj) {
 	} = responseElemObj;
 	updateStatusElements(status, statusText, statusElement, statusTextElement);
 	populateHeaders(headers, responseHeadersTable);
-	populateBody(data, responseBody, responseContainer, responseMessage);
+	populateBody(headers, data, responseBody, responseContainer, responseMessage);
 }
 
 export async function refreshSavedRequests(savedRequestsList) {
@@ -192,11 +192,70 @@ function populateHeaders(headers, responseHeadersTable) {
 	});
 }
 
-function populateBody(data, responseBody, responseContainer, responseMessage) {
-	responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
+// function populateBody(data, responseBody, responseContainer, responseMessage) {
+// 	responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
+
+// 	responseContainer.style.display = 'block';
+// 	responseMessage.style.display = 'none';
+// }
+
+function populateBody(
+	headers,
+	data,
+	responseBody,
+	responseContainer,
+	responseMessage,
+) {
+	console.log(data);
+	console.log(headers);
+	if (isBase64(data)) {
+		handleBinaryData(headers, data, responseBody);
+	} else {
+		handleTextData(data, responseBody);
+	}
 
 	responseContainer.style.display = 'block';
 	responseMessage.style.display = 'none';
+}
+
+function handleBinaryData(headers, data, responseBody) {
+	const contentType = headers['content-type'] || '';
+
+	if (contentType.includes('image')) {
+		renderImage(data, contentType, responseBody);
+	} else if (contentType.includes('pdf')) {
+		renderPDF(data, contentType, responseBody);
+	} else {
+		renderGenericFile(data, contentType, responseBody);
+	}
+}
+
+function renderImage(data, contentType, responseBody) {
+	responseBody.innerHTML = `<img src="data:${contentType};base64,${data}" alt="image" />`;
+}
+
+// function renderPDF(data, contentType, responseBody) {
+// 	responseBody.innerHTML = `<a href="data:${contentType};base64,${data}" download="file.pdf">Download PDF</a>`;
+// }
+
+// function renderPDF(data, contentType, responseBody) {
+// 	responseBody.innerHTML = `<object data="data:${contentType};base64,${data}" type="${contentType}" width="100%" height="600px"></object>`;
+// }
+
+function renderPDF(data, contentType, responseBody) {
+	responseBody.innerHTML = `<iframe src="data:${contentType};base64,${data}" width="100%" height="600px"></iframe>`;
+}
+
+function renderGenericFile(data, contentType, responseBody) {
+	responseBody.innerHTML = `<a href="data:${contentType};base64,${data}" download="file">Download File</a>`;
+}
+
+function handleTextData(data, responseBody) {
+	responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
+}
+
+function isBase64(str) {
+	return typeof str === 'string' && /^([A-Za-z0-9+/=]){4,}$/.test(str);
 }
 
 export function renderResponseError(error, responseElemObj) {
