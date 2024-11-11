@@ -3,11 +3,19 @@ import { displayPopup } from './popup.js';
 export const collectUrl = (urlInputEl, paramsContainerEl) => {
 	const baseUrl = urlInputEl.value.trim();
 	if (!baseUrl) {
-		displayPopup('error', 'URL cannot be empty.');
+		displayPopup('error', 'URL cannot be empty!');
 		return null;
 	}
 
-	const url = new URL(baseUrl);
+	let url;
+	try {
+		url = new URL(baseUrl);
+	} catch (error) {
+		displayPopup('error', `Invalid URL format: ${error.message}`);
+		console.error('Invalid URL format:', error);
+		return null;
+	}
+
 	Array.from(paramsContainerEl.children).forEach((paramDiv) => {
 		const key = paramDiv.querySelector('input[name="queryParams[key]"]').value;
 		const value = paramDiv.querySelector(

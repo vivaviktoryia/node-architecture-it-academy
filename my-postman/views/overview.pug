@@ -65,10 +65,20 @@ block content
                 span#statusText 
 
             div.tabs
-                button.tablink#tabBody(type="button" class="active") Body
+                button.tablink#prettyBodyButton(type="button" class="active") Pretty Body
+                button.tablink#rawBodyButton(type="button") Raw Body
                 button.tablink#tabHeader(type="button") Headers
 
+
             div.tab-content
+                div#prettyBodyContent(class="tab-content-item")
+                    h3 Pretty Body
+                    pre#responsePrettyBody No Body
+
+                div#rawBodyContent(class="tab-content-item" style="display: none;")
+                    h3 Raw Body
+                    pre#responseRawBody No Body
+
                 div#headersTab(class="tab-content-item" style="display: none;")
                     h3 Headers
                     table
@@ -77,6 +87,3 @@ block content
                                 th Header
                                 th Value
                         tbody#responseHeaders
-                div#bodyTab(class="tab-content-item")
-                    h3 Body
-                    pre#responseBody No Body

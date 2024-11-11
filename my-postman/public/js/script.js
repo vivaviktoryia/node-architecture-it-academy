@@ -10,7 +10,6 @@ import {
 
 import {
 	renderResponse,
-	renderResponseError,
 	renderSavedRequests,
 	renderSavedRequestsError,
 } from './utils/renderData.js';
@@ -46,13 +45,17 @@ document.addEventListener('DOMContentLoaded', () => {
 	const statusElement = document.getElementById('status');
 	const statusTextElement = document.getElementById('statusText');
 
-	const tabBody = document.getElementById('tabBody');
-	const bodyTabContent = document.getElementById('bodyTab');
+	const tabPrettyBody = document.getElementById('prettyBodyButton');
+	const tabRawBody = document.getElementById('rawBodyButton');
 	const tabHeader = document.getElementById('tabHeader');
-	const headersTabContent = document.getElementById('headersTab');
+
+	const prettyBodyContent = document.getElementById('prettyBodyContent');
+	const rawBodyContent = document.getElementById('rawBodyContent');
+	const headerContent = document.getElementById('headersTab');
 
 	const responseHeadersTable = document.getElementById('responseHeaders');
-	const responseBody = document.getElementById('responseBody');
+	const responsePrettyBody = document.getElementById('responsePrettyBody');
+	const responseRawBody = document.getElementById('responseRawBody');
 
 	//SAVED REQUESTS
 	const savedRequestsList = document.getElementById('savedRequestsList');
@@ -65,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		statusElement,
 		statusTextElement,
 		responseHeadersTable,
-		responseBody,
+		responseRawBody,
+		responsePrettyBody,
 	};
 
 	const requestElemObj = {
@@ -112,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		clearResponse(responseElemObj);
 
-		const { responseData, error } = await sendRequest(
+		const { responseData } = await sendRequest(
 			urlInput,
 			paramsContainer,
 			selectedMethod,
@@ -120,11 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			requestBody,
 		);
 
-		if (error) {
-			renderResponseError(error, responseElemObj);
-		} else {
-			renderResponse(responseData, responseElemObj);
-		}
+		renderResponse(responseData, responseElemObj);
 	});
 
 	//SAVED REQUESTS: Initial load of saved requests and REFRESH button
@@ -146,38 +146,40 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
-	// requestDiv.addEventListener('click', async () => {
-	// 	const { responseData, error } = await fetchAndPopulateRequest(requestId);
-	// 	if (responseData) {
-	// 		populateRequestForm(
-	// 			responseData.data,
-	// 			urlInput,
-	// 			selectedMethod,
-	// 			paramsContainer,
-	// 			requestHeaders,
-	// 			requestBodyContentType,
-	// 			requestBody,
-	// 		);
-	// 	}
-	// });
-
 	// RESPONSE - tab logic
-	tabBody.addEventListener('click', () =>
+	tabPrettyBody.addEventListener('click', function () {
 		showTabContent(
-			'Body',
-			bodyTabContent,
-			headersTabContent,
-			tabBody,
+			'Pretty Body',
+			prettyBodyContent,
+			rawBodyContent,
+			headerContent,
+			tabPrettyBody,
+			tabRawBody,
 			tabHeader,
-		),
-	);
-	tabHeader.addEventListener('click', () =>
+		);
+	});
+
+	tabRawBody.addEventListener('click', function () {
+		showTabContent(
+			'Raw Body',
+			prettyBodyContent,
+			rawBodyContent,
+			headerContent,
+			tabPrettyBody,
+			tabRawBody,
+			tabHeader,
+		);
+	});
+
+	tabHeader.addEventListener('click', function () {
 		showTabContent(
 			'Headers',
-			bodyTabContent,
-			headersTabContent,
-			tabBody,
+			prettyBodyContent,
+			rawBodyContent,
+			headerContent,
+			tabPrettyBody,
+			tabRawBody,
 			tabHeader,
-		),
-	);
+		);
+	});
 });

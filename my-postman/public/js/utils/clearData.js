@@ -24,13 +24,15 @@ export function clearResponse(responseElemObj) {
 		statusElement,
 		statusTextElement,
 		responseHeadersTable,
-		responseBody,
+		responsePrettyBody,
+		responseRawBody,
 	} = responseElemObj;
 
 	responseContainer.style.display = 'none';
 	responseMessage.style.display = 'block';
 	responseHeadersTable.innerHTML = '';
-	responseBody.innerText = 'No Body';
+	responseRawBody.innerText = 'No Body';
+	responsePrettyBody.innerText = 'No Body';
 	statusElement.innerText = 'No Status';
 	statusTextElement.innerText = '';
 }

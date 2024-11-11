@@ -91,18 +91,36 @@ export function renderSavedRequestsError(errorMessage, savedRequestsList) {
 }
 
 export function renderResponse(responseData, responseElemObj) {
-	const { status, statusText, headers, data } = responseData;
+	const {
+		status,
+		statusText,
+		data,
+		error,
+		headers: responseHeaders,
+	} = responseData;
+	const headers = data ? responseHeaders : error?.headers || {};
+	const responseContent = data || error?.message || null;
+
 	const {
 		responseContainer,
 		responseMessage,
 		statusElement,
 		statusTextElement,
 		responseHeadersTable,
-		responseBody,
+		responseRawBody,
+		responsePrettyBody,
 	} = responseElemObj;
+
 	updateStatusElements(status, statusText, statusElement, statusTextElement);
 	populateHeaders(headers, responseHeadersTable);
-	populateBody(headers, data, responseBody, responseContainer, responseMessage);
+	populateBody(
+		headers,
+		responseContent,
+		responsePrettyBody,
+		responseRawBody,
+		responseContainer,
+		responseMessage,
+	);
 }
 
 export async function refreshSavedRequests(savedRequestsList) {
@@ -145,9 +163,9 @@ export function populateRequestForm(
 	requestBodyContentTypeEl.value =
 		request.bodyContentType || 'application/json';
 	if (typeof request.body === 'object') {
-		requestBodyEl.value = JSON.stringify(request.body, null, 2); 
+		requestBodyEl.value = JSON.stringify(request.body, null, 2);
 	} else {
-		requestBodyEl.value = request.body || ''; 
+		requestBodyEl.value = request.body || '';
 	}
 }
 
@@ -192,87 +210,73 @@ function populateHeaders(headers, responseHeadersTable) {
 	});
 }
 
-// function populateBody(data, responseBody, responseContainer, responseMessage) {
-// 	responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
-
-// 	responseContainer.style.display = 'block';
-// 	responseMessage.style.display = 'none';
-// }
-
 function populateBody(
 	headers,
 	data,
-	responseBody,
+	responsePrettyBody,
+	responseRawBody,
 	responseContainer,
 	responseMessage,
 ) {
-	console.log(data);
-	console.log(headers);
+	responseRawBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
 	if (isBase64(data)) {
-		handleBinaryData(headers, data, responseBody);
+		handleBinaryData(headers, data, responsePrettyBody);
 	} else {
-		handleTextData(data, responseBody);
+		handleTextData(headers, data, responsePrettyBody);
 	}
 
 	responseContainer.style.display = 'block';
 	responseMessage.style.display = 'none';
 }
 
-function handleBinaryData(headers, data, responseBody) {
+function handleBinaryData(headers, data, responsePrettyBody) {
 	const contentType = headers['content-type'] || '';
 
 	if (contentType.includes('image')) {
-		renderImage(data, contentType, responseBody);
+		renderImage(data, contentType, responsePrettyBody);
 	} else if (contentType.includes('pdf')) {
-		renderPDF(data, contentType, responseBody);
+		renderPDF(data, contentType, responsePrettyBody);
 	} else {
-		renderGenericFile(data, contentType, responseBody);
+		renderGenericFile(data, contentType, responsePrettyBody);
 	}
 }
 
-function renderImage(data, contentType, responseBody) {
-	responseBody.innerHTML = `<img src="data:${contentType};base64,${data}" alt="image" />`;
+function renderImage(data, contentType, responsePrettyBody) {
+	responsePrettyBody.innerHTML = `<img src="data:${contentType};base64,${data}" alt="image" />`;
 }
 
 // function renderPDF(data, contentType, responseBody) {
 // 	responseBody.innerHTML = `<a href="data:${contentType};base64,${data}" download="file.pdf">Download PDF</a>`;
 // }
 
-// function renderPDF(data, contentType, responseBody) {
-// 	responseBody.innerHTML = `<object data="data:${contentType};base64,${data}" type="${contentType}" width="100%" height="600px"></object>`;
+
+function renderPDF(data, contentType, responsePrettyBody) {
+	responsePrettyBody.innerHTML = `<iframe src="data:${contentType};base64,${data}" width="100%" height="600px"></iframe>`;
+}
+
+function renderGenericFile(data, contentType, responsePrettyBody) {
+	responsePrettyBody.innerHTML = `<a href="data:${contentType};base64,${data}" download="file">Download File</a>`;
+}
+
+// RAW DATA
+// function handleTextData(data, responseBody) {
+// 	responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
 // }
 
-function renderPDF(data, contentType, responseBody) {
-	responseBody.innerHTML = `<iframe src="data:${contentType};base64,${data}" width="100%" height="600px"></iframe>`;
+function handleTextData(headers, data, responsePrettyBody) {
+	if (isHtmlContentType(headers)) {
+		responsePrettyBody.innerHTML = data;
+	} else {
+		responsePrettyBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
+	}
 }
 
-function renderGenericFile(data, contentType, responseBody) {
-	responseBody.innerHTML = `<a href="data:${contentType};base64,${data}" download="file">Download File</a>`;
-}
-
-function handleTextData(data, responseBody) {
-	responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
+function isHtmlContentType(headers) {
+	return (
+		headers['content-type'] && headers['content-type'].includes('text/html')
+	);
 }
 
 function isBase64(str) {
 	return typeof str === 'string' && /^([A-Za-z0-9+/=]){4,}$/.test(str);
-}
-
-export function renderResponseError(error, responseElemObj) {
-	const {
-		responseContainer,
-		responseMessage,
-		statusElement,
-		statusTextElement,
-		responseHeadersTable,
-		responseBody,
-	} = responseElemObj;
-
-	console.error('Error:', error);
-	responseContainer.style.display = 'block';
-	responseMessage.style.display = 'none';
-	responseHeadersTable.innerHTML = '';
-	responseBody.innerText = '';
-	statusElement.innerText = 'Error';
-	statusTextElement.innerText = `Error occurred: ${error.message}`;
 }

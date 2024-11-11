@@ -1,19 +1,32 @@
 export function showTabContent(
 	tabName,
-	bodyContent,
+	prettyBodyContent,
+	rawBodyContent,
 	headerContent,
-	tabBody,
+	tabPrettyBody,
+	tabRawBody,
 	tabHeader,
 ) {
-	if (tabName === 'Body') {
-		bodyContent.style.display = 'block';
-		headerContent.style.display = 'none';
-		tabBody.classList.add('active');
-		tabHeader.classList.remove('active');
-	} else {
-		bodyContent.style.display = 'none';
+	if (tabName === 'Pretty Body') {
+		prettyBodyContent.style.display = 'block'; 
+		rawBodyContent.style.display = 'none'; 
+		headerContent.style.display = 'none'; 
+		tabPrettyBody.classList.add('active'); 
+		tabRawBody.classList.remove('active'); 
+		tabHeader.classList.remove('active'); 
+	} else if (tabName === 'Raw Body') {
+		prettyBodyContent.style.display = 'none';
+		rawBodyContent.style.display = 'block'; 
+		headerContent.style.display = 'none'; 
+		tabPrettyBody.classList.remove('active'); 
+		tabRawBody.classList.add('active'); 
+		tabHeader.classList.remove('active'); 
+	} else if (tabName === 'Headers') {
 		headerContent.style.display = 'block';
-		tabHeader.classList.add('active');
-		tabBody.classList.remove('active');
+		prettyBodyContent.style.display = 'none';
+		rawBodyContent.style.display = 'none'; 
+		tabPrettyBody.classList.remove('active'); 
+		tabRawBody.classList.remove('active'); 
+		tabHeader.classList.add('active'); 
 	}
 }
