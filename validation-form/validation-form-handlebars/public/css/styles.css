@@ -1,0 +1,33 @@
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f2f2f2;
+	text-align: center;
+	padding: 50px;
+}
+ul {
+    list-style-type: none;
+  }
+
+li {
+    font-size: 18px;
+}
+
+.error {
+	background-color: white;
+	border-radius: 5px;
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.error__title {
+	color: #e74c3c;
+	font-size: 24px;
+}
+
+.error__emoji {
+	font-size: 48px;
+}
+
+.error__msg {
+	font-size: 18px;
+}
