@@ -1,0 +1,15 @@
+<h1>Please Fill Out the Form</h1>
+<div class="form-container">
+    {{#if errorMessage}}
+        <p style="color: red;">{{errorMessage}}</p>
+    {{/if}}
+    <form method="post" action="/forms">
+        <label for="name">Name:</label>
+        <input type="text" placeholder="Enter your name" name="name" value="{{values.name}}">
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" placeholder="Enter your email" name="email" value="{{values.email}}">
+        <br>
+        <input type="submit" value="Submit 😉">
+    </form>
+</div>
