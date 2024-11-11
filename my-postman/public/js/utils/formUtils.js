@@ -101,7 +101,7 @@ export async function fetchAndPopulateRequest(requestId) {
 		const response = await fetch(`/api/v1/requests/${requestId}`);
 
 		if (!response.ok) {
-			displayPopup('error', `Error fetching request: ${response.statusText}`);
+			displayPopup('error', `Error fetching request!!: ${response.statusText}`);
 			throw new Error(`Error fetching request: ${response.statusText}`);
 		}
 
@@ -109,7 +109,7 @@ export async function fetchAndPopulateRequest(requestId) {
 	return { responseData, error: null };
 	} catch (error) {
 		console.error('Error fetching request:', error);
-		displayPopup('error', `Error fetching request: ${response.statusText}`);
+		displayPopup('error', `Error fetching request💥: ${response.statusText}`);
 		return { responseData: null, error };
 	}
 }

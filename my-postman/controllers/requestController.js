@@ -158,112 +158,32 @@ const createRequest = async (req, res, next) => {
 	}
 };
 
-// const sendRequest = async (req, res, next) => {
-// 	try {
-// 		const { url, method, headers = {}, body } = req.body;
-// 		const response = await axios({
-// 			method,
-// 			url,
-// 			headers,
-// 			data: method === 'GET' ? undefined : body || {},
-// 			maxRedirects: 0,
-// 			timeout: 1000,
-// 			responseType: 'arraybuffer',
-// 			validateStatus: (status) => status < 500,
-// 		});
-
-// 		let responseBody = response.data;
-// 		const contentType = response.headers['content-type'] || '';
-
-// 		if (contentType.includes('application/json')) {
-// 			try {
-// 				responseBody = JSON.parse(response.data);
-// 			} catch (error) {
-// 				return res.status(422).json({
-// 					status: 422,
-// 					statusText: 'Error parsing JSON response',
-// 					data: null,
-// 					error: { message: error.message },
-// 				});
-// 			}
-// 		} else if (contentType.includes('text/plain')) {
-// 			responseBody = response.data.toString('utf-8');
-// 		} else if (contentType.includes('image')) {
-// 			responseBody = Buffer.from(response.data, 'binary').toString('base64');
-// 		} else if (!contentType.includes('text')) {
-// 			responseBody = Buffer.from(response.data, 'binary').toString('base64');
-// 		} else if (contentType.includes('pdf')) {
-// 			responseBody = Buffer.from(response.data, 'binary').toString('base64');
-// 		} else if (!contentType.includes('text')) {
-// 			responseBody = Buffer.from(response.data, 'binary').toString('base64');
-// 		}
-
-// 		res.status(200).json({
-// 			status: response.status,
-// 			statusText: response.statusText,
-// 			headers: response.headers,
-// 			data: responseBody || null,
-// 			error: null,
-// 		});
-// 	} catch (error) {
-// 		let status = 500;
-// 		let statusText = 'Internal server error';
-// 		let errorData = null;
-
-// 		if (error.response) {
-// 			status = error.response.status;
-// 			statusText = error.response.statusText || 'Request failed';
-// 			errorData = error.response.data;
-// 		} else if (error.request) {
-// 			status = 502;
-// 			statusText = 'Bad Gateway - Unable to reach the target server';
-// 		} else {
-// 			console.error('Error Message:', error.message);
-// 		}
-
-// 		res.status(status).json({
-// 			status,
-// 			statusText,
-// 			data: null,
-// 			error: {
-// 				message: error.message,
-// 				details: errorData,
-// 			},
-// 		});
-// 	}
-// };
-
 const sendRequest = async (req, res, next) => {
 	try {
-		// Extract request data
 		const { url, method, headers = {}, body } = req.body;
-
-		// Send the request
-		const response = await sendAxiosRequest(method, url, headers, body);
-
-		// Process and send the response back to the client
+		const response = await axios({
+			method,
+			url,
+			headers,
+			data: method === 'GET' ? undefined : body || {},
+			maxRedirects: 0,
+			timeout: 1000,
+			responseType: 'arraybuffer',
+			validateStatus: (status) => status < 500,
+		});
 		const responseBody = processResponseBody(response);
-		sendResponse(res, response, responseBody);
+		res.status(200).json({
+			status: response.status,
+			statusText: response.statusText,
+			headers: response.headers,
+			data: responseBody || null,
+			error: null,
+		});
 	} catch (error) {
 		handleError(error, res);
 	}
 };
 
-// Send the actual axios request
-const sendAxiosRequest = async (method, url, headers, body) => {
-	return axios({
-		method,
-		url,
-		headers,
-		data: method === 'GET' ? undefined : body || {},
-		maxRedirects: 0,
-		timeout: 1000,
-		responseType: 'arraybuffer',
-		validateStatus: (status) => status < 500,
-	});
-};
-
-// Process the response body based on the content type
 const processResponseBody = (response) => {
 	const contentType = response.headers['content-type'] || '';
 	let responseBody = response.data;
@@ -272,9 +192,18 @@ const processResponseBody = (response) => {
 		try {
 			responseBody = JSON.parse(response.data);
 		} catch (error) {
-			throw new Error('Error parsing JSON response');
+			console.error('Error parsing JSON response');
+			return res.status(422).json({
+				status: 422,
+				statusText: 'Error parsing JSON response',
+				data: null,
+				error: { message: error.message },
+			});
 		}
-	} else if (contentType.includes('text/plain')) {
+	} else if (
+		contentType.includes('text/plain') ||
+		contentType.includes('text/html')
+	) {
 		responseBody = response.data.toString('utf-8');
 	} else if (contentType.includes('image') || contentType.includes('pdf')) {
 		responseBody = Buffer.from(response.data, 'binary').toString('base64');
@@ -285,32 +214,18 @@ const processResponseBody = (response) => {
 	return responseBody;
 };
 
-// Send the response to the client
-const sendResponse = (res, response, responseBody) => {
-	res.status(200).json({
-		status: response.status,
-		statusText: response.statusText,
-		headers: response.headers,
-		data: responseBody || null,
-		error: null,
-	});
-};
-
-// Handle errors in the request
-const handleError = (error, res) => {
-	let status = 500;
-	let statusText = 'Internal server error';
+const handleProxyError = (error, res) => {
+	let status = 502;
+	let statusText = 'Bad Gateway - Unable to reach the target server';
+	let errorMessage = error.message;
 	let errorData = null;
+	let errorHeaders = null;
 
 	if (error.response) {
 		status = error.response.status;
 		statusText = error.response.statusText || 'Request failed';
-		errorData = error.response.data;
-	} else if (error.request) {
-		status = 502;
-		statusText = 'Bad Gateway - Unable to reach the target server';
-	} else {
-		console.error('Error Message:', error.message);
+		errorData = error.response.data.toString('utf-8');
+		errorHeaders = error.response?.headers;
 	}
 
 	res.status(status).json({
@@ -318,12 +233,51 @@ const handleError = (error, res) => {
 		statusText,
 		data: null,
 		error: {
-			message: error.message,
+			message: errorMessage,
+			details: errorData,
+			headers: errorHeaders,
+		},
+	});
+};
+
+const handleValidationError = (error, res) => {
+	let status = 422;
+	let statusText = 'Unprocessable Entity';
+	let errorMessage = 'Error parsing JSON response';
+	let errorData = null;
+
+	if (error instanceof SyntaxError) {
+		errorMessage = error.message;
+	} else {
+		errorMessage = 'Invalid Request Data';
+	}
+
+	res.status(status).json({
+		status,
+		statusText,
+		data: null,
+		error: {
+			message: errorMessage,
 			details: errorData,
 		},
 	});
 };
 
+const handleError = (error, res) => {
+	if (error.response || error.request) {
+		handleProxyError(error, res);
+	} else if (error instanceof SyntaxError || error instanceof Error) {
+		handleValidationError(error, res);
+	} else {
+		console.error('Unknown Error:', error.message);
+		res.status(500).json({
+			status: 500,
+			statusText: 'Internal Server Error',
+			data: null,
+			error: { message: 'An unexpected error occurred💥💥💥' },
+		});
+	}
+};
 
 module.exports = {
 	getAllRequests,

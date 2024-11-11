@@ -91,7 +91,16 @@ export function renderSavedRequestsError(errorMessage, savedRequestsList) {
 }
 
 export function renderResponse(responseData, responseElemObj) {
-	const { status, statusText, headers, data } = responseData;
+	const {
+		status,
+		statusText,
+		data,
+		error,
+		headers: responseHeaders,
+	} = responseData;
+	const headers = data ? responseHeaders : error?.headers || {};
+	const responseContent = data || error?.message || null;
+
 	const {
 		responseContainer,
 		responseMessage,
@@ -100,9 +109,16 @@ export function renderResponse(responseData, responseElemObj) {
 		responseHeadersTable,
 		responseBody,
 	} = responseElemObj;
+
 	updateStatusElements(status, statusText, statusElement, statusTextElement);
 	populateHeaders(headers, responseHeadersTable);
-	populateBody(headers, data, responseBody, responseContainer, responseMessage);
+	populateBody(
+		headers,
+		responseContent,
+		responseBody,
+		responseContainer,
+		responseMessage,
+	);
 }
 
 export async function refreshSavedRequests(savedRequestsList) {
@@ -145,9 +161,9 @@ export function populateRequestForm(
 	requestBodyContentTypeEl.value =
 		request.bodyContentType || 'application/json';
 	if (typeof request.body === 'object') {
-		requestBodyEl.value = JSON.stringify(request.body, null, 2); 
+		requestBodyEl.value = JSON.stringify(request.body, null, 2);
 	} else {
-		requestBodyEl.value = request.body || ''; 
+		requestBodyEl.value = request.body || '';
 	}
 }
 
@@ -192,7 +208,7 @@ function populateHeaders(headers, responseHeadersTable) {
 	});
 }
 
-// function populateBody(data, responseBody, responseContainer, responseMessage) {
+// function populateRawBody(data, responseBody, responseContainer, responseMessage) {
 // 	responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
 
 // 	responseContainer.style.display = 'block';
@@ -206,12 +222,10 @@ function populateBody(
 	responseContainer,
 	responseMessage,
 ) {
-	console.log(data);
-	console.log(headers);
 	if (isBase64(data)) {
 		handleBinaryData(headers, data, responseBody);
 	} else {
-		handleTextData(data, responseBody);
+		handleTextData(headers, data, responseBody);
 	}
 
 	responseContainer.style.display = 'block';
@@ -250,29 +264,25 @@ function renderGenericFile(data, contentType, responseBody) {
 	responseBody.innerHTML = `<a href="data:${contentType};base64,${data}" download="file">Download File</a>`;
 }
 
-function handleTextData(data, responseBody) {
-	responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
+// RAW DATA
+// function handleTextData(data, responseBody) {
+// 	responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
+// }
+
+function handleTextData(headers, data, responseBody) {
+	if (isHtmlContentType(headers)) {
+		responseBody.innerHTML = data;
+	} else {
+		responseBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
+	}
+}
+
+function isHtmlContentType(headers) {
+	return (
+		headers['content-type'] && headers['content-type'].includes('text/html')
+	);
 }
 
 function isBase64(str) {
 	return typeof str === 'string' && /^([A-Za-z0-9+/=]){4,}$/.test(str);
-}
-
-export function renderResponseError(error, responseElemObj) {
-	const {
-		responseContainer,
-		responseMessage,
-		statusElement,
-		statusTextElement,
-		responseHeadersTable,
-		responseBody,
-	} = responseElemObj;
-
-	console.error('Error:', error);
-	responseContainer.style.display = 'block';
-	responseMessage.style.display = 'none';
-	responseHeadersTable.innerHTML = '';
-	responseBody.innerText = '';
-	statusElement.innerText = 'Error';
-	statusTextElement.innerText = `Error occurred: ${error.message}`;
 }

@@ -10,7 +10,6 @@ import {
 
 import {
 	renderResponse,
-	renderResponseError,
 	renderSavedRequests,
 	renderSavedRequestsError,
 } from './utils/renderData.js';
@@ -112,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		clearResponse(responseElemObj);
 
-		const { responseData, error } = await sendRequest(
+		const { responseData } = await sendRequest(
 			urlInput,
 			paramsContainer,
 			selectedMethod,
@@ -120,11 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			requestBody,
 		);
 
-		if (error) {
-			renderResponseError(error, responseElemObj);
-		} else {
-			renderResponse(responseData, responseElemObj);
-		}
+		renderResponse(responseData, responseElemObj);
 	});
 
 	//SAVED REQUESTS: Initial load of saved requests and REFRESH button
