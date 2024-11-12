@@ -1,7 +1,9 @@
 const dotenv = require('dotenv');
 const express = require('express');
 const path = require('path');
-const customCors = require('./utils/cors'); 
+const customCors = require('./utils/cors');
+const AppError = require('./utils/appError');
+const { globalErrorHandler } = require('./controllers/errorController');
 
 dotenv.config({ path: `${__dirname}/config.env` });
 
@@ -13,7 +15,6 @@ const {
 	logLineAsync,
 	loggerMiddleware,
 } = require('./utils/logger');
-
 
 const logFileName = '_server.log';
 const logFilePath = path.resolve('logs', logFileName);
@@ -40,7 +41,7 @@ process.on('uncaughtException', (err) => {
 	process.exit(1);
 });
 
-// ROUTES: 
+// ROUTES:
 webserver.use('/', viewRouter);
 // getAllRequests, getRequest, deleteRequest, createRequest
 webserver.use('/api/v1/requests', requestRouter);
@@ -50,8 +51,9 @@ webserver.use('/api/v1/request', requestRouter);
 // 404 error
 webserver.all('*', (req, res, next) => {
 	const errorMsg = `Can't find ${req.originalUrl} on this server!`;
-	res.status(404).send(errorMsg);
+	next(new AppError(errorMsg, 404, { statusText: 'Not Found!' }));
 });
+webserver.use(globalErrorHandler);
 
 webserver.listen(port, () => {
 	const logLine = `Web server running on port  ${port}, process.pid = ${process.pid}`;

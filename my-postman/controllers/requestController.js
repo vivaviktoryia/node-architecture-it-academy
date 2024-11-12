@@ -1,7 +1,7 @@
 const axios = require('axios');
 const path = require('path');
 
-const { handleError } = require('./errorController');
+const AppError = require('../utils/appError');
 
 const {
 	getAllRequestsService,
@@ -20,7 +20,7 @@ const getAllRequests = async (req, res, next) => {
 			data: savedRequests,
 		});
 	} catch (error) {
-		handleError(error, res);
+		return next(new AppError('Failed to retrieve requests', 500));
 	}
 };
 
@@ -30,13 +30,11 @@ const getRequest = async (req, res, next) => {
 		const request = await getRequestByIdService(requestId, requestsFilePath);
 
 		if (!request) {
-			const error = {
-				custom: true,
-				status: 404,
-				statusText: 'Not Found',
-				message: 'Request not found.',
-			};
-			return handleError(error);
+			return next(
+				new AppError('Request not found', 404, {
+					statusText: 'Not Found',
+				}),
+			);
 		}
 
 		res.status(200).json({
@@ -46,8 +44,9 @@ const getRequest = async (req, res, next) => {
 			error: null,
 		});
 	} catch (error) {
-		error.message = 'An error occurred while retrieving the request.';
-		handleError(error, res);
+		return next(
+			new AppError('An error occurred while retrieving the request', 500),
+		);
 	}
 };
 
@@ -57,8 +56,9 @@ const deleteRequest = async (req, res, next) => {
 		await deleteRequestByIdService(requestId, requestsFilePath);
 		res.status(204).send();
 	} catch (error) {
-		error.message = 'An error occurred while deleting the request.';
-		handleError(error, res);
+		return next(
+			new AppError('An error occurred while deleting the request', 500),
+		);
 	}
 };
 
@@ -82,8 +82,9 @@ const createRequest = async (req, res, next) => {
 			error: null,
 		});
 	} catch (error) {
-		error.message = 'An error occurred while saving the request🤯';
-		handleError(error, res);
+		return next(
+			new AppError('An error occurred while saving the request', 500),
+		);
 	}
 };
 
@@ -100,7 +101,11 @@ const sendRequest = async (req, res, next) => {
 			error: null,
 		});
 	} catch (error) {
-		handleError(error, res);
+		if (error.response) {
+			return next(error);
+		} else {
+			return next(new AppError('Failed to send the HTTP request', 500));
+		}
 	}
 };
 
@@ -135,7 +140,7 @@ const safelyParseJson = (data, res) => {
 	try {
 		return JSON.parse(data);
 	} catch (error) {
-		return handleError(error, res);
+		return next(new AppError('Failed to send the HTTP request', 500));
 	}
 };
 

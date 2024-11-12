@@ -1,4 +1,5 @@
 const { check, validationResult } = require('express-validator');
+const AppError = require('../utils/appError');
 
 const validationRules = [
 	check('url')
@@ -22,18 +23,16 @@ const validationRules = [
 const validateRequest = async (req, res, next) => {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
-		return res.status(400).json({
-			status: 400,
-			statusText: 'Bad request',
-			data: null,
-			error: {
-				message: 'Validation failed',
-				details: errors.array().map((err) => ({
-					field: err.param,
-					message: err.msg,
-				})),
-			},
-		});
+		const errorDetails = errors.array().map((err) => ({
+			field: err.path,
+			message: err.msg,
+		}));
+		return next(
+			new AppError('Validation failed', 400, {
+				statusText: 'Bad request',
+				details: errorDetails,
+			}),
+		);
 	}
 	next();
 };
