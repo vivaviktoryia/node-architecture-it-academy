@@ -35,7 +35,7 @@ block content
 
 
                     div.form-row
-                        label(for="contentType") Body Content-Type:
+                        label(for="requestBodyContentType") Body Content-Type:
                         select(name="contentType" id="requestBodyContentType")
                             option(value="application/json") JSON
                             option(value="application/xml") XML
@@ -44,7 +44,7 @@ block content
                             option(value="text/html") HTML
 
                     div.form-row
-                        label(for="body") Body:
+                        label(for="requestBody") Body:
                         textarea(name="body" class="request-body" id="requestBody" placeholder="Request body")
 
                     div.form-row.center-button

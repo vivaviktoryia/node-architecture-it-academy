@@ -230,7 +230,7 @@ function populateBody(
 
 // RAW BODY
 function populateRawBody(data, responseRawBody) {
-	responseRawBody.innerText = JSON.stringify(data, null, 2) || 'No Body';
+	responseRawBody.innerText = JSON.stringify(data) || 'No Body';
 }
 
 // PRETTY BODY

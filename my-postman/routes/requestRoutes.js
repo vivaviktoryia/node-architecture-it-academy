@@ -4,11 +4,11 @@ const {
 	getAllRequests,
 	getRequest,
 	deleteRequest,
-	validationRules,
-	validateRequest,
 	createRequest,
 	sendRequest,
 } = require('../controllers/requestController');
+
+const { validationRules, validateRequest } = require('../services/validators');
 
 const router = express.Router();
 
