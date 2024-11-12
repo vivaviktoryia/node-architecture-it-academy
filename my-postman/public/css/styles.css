@@ -70,29 +70,28 @@ body {
 	background-color: #b8e6b8;
 }
 
-
 .request-item {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    position: relative;
+	border: 1px solid #ccc;
+	padding: 10px;
+	margin-bottom: 10px;
+	border-radius: 5px;
+	background-color: #f9f9f9;
+	position: relative;
 }
 
 .delete-cross {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    color: black;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    display: none; 
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	color: black;
+	font-size: 20px;
+	font-weight: bold;
+	cursor: pointer;
+	display: none;
 }
 
 .request-item:hover .delete-cross {
-    display: block; 
+	display: block;
 }
 
 .request-item p {
@@ -342,4 +341,28 @@ pre#responseRawBody {
 }
 .popup--error {
 	background-color: #eb4d4b;
+}
+.error {
+	max-width: 80rem;
+	text-align: center;
+	margin-top: 50px;
+}
+
+.error__title {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 1rem;
+}
+
+.error__emoji {
+	font-size: 3.75rem;
+	margin-left: 1rem;
+}
+
+.error__msg {
+	font-size: 2.5rem;
+	font-weight: 700;
+	max-width: 50rem;
+	margin: 0 auto;
 }
