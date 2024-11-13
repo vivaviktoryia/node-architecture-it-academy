@@ -68,14 +68,5 @@
       "content-type": "application/json; charset=utf-8"
     },
     "body": ""
-  },
-  {
-    "id": "1731446723772",
-    "url": "http://nodearch.e-learning.by:4052/main1.html",
-    "method": "GET",
-    "headers": {
-      "content-type": "application/json; charset=utf-8"
-    },
-    "body": ""
   }
 ]
