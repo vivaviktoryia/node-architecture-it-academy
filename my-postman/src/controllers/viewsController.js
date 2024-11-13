@@ -4,7 +4,7 @@ const {
 	saveRequest,
 	loadRequests,
 	removeRequest,
-} = require('../utils/requestStorage');
+} = require('../../utils/requestStorage');
 const requestsFilePath = path.resolve('data', 'savedRequests.json');
 
 const getOverview = async (req, res, next) => {

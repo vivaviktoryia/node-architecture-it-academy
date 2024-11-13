@@ -1,10 +1,10 @@
-const AppError = require('../utils/appError');
+const AppError = require('../../utils/appError');
 
 const {
 	saveRequest,
 	loadRequests,
 	removeRequest,
-} = require('../utils/requestStorage');
+} = require('../../utils/requestStorage');
 
 const getAllRequestsService = async (filePath) => {
 	return await loadRequests(filePath);
@@ -20,7 +20,7 @@ const deleteRequestByIdService = async (requestId, filePath) => {
 	const requestIndex = savedRequests.findIndex((req) => req.id === requestId);
 
 	if (requestIndex === -1) {
-			return new AppError('Request not found', 404, {
+		return new AppError('Request not found', 404, {
 			statusText: 'Not Found',
 		});
 	}

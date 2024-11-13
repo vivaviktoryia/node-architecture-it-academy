@@ -1,7 +1,7 @@
 const axios = require('axios');
 const path = require('path');
 
-const AppError = require('../utils/appError');
+const AppError = require('../../utils/appError');
 
 const {
 	getAllRequestsService,

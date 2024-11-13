@@ -1,5 +1,5 @@
 const { check, validationResult } = require('express-validator');
-const AppError = require('../utils/appError');
+const AppError = require('../../utils/appError');
 
 const validationRules = [
 	check('url')

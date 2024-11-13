@@ -4,7 +4,7 @@
   "description": "implement logic postman",
   "main": "index.js",
   "scripts": {
-    "app": "nodemon app.js"
+    "start": "nodemon server.js"
   },
   "keywords": [
     "postman",

@@ -1,4 +1,4 @@
-const AppError = require('../utils/appError');
+const AppError = require('../../utils/appError');
 
 const handleProxyError = (error) => {
 	let status = error.response?.status || 502;
