@@ -27,6 +27,11 @@ const getAllRequests = async (req, res, next) => {
 const getRequest = async (req, res, next) => {
 	try {
 		const { requestId } = req.params;
+
+		if (!requestId) {
+			return next(new AppError('Request ID is required', 400));
+		}
+
 		const request = await getRequestByIdService(requestId, requestsFilePath);
 
 		if (!request) {

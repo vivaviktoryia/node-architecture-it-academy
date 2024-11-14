@@ -6,23 +6,14 @@ const {
 	removeRequest,
 } = require('../../utils/requestStorage');
 
-// const getAllRequestsService = async (filePath) => {
-// 	return await loadRequests(filePath);
-// };
-
 const getAllRequestsService = async (filePath) => {
 	try {
 		const requests = await loadRequests(filePath);
 		return requests;
 	} catch (error) {
-		return new AppError('Error loading requests from the file', 500);
+		return new AppError(error.message || 'Error loading requests from the file', 500);
 	}
 };
-
-// const getRequestByIdService = async (requestId, filePath) => {
-// 	const savedRequests = await loadRequests(filePath);
-// 	return savedRequests.find((req) => req.id === requestId);
-// };
 
 const getRequestByIdService = async (requestId, filePath) => {
 	try {
@@ -40,19 +31,6 @@ const getRequestByIdService = async (requestId, filePath) => {
 	}
 };
 
-// const deleteRequestByIdService = async (requestId, filePath) => {
-// 	const savedRequests = await loadRequests(filePath);
-// 	const requestIndex = savedRequests.findIndex((req) => req.id === requestId);
-
-// 	if (requestIndex === -1) {
-// 		return new AppError('Request not found', 404, {
-// 			statusText: 'Not Found',
-// 		});
-// 	}
-
-// 	await removeRequest(requestIndex, filePath);
-// };
-
 const deleteRequestByIdService = async (requestId, filePath) => {
 	try {
 		const savedRequests = await loadRequests(filePath);
@@ -67,10 +45,6 @@ const deleteRequestByIdService = async (requestId, filePath) => {
 		return new AppError(error.message || 'Failed to delete request', 500);
 	}
 };
-
-// const createRequestService = async (newRequest, filePath) => {
-// 	await saveRequest(newRequest, filePath);
-// };
 
 const createRequestService = async (newRequest, filePath) => {
 	try {
