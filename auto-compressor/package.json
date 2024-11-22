@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "autoCompressor.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "example": "node autoCompressor.js ./folder-to-check",
+    "compress": "node autoCompressor.js"
   },
   "author": "Vik",
   "license": "ISC",
