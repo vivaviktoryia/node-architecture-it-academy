@@ -1,0 +1,14 @@
+{
+  "name": "auto-compressor",
+  "version": "1.0.0",
+  "main": "autoCompressor.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vik",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}
