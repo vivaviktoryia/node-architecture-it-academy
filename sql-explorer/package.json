@@ -1,0 +1,14 @@
+{
+  "name": "sql-explorer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "author": "Viktoryia",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "mysql2": "^3.11.4"
+  }
+}
