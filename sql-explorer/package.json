@@ -3,12 +3,18 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "node app.js"
+    "test": "node app.js",
+    "backup:db:with-data": "node database/backupDB.js export --with-data",
+    "backup:db:without-data": "node database/backupDB.js export --without-data",
+    "db:setup": "node database/backupDB.js import database/backup/initial_backup.sql",
+    "db:migrate": "node database/backupDB.js migrate",
+    "db:rollback": "node database/backupDB.js rollback"
   },
   "author": "Viktoryia",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "dotenv": "^16.4.5",
     "mysql2": "^3.11.4"
   }
 }
