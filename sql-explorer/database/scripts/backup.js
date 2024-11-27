@@ -3,7 +3,6 @@ const path = require('path');
 const fs = require('fs');
 
 const user = process.env.DB_USER || 'nodeuser';
-const password = process.env.DB_USER_PASSWORD || 'nodepass';
 const dbName = process.env.DB_NAME || 'learning_db';
 const backupDir = path.join(__dirname, '../backup'); 
 
@@ -32,27 +31,20 @@ const runCommand = (command) => {
 
 const getExportDBCommand = (
 	user,
-	password,
-	dbName,
+dbName,
 	backupDir,
 	timestamp,
 	withData = true,
 ) => {
 	const dataOption = withData ? '' : '--no-data';
 
-	return `mysqldump -u ${user} -p${password} --databases ${dataOption} --add-drop-database --no-tablespaces --skip-column-statistics  ${dbName} > ${backupDir}/backup_${dbName}_${timestamp}.sql`;
+	return `mysqldump -u ${user} -p --databases ${dataOption} --add-drop-database --no-tablespaces --skip-column-statistics  ${dbName} > ${backupDir}/backup_${dbName}_${timestamp}.sql`;
 };
 
-const getImportDBCommand = (user, password, dbName, fileName) => {
-	return `mysql -u ${user} -p${password} ${dbName} < ${fileName}`;
+const getImportDBCommand = (user, dbName, fileName) => {
+	return `mysql -u ${user} -p ${dbName} < ${fileName}`;
 };
 
-
-
-if (!password) {
-	console.error('DB_PASSWORD is required in the environment variables.');
-	process.exit(1);
-}
 
 const timestamp = new Date()
 	.toISOString()
@@ -63,7 +55,6 @@ const backupDatabase = async (withData = true) => {
 	console.log('Backing up database...');
 	const backupCommand = getExportDBCommand(
 		user,
-		password,
 		dbName,
 		backupDir,
 		timestamp,
@@ -79,7 +70,7 @@ const backupDatabase = async (withData = true) => {
 
 const restoreDatabase = async (backupFile) => {
 	console.log(`Restoring database from backup: ${backupFile}...`);
-	const restoreCommand = getImportDBCommand(user, password, dbName, backupFile);
+	const restoreCommand = getImportDBCommand(user, dbName, backupFile);
 	try {
 		await runCommand(restoreCommand);
 		console.log('Database restored successfully.');
