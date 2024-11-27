@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 dotenv.config({ path: `${__dirname}/.env` });
 
 const app = require('./app');
-const port = process.env.PORT || 7181;
+const port = process.env.HTTP_PORT || 7181;
 
 const { logLineSync, logLineAsync } = require('./src/utils/logger');
 
@@ -16,13 +16,6 @@ process.on('uncaughtException', (err) => {
 	process.exit(1);
 });
 
-// const pool = mysql.createPool({
-// 	host: 'localhost',
-// 	user: 'root',
-// 	password: 'lexus_ita',
-// 	database: 'test',
-// 	connectionLimit: 5,
-// });
 
 const server = app.listen(port, () => {
 	const logLine = `Web server running on port  ${port}, process.pid = ${process.pid}`;

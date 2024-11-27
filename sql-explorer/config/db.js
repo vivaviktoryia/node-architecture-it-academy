@@ -1,11 +1,17 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
-const pool = mysql.createPool({
-	host: 'localhost',
-	user: 'root',
-	password: 'lexus_ita',
-	database: 'test',
+const connectionConfig = {
+	host: process.env.HOST || 'localhost',
+	port: process.env.DB_PORT || 3306,
+	user: process.env.DB_USER || 'nodeuser',
+	password: process.env.DB_USER_PASSWORD || 'nodepass',
+	database: process.env.DB_NAME || 'learning_db',
 	connectionLimit: 5,
-});
+	timezone: 'Z',
+};
 
-module.exports = {pool};
+const createConnection = async () => {
+	return mysql.createConnection(connectionConfig);
+};
+
+module.exports = { createConnection };

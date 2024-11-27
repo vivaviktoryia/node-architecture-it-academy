@@ -1,5 +1,4 @@
-const getOverview = async (req, res, next) => {
-	
+const getOverview = (req, res, next) => {
 	res.render('overview');
 };
 

@@ -2,8 +2,10 @@ const path = require('path');
 const express = require('express');
 const globalErrorHandler = require('./src/controllers/errorController');
 const AppError = require('./src/utils/appError');
+
 const viewRouter = require('./src/routes/viewRoutes');
 const queryRouter = require('./src/routes/queryRoutes');
+
 const app = express();
 
 app.set('view engine', 'pug');
