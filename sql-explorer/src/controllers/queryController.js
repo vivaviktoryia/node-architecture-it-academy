@@ -1,6 +1,6 @@
 const { createConnection } = require('../../config/db');
 
-const executeQuery = async (req, res) => {
+const executeQuery = async (req, res, next) => {
 	const { query } = req.body;
 
 	if (!query) {
@@ -18,7 +18,7 @@ const executeQuery = async (req, res) => {
 			? { success: true, type: 'select', data: rows }
 			: { success: true, type: 'update', affectedRows: rows.affectedRows };
 
-		res.json(response);
+		res.status(200).json(response);
 	} catch (err) {
 		res.status(400).json({
 			success: false,
