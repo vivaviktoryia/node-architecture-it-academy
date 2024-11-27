@@ -1,4 +1,9 @@
 const mysql = require('mysql2/promise');
+const path = require('path');
+const { logLineAsync } = require('../src/utils/logger');
+
+const logFileName = '_server.log';
+const logFilePath = path.resolve('logs', logFileName);
 
 const connectionConfig = {
 	host: process.env.HOST || 'localhost',
@@ -12,9 +17,11 @@ const connectionConfig = {
 
 const createConnection = async () => {
 	const { host, port, user, database } = connectionConfig;
-	
-	console.info('Attempting to connect to MariaDB ...');
-	console.info(`Connecting to: ${user}@${host}:${port} / ${database}`);
+	logLineAsync(logFilePath, 'Attempting to connect to MariaDB ...');
+	logLineAsync(
+		logFilePath,
+		`Connecting to: ${user}@${host}:${port} / ${database}`,
+	);
 
 	return mysql.createConnection(connectionConfig);
 };
