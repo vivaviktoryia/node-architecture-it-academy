@@ -5,6 +5,7 @@ const AppError = require('./src/utils/appError');
 
 const viewRouter = require('./src/routes/viewRoutes');
 const queryRouter = require('./src/routes/queryRoutes');
+const { loggerMiddleware } = require('./src/utils/logger');
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.set('views', path.join(__dirname, 'views'));
 // body parser
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+app.use(loggerMiddleware);
 
 app.use(express.static(path.join(__dirname, 'public')));
 

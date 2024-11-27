@@ -11,6 +11,11 @@ const connectionConfig = {
 };
 
 const createConnection = async () => {
+	const { host, port, user, database } = connectionConfig;
+	
+	console.info('Attempting to connect to MariaDB ...');
+	console.info(`Connecting to: ${user}@${host}:${port} / ${database}`);
+
 	return mysql.createConnection(connectionConfig);
 };
 
