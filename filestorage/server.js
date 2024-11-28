@@ -1,5 +1,9 @@
 const dotenv = require('dotenv');
-const { logError, logInfo } = require('./src/utils/logger');
+
+const http = require('http');
+const socketIo = require('socket.io');
+
+const { logError, logInfo } = require('./utils/logger');
 
 dotenv.config({ path: `${__dirname}/.env` });
 
@@ -12,7 +16,40 @@ process.on('uncaughtException', async (err) => {
 	process.exit(1);
 });
 
-const server = app.listen(port, async () => {
+// HTTP server
+const server = http.createServer(app);
+// Initialize WebSocket server using HTTP server
+const io = socketIo(server);
+
+io.on('connection', (socket) => {
+	console.log('A new WebSocket connection established');
+
+	socket.on('message', (data) => {
+		console.log('Message from client:', data);
+		socket.emit('response', `Server received: ${data}`);
+	});
+
+	socket.on('uploadProgress', (data) => {
+		console.log(`Upload progress: ${data.progress}%`);
+		socket.broadcast.emit('uploadProgress', data);
+	});
+
+	socket.on('uploadComplete', (data) => {
+		console.log('Upload completed:', data.message);
+		socket.emit('uploadComplete', data);
+	});
+
+	socket.on('uploadError', (data) => {
+		console.log('Upload error:', data.message);
+		socket.emit('uploadError', data);
+	});
+
+	socket.on('disconnect', () => {
+		console.log('A WebSocket client disconnected');
+	});
+});
+
+server.listen(port, async () => {
 	const logLine = `Web server running on port ${port}, process.pid = ${process.pid}`;
 	await logInfo(logLine);
 });

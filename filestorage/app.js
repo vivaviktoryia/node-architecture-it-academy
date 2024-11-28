@@ -1,10 +1,11 @@
-const path = require('path');
 const express = require('express');
-const { setupMorgan } = require('./src/utils/logger');
+const path = require('path');
+const { setupMorgan } = require('./utils/logger');
 const globalErrorHandler = require('./src/controllers/errorController');
-const AppError = require('./src/utils/appError');
+const AppError = require('./utils/appError');
 
 const viewRouter = require('./src/routes/viewRoutes');
+const fileRouter = require('./src/routes/fileRoutes');
 
 const app = express();
 
@@ -21,6 +22,8 @@ setupMorgan(app);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTES:
+app.use('/api/v1', fileRouter);
+
 app.use('/', viewRouter);
 
 app.all('*', (req, res, next) => {
