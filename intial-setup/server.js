@@ -1,29 +1,25 @@
-const path = require('path');
 const dotenv = require('dotenv');
+const { logError, logInfo } = require('./src/utils/logger');
+
 dotenv.config({ path: `${__dirname}/.env` });
 
 const app = require('./app');
 const port = process.env.PORT || 7181;
 
-const { logLineSync, logLineAsync } = require('./src/utils/logger');
-
-const logFileName = '_server.log';
-const logFilePath = path.resolve('logs', logFileName);
-
-process.on('uncaughtException', (err) => {
-	const logLine = `UNCAUGHT EXCEPTION!💥 Shutting down... ${err.name}: ${err.message}`;
-	logLineSync(logFilePath, logLine);
+process.on('uncaughtException', async (err) => {
+	const logLine = `UNCAUGHT EXCEPTION! 💥 ${err.name}: ${err.message}`;
+	await logError(logLine);
 	process.exit(1);
 });
 
 const server = app.listen(port, async () => {
-	const logLine = `Web server running on port  ${port}, process.pid = ${process.pid}`;
-	await logLineAsync(logFilePath, logLine);
+	const logLine = `Web server running on port ${port}, process.pid = ${process.pid}`;
+	await logInfo(logLine);
 });
 
-process.on('unhandledRejection', (err) => {
+process.on('unhandledRejection', async (err) => {
 	const logLine = `UNHANDLED REJECTION!💥 Shutting down... ${err.name}: ${err.message}`;
-	logLineSync(logFilePath, logLine);
+	await logError(logLine);
 	server.close(() => {
 		process.exit(1);
 	});

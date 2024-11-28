@@ -1,3 +1,5 @@
+const { logError } = require('../utils/logger');
+
 const sendError = (err, req, res) => {
 	// A) API
 	if (req.originalUrl.startsWith('/api')) {
@@ -24,6 +26,8 @@ const globalErrorHandler = (err, req, res, next) => {
 	err.statusCode = err.statusCode || 500;
 	err.status = err.status || 'error';
 
+	logError(err);
+	
 	sendError(err, req, res);
 };
 
