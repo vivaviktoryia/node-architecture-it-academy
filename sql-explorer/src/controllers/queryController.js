@@ -79,8 +79,10 @@ async function handleStandardQuery(connection, query) {
 
 async function getCurrentDatabase(connection) {
 	try {
-		const [rows] = await connection.query('SELECT DATABASE() AS database');
-		return rows[0]?.database || 'None';
+		const [rows] = await connection.query(
+			'SELECT DATABASE() AS current_database',
+		);
+		return rows[0]?.current_database || 'None';
 	} catch (err) {
 		console.error('Error fetching current database:', err.message);
 		return 'Unknown';
