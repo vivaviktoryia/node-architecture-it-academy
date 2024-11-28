@@ -17,9 +17,9 @@ process.on('uncaughtException', (err) => {
 });
 
 
-const server = app.listen(port, () => {
+const server = app.listen(port, async () => {
 	const logLine = `Web server running on port  ${port}, process.pid = ${process.pid}`;
-	logLineAsync(logFilePath, logLine);
+	await logLineAsync(logFilePath, logLine);
 });
 
 process.on('unhandledRejection', (err) => {
