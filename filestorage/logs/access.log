@@ -1,4 +1,0 @@
-::1 - - [28/Nov/2024:17:59:24 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-::1 - - [28/Nov/2024:17:59:24 +0000] "GET /css/styles.css HTTP/1.1" 304 - "http://localhost:7181/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-::1 - - [28/Nov/2024:17:59:24 +0000] "GET /js/script.js HTTP/1.1" 304 - "http://localhost:7181/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-::1 - - [28/Nov/2024:17:59:24 +0000] "GET /img/favicon.png HTTP/1.1" 200 11231 "http://localhost:7181/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
