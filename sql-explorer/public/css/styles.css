@@ -78,3 +78,15 @@ th {
 	max-width: 50rem;
 	margin: 0 auto;
 }
+
+.loading {
+	color: #007bff;
+	font-size: 1.2em;
+	margin-top: 10px;
+}
+
+.database-info {
+	font-weight: bold;
+	margin-bottom: 10px;
+	color: #333;
+}
