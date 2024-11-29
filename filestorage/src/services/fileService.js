@@ -84,6 +84,7 @@ const getFilePath = async (filename) => {
 };
 
 module.exports = {
+	ensureUploadDir,
 	uploadMiddleware,
 	saveFileData,
 	getFileList,

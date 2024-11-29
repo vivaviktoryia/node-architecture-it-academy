@@ -15,9 +15,40 @@ if (progressCircle) {
 	progressCircle.style.strokeDashoffset = `${circumference}`;
 }
 
+// uploadForm.addEventListener('submit', (event) => {
+// 	event.preventDefault();
+
+// 	const formData = new FormData(uploadForm);
+// 	const xhr = new XMLHttpRequest();
+
+// 	xhr.open('POST', '/api/v1/files', true);
+
+// 	xhr.upload.addEventListener('progress', (event) => {
+// 		if (event.lengthComputable) {
+// 			const progress = (event.loaded / event.total) * 100;
+// 			updateProgress(progress);
+// 			socket.emit('uploadProgress', { progress });
+// 		}
+// 	});
+
+// 	xhr.onload = () => {
+// 		if (xhr.status === 201) {
+// 			showSuccess('File uploaded successfully!');
+// 			loadFileList();
+// 			resetForm();
+// 			socket.emit('uploadComplete', { message: 'Upload complete' });
+// 		} else {
+// 			showError('Error uploading file.');
+// 			socket.emit('uploadError', { message: 'Upload failed' });
+// 		}
+// 	};
+
+// 	xhr.send(formData);
+// });
+
 uploadButton.addEventListener('click', async () => {
 	const file = fileInput.files[0];
-	const comment = commentField.value.trim();
+	const comment = commentInput.value.trim();
 
 	if (!file) {
 		alert('Please select a file');
@@ -44,11 +75,13 @@ uploadButton.addEventListener('click', async () => {
 });
 
 socket.on('uploadProgress', (data) => {
+	// progressFill.style.width = `${data.progress}%`;
 	updateProgress(data.progress);
 });
 
 socket.on('uploadComplete', (data) => {
 	showSuccess(data.message);
+	// progressFill.style.width = '0';
 	resetForm();
 	loadFileList();
 });
