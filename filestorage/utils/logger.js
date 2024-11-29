@@ -6,12 +6,13 @@ const { DateTime } = require('luxon');
 
 const appendFileAsync = promisify(fs.appendFile);
 
-const logsDir = path.resolve(__dirname, '../../logs');
+const logsDir = path.resolve(__dirname, '../logs');
 const logFile = path.resolve(logsDir, '_server.log');
 
 if (!fs.existsSync(logsDir)) {
 	fs.mkdirSync(logsDir, { recursive: true });
 }
+
 const logFormat =
 	':method :url :status :response-time ms - :res[content-length] :remote-addr';
 

@@ -22,7 +22,7 @@ setupMorgan(app);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTES:
-app.use('/api/v1', fileRouter);
+app.use('/api/v1/files', fileRouter);
 
 app.use('/', viewRouter);
 
