@@ -1,6 +1,6 @@
 const path = require('path');
 const express = require('express');
-const { setupMorgan } = require('./src/utils/logger');
+const { setupMorgan } = require('./utils/logger');
 const globalErrorHandler = require('./src/controllers/errorController');
 const AppError = require('./src/utils/appError');
 

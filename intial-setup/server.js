@@ -1,5 +1,5 @@
 const dotenv = require('dotenv');
-const { logError, logInfo } = require('./src/utils/logger');
+const { logError, logInfo } = require('./utils/logger');
 
 dotenv.config({ path: `${__dirname}/.env` });
 

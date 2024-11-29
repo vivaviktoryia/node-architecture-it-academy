@@ -1,4 +1,4 @@
-const { logError } = require('../utils/logger');
+const { logError } = require('../../utils/logger');
 
 const sendError = (err, req, res) => {
 	// A) API
