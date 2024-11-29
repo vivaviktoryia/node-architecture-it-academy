@@ -1,43 +1,84 @@
+const { DateTime } = require('luxon');
 const fileService = require('../services/fileService');
+const { v4: uuidv4 } = require('uuid');
 
-const handleFileUpload = (req, res, next) => {
-	fileService.singleFileUpload().single('file')(req, res, (err) => {
-		if (err) {
-			return next(err);
+// UPLOAD
+const uploadFile = async (req, res, next) => {
+	try {
+		const { file } = req;
+		const { comment } = req.body;
+
+		if (!file) {
+			return res
+				.status(400)
+				.json({ status: 'error', message: 'No file uploaded' });
 		}
-
-		res.json({
-			message: 'File uploaded successfully!',
-			filename: req.file.filename,
+		if (!comment) {
+			return res
+				.status(400)
+				.json({ status: 'error', message: 'No comment provided' });
+		}
+		const createdAt = DateTime.now().toUTC();
+		const fileID = uuidv4();
+		await fileService.saveFileData(fileID, file.filename, comment, createdAt);
+		res.status(201).json({
+			status: 'success',
+			message: 'File uploaded successfully',
+			data: {
+				fileID,
+				filename: file.filename,
+				comment,
+				createdAt,
+			},
 		});
-	});
+	} catch (error) {
+		res.status(500).json({
+			status: 'error',
+			message: `Error uploading file: ${error.message}`,
+		});
+	}
 };
 
-const getFileList = async (req, res) => {
+// GET ALL FILES
+const getFileList = async (req, res, next) => {
 	try {
 		const files = await fileService.getFileList();
-		res.json({ files });
-	} catch (err) {
-		res.status(500).json({ error: err.message });
+		res.status(200).json({
+			status: 'success',
+			message: 'Files retrieved successfully',
+			data: files,
+		});
+	} catch (error) {
+		res.status(500).json({
+			status: 'error',
+			message: `Error retrieving file: ${error.message}`,
+		});
 	}
 };
 
-const downloadFile = async (req, res) => {
-	const { filename } = req.params;
-
+// DOWNLOAD
+const downloadFile = async (req, res, next) => {
 	try {
+		const { filename } = req.params;
+		console.log(filename);
 		const filePath = await fileService.getFilePath(filename);
-
-		res.download(filePath, filename, (err) => {
-			if (err) {
-				console.log('Download error:', err);
-				res.status(500).send('Error downloading file');
+console.log(filePath);
+		res.download(filePath, filename, (error) => {
+			if (error) {
+				console.error('Download error:', error);
+				res.status(500).json({
+					status: 'error',
+					message: 'Error downloading file',
+				});
 			}
 		});
-	} catch (err) {
-		console.log('File not found:', err);
-		res.status(404).send('File not found');
+	} catch (error) {
+		console.error('File not found:', error);
+		res.status(404).json({
+			status: 'error',
+			message: 'File not found',
+		});
 	}
 };
 
-module.exports = { handleFileUpload, getFileList, downloadFile };
+module.exports = { uploadFile, getFileList, downloadFile };

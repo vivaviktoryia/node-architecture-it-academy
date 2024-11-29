@@ -1,16 +1,15 @@
 const express = require('express');
+const { uploadMiddleware } = require('../services/fileService');
 const {
-	handleFileUpload,
+	uploadFile,
 	getFileList,
 	downloadFile,
 } = require('../controllers/fileController');
 
 const router = express.Router();
 
-router.post('/upload', handleFileUpload);
-
-router.get('/files', getFileList);
-
-router.get('/download/:filename', downloadFile);
+router.get('/', getFileList);
+router.post('/', uploadMiddleware.single('file'), uploadFile);
+router.route('/:filename').get(downloadFile);
 
 module.exports = router;
