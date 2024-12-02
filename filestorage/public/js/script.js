@@ -22,41 +22,42 @@ uploadButton.addEventListener('click', async (event) => {
 	event.preventDefault();
 	if (!socketConnected) {
 		socket.connect();
-	}
-
-	socket.on('connect', async () => {
-		console.log('Socket connected');
-		socketConnected = true;
 		uploadButton.disabled = false;
 		await handleUpload(event);
-	});
+	}
+
+	// socket.on('connect', async () => {
+	// 	console.log('Socket connected');
+	// 	// socketConnected = true;
+	// 	uploadButton.disabled = false;
+	// 	await handleUpload(event);
+	// });
 });
 
-socket.on('disconnect', () => {
-	console.log('Socket disconnected');
-	socketConnected = false;
-});
+// socket.on('disconnect', () => {
+// 	console.log('Socket disconnected');
+// 	socketConnected = false;
+// });
 
-socket.on('uploadStart', ({ fileName, totalSize, message }) => {
-	console.log(message);
-	startUploadingChunks(fileName, totalSize);
-});
+// socket.on('uploadStart', ({ fileName, totalSize, message }) => {
+// 	console.log(message);
+// 	startUploadingChunks(fileName, totalSize);
+// });
 socket.on('uploadProgress', ({ progress }) => {
 	console.log(`Received progress update: ${progress}%`);
 	if (progress > 0 && progress <= 100) {
 		if (progressText.textContent !== `${progress}%`) updateProgress(progress);
 	}
-		
 });
 
-socket.on('uploadComplete', ({ message }) => {
-	console.log('Upload complete:', message);
-	showSuccess(message);
-	resetForm();
-	socketConnected = false;
+// socket.on('uploadComplete', ({ message }) => {
+// 	console.log('Upload complete:', message);
+// 	showSuccess(message);
+// 	resetForm();
+// 	socketConnected = false;
 
-	loadFileList();
-});
+// 	loadFileList();
+// });
 
 socket.on('uploadError', ({ message }) => showError(`Error: ${message}`));
 
@@ -81,29 +82,60 @@ async function handleUpload(event) {
 	}
 
 	try {
-		socket.emit('fileUploadStart', {
-			fileName: file.name,
-			totalSize: file.size,
-			comment,
-		});
+		socket.emit(
+			'fileUploadStart',
+			{
+				fileName: file.name,
+				totalSize: file.size,
+				comment,
+			},
+			(response) => {
+				if (response.status === 'ready') {
+					// showSuccess('!!!!!!RESPONSE!!!!!!!!!')
+					startUploadingChunks();
+				} else {
+					showError('ERROR!!!!!!!!fileUploadStart!!!!!!!!!!');
+				}
+			},
+		);
 	} catch (error) {
 		console.error('File upload initialization failed', error);
 		showError('An error occurred during upload initialization!');
 	}
 }
 
-async function startUploadingChunks(fileName, totalSize) {
+async function startUploadingChunks() {
 	const file = fileInput.files[0];
 	let offset = 0;
 
 	try {
 		while (offset < file.size) {
+			console.log('offset:', offset);
+			console.log('file.size', file.size);
 			const chunk = file.slice(offset, offset + CHUNK_SIZE);
 			const buffer = await chunk.arrayBuffer();
-			socket.emit('fileUploadChunk', buffer);
+			socket.emit('fileUploadChunk', buffer, (response) => {
+				if (response.status === 'success') {
+					updateProgress(response.progress);
+					// showSuccess(`!!!!!!RESPONSE!!!!!!!!! ${response.progress}`);
+				} else {
+					showError('ERROR!!!!!!!!startUploadingChunks!!!!!!!!!!');
+				}
+			});
 			offset += CHUNK_SIZE;
 		}
-		socket.emit('fileUploadEnd');
+		socket.emit('fileUploadEnd', (response) => {
+			if (response.status === 'finish') {
+				// showSuccess(`!!!!!!RESPONSE!!!!!!!!! ${response.status}`);
+				showSuccess(response.message);
+				resetForm();
+				// socketConnected = false;
+
+				loadFileList();
+			} else {
+				showError('ERROR!!!!!!!fileUploadEnd!!!!!!!!!!!');
+			}
+		});
 	} catch (error) {
 		console.error('File upload failed', error);
 		showError('An error occurred during file upload.');
@@ -123,7 +155,7 @@ function resetForm() {
 	commentField.value = '';
 	fileInput.value = '';
 	uploadButton.disabled = true;
-
+	socketConnected = false;
 }
 
 async function loadFileList() {

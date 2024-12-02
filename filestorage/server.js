@@ -54,7 +54,34 @@ io.on('connection', (socket) => {
 		fileName = '',
 		comment = '';
 
-	socket.on('fileUploadStart', async (data) => {
+	// socket.on('fileUploadStart', async (data) => {
+	// 	try {
+	// 		if (!data || !data.fileName || !data.totalSize || !data.comment) {
+	// 			throw new Error('Invalid upload start data');
+	// 		}
+	// 		if (isStreamEnded) return;
+	// 		fileName = data.fileName;
+	// 		totalSize = data.totalSize;
+	// 		comment = data.comment;
+	// 		fileID = uuidv4();
+
+	// 		await ensureUploadDir();
+	// 		const filePath = path.join(uploadDir, fileName);
+	// 		writeStream = fs.createWriteStream(filePath);
+	// 		uploadedBytes = 0;
+
+	// 		socket.emit('uploadStart', {
+	// 			fileName,
+	// 			totalSize,
+	// 			message: 'Upload initialized',
+	// 		});
+	// 	} catch (error) {
+	// 		console.error('Error in fileUploadStart:', error);
+	// 		socket.emit('uploadError', { message: error.message });
+	// 	}
+	// });
+
+	socket.on('fileUploadStart', async (data, cb) => {
 		try {
 			if (!data || !data.fileName || !data.totalSize || !data.comment) {
 				throw new Error('Invalid upload start data');
@@ -69,28 +96,32 @@ io.on('connection', (socket) => {
 			const filePath = path.join(uploadDir, fileName);
 			writeStream = fs.createWriteStream(filePath);
 			uploadedBytes = 0;
-
-			socket.emit('uploadStart', {
-				fileName,
-				totalSize,
-				message: 'Upload initialized',
-			});
+			cb({ status: 'ready', message: 'Upload initialized' });
+			console.log('isStreamEnded fileUploadStart', isStreamEnded);
+			// socket.emit('uploadStart', {
+			// 	fileName,
+			// 	totalSize,
+			// 	message: 'Upload initialized',
+			// });
 		} catch (error) {
 			console.error('Error in fileUploadStart:', error);
-			socket.emit('uploadError', { message: error.message });
+			// socket.emit('uploadError', { message: error.message });
+			cb({ status: 'error', message: error.message });
 		}
 	});
 
-	socket.on('fileUploadChunk', (chunk) => {
+	socket.on('fileUploadChunk', (chunk, cb) => {
+		console.log('isStreamEnded fileUploadChunk', isStreamEnded);
 		if (!writeStream) {
-			socket.emit('uploadError', { message: 'Upload not initialized' });
+			cb({ status: 'error', message: 'Upload not initialized' });
+			// socket.emit('uploadError', { message: 'Upload not initialized' });
 			return;
 		}
 
 		if (writeStream.writableEnded) {
-			socket.emit('uploadError', {
-				message: 'Upload stream is already closed',
-			});
+			cb({ status: 'error', message: 'Upload stream is already closed' });
+			// socket.emit('uploadError', {
+			// 	message: 'Upload stream is already closed',
 			return;
 		}
 		if (isStreamEnded) return;
@@ -98,19 +129,23 @@ io.on('connection', (socket) => {
 			const buffer = Buffer.from(chunk);
 			writeStream.write(buffer, (err) => {
 				if (err) {
-					socket.emit('uploadError', { message: 'Error writing file chunk' });
+					cb({ status: 'error', message: 'Error writing file chunk' });
+					// socket.emit('uploadError', { message: 'Error writing file chunk' });
 					return;
 				}
 				uploadedBytes += buffer.length;
 				const progress = Math.round((uploadedBytes / totalSize) * 100);
-				socket.emit('uploadProgress', { progress });
+				// socket.emit('uploadProgress', { progress });
+				cb({ status: 'success', progress });
+
 			});
 		} catch (error) {
-			socket.emit('uploadError', { message: 'Error writing file chunk' });
+			// socket.emit('uploadError', { message: 'Error writing file chunk' });
+			cb({ status: 'error' });
 		}
 	});
 
-	socket.on('fileUploadEnd', async () => {
+	socket.on('fileUploadEnd', async (cb) => {
 		if (!writeStream || isStreamEnded) return;
 		try {
 			isStreamEnded = true;
@@ -125,11 +160,13 @@ io.on('connection', (socket) => {
 				data.files.push(newFile);
 				await writeDataFile(data);
 
-				socket.emit('uploadComplete', { message: 'File upload complete' });
+				cb({ status: 'finish', message: 'File upload complete' });
+				// socket.emit('uploadComplete', { message: 'File upload complete' });
 				socket.disconnect();
 			});
 		} catch (error) {
-			socket.emit('uploadError', { message: 'Error completing upload' });
+			// socket.emit('uploadError', { message: 'Error completing upload' });
+			cb({ status: 'error', message: 'Error completing upload' });
 		}
 	});
 
