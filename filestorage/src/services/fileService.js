@@ -56,10 +56,10 @@ const storageConfig = multer.diskStorage({
 
 const uploadMiddleware = multer({ storage: storageConfig });
 
-const saveFileData = async (fileID, filename, comment, createdAt) => {
+const saveFileData = async (fileID, fileName, comment, createdAt) => {
 	const data = await readDataFile();
 
-	const newFileData = { fileID, filename, comment, createdAt };
+	const newFileData = { fileID, fileName, comment, createdAt };
 	data.files.push(newFileData);
 
 	await writeDataFile(data);
@@ -74,17 +74,19 @@ const getFileList = async () => {
 	}
 };
 
-const getFilePath = async (filename) => {
+const getFilePath = async (fileName) => {
 	const data = await readDataFile();
-	const file = data.files.find((file) => file.filename === filename);
+	const file = data.files.find((file) => file.fileName === fileName);
 	if (!file) {
 		throw new Error('File not found');
 	}
-	return path.resolve(uploadDir, file.filename);
+	return path.resolve(uploadDir, file.fileName);
 };
 
 module.exports = {
 	ensureUploadDir,
+	readDataFile,
+	writeDataFile,
 	uploadMiddleware,
 	saveFileData,
 	getFileList,
