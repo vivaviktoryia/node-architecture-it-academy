@@ -24,17 +24,13 @@ if (elements.progressCircle) {
 elements.uploadButton.addEventListener('click', onUploadButtonClick);
 elements.fileInput.addEventListener('change', onFileInputChange);
 
-// Socket listeners
-socket.on('uploadProgress', onUploadProgress);
-socket.on('uploadError', onUploadError);
-
-function onUploadButtonClick(event) {
+async function onUploadButtonClick(event) {
 	event.preventDefault();
 	if (!socketConnected) {
 		socket.connect();
-		elements.uploadButton.disabled = false;
-		handleUpload(event);
 	}
+	elements.uploadButton.disabled = false;
+	await handleUpload(event);
 }
 
 function onFileInputChange(event) {
@@ -57,6 +53,7 @@ function onUploadError({ message }) {
 	showError(`Error: ${message}`);
 }
 
+// fileUploadStart
 async function handleUpload(event) {
 	event.preventDefault();
 	const file = elements.fileInput.files[0];
@@ -85,21 +82,30 @@ async function handleUpload(event) {
 	}
 }
 
+// fileUploadChunk, fileUploadEnd
 async function startUploadingChunks() {
 	const file = elements.fileInput.files[0];
 	let offset = 0;
 
 	try {
 		while (offset < file.size) {
-			const chunk = file.slice(offset, offset + CHUNK_SIZE);
+			const chunk = file.slice(
+				offset,
+				Math.min(offset + CHUNK_SIZE, file.size),
+			);
 			const buffer = await chunk.arrayBuffer();
-			socket.emit('fileUploadChunk', buffer, (response) => {
-				if (response.status === 'success') {
-					updateProgress(response.progress);
-				} else {
-					showError('Error uploading chunk!');
-				}
+
+			await new Promise((resolve, reject) => {
+				socket.emit('fileUploadChunk', buffer, (response) => {
+					if (response.status === 'success') {
+						updateProgress(response.progress);
+						resolve();
+					} else {
+						reject(new Error('Error uploading chunk!'));
+					}
+				});
 			});
+
 			offset += CHUNK_SIZE;
 		}
 
@@ -110,6 +116,8 @@ async function startUploadingChunks() {
 				loadFileList();
 			} else {
 				showError('Error ending file upload!');
+				resetForm();
+				loadFileList();
 			}
 		});
 	} catch (error) {
