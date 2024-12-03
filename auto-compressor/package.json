@@ -1,0 +1,15 @@
+{
+  "name": "auto-compressor",
+  "version": "1.0.0",
+  "main": "autoCompressor.js",
+  "scripts": {
+    "example": "node autoCompressor.js ./folder-to-check",
+    "compress": "node autoCompressor.js"
+  },
+  "author": "Vik",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}

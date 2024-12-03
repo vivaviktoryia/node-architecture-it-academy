@@ -1,0 +1,21 @@
+{
+  "name": "sql-explorer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "backup:db:with-data": "node database/scripts/backup.js backup",
+    "backup:db:without-data": "node database/scripts/backup.js backup --without-data",
+    "db:setup": "node database/scripts/backup.js restore database/backup/learning_db.sql"
+  },
+  "author": "Viktoryia",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "mysql2": "^3.11.4",
+    "nodemon": "^3.1.7",
+    "pug": "^3.0.3"
+  }
+}

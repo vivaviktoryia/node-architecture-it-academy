@@ -1,0 +1,12 @@
+extends base
+
+block content
+    div.container
+        h1 SQL Explorer
+        div#current-database.database-info Current Database: None
+        form#sql-form
+            textarea#query(name='query' placeholder='Enter SQL query' rows='5' cols='50')
+            br
+            button(type='submit') Execute SQL
+        div#error(style='color: red')
+        div#result

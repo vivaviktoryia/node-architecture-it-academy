@@ -1,0 +1,168 @@
+:root {
+	--primary-color: #4caf50;
+	--accent-color: #3a8ecf;
+	--bg-color: #f9fafc;
+	--text-color: #333;
+	--border-radius: 8px;
+	--box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+body {
+	font-family: 'Inter', sans-serif;
+	background-color: var(--bg-color);
+	color: var(--text-color);
+	line-height: 1.5;
+	padding: 20px;
+}
+.container {
+	max-width: 600px;
+	margin: auto;
+	background: #fff;
+	border-radius: var(--border-radius);
+	box-shadow: var(--box-shadow);
+	padding: 20px;
+}
+h1,
+h2 {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+form {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 15px;
+}
+
+label {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+input[type='text'],
+input[type='file'] {
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+
+button {
+	pointer-events: auto;
+	background-color: var(--primary-color);
+	color: white;
+	padding: 10px 15px;
+	font-size: 1rem;
+	font-weight: bold;
+	border: none;
+	border-radius: var(--border-radius);
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+button:hover {
+	background-color: #45a049;
+}
+
+.placeholder {
+	text-align: center;
+	font-size: 1rem;
+	color: #aaa;
+}
+
+.progress-container {
+	margin: 20px auto;
+	position: relative;
+	width: 100px;
+	height: 100px;
+}
+
+.progress {
+	transform: rotate(-90deg);
+	position: absolute;
+	width: 100px;
+	height: 100px;
+}
+
+.progress-circle {
+	stroke: #4caf50;
+	stroke-width: 10;
+	fill: none;
+	transition: stroke-dashoffset 0.3s ease;
+}
+
+#progressText {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 18px;
+	font-weight: bold;
+}
+
+ul#fileList {
+	list-style-type: none;
+	margin: 20px auto;
+	padding: 0;
+	width: 90%;
+	max-width: 600px;
+}
+
+.file-item {
+	background: #fff;
+	margin-bottom: 10px;
+	padding: 10px 15px;
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.file-item a {
+	color: #007bff;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.file-item a:hover {
+	text-decoration: underline;
+}
+
+.file-item .comment {
+	font-style: italic;
+	color: #555;
+}
+.error {
+	max-width: 80rem;
+	text-align: center;
+	margin-top: 50px;
+}
+
+.error__title {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 1rem;
+}
+
+.error__emoji {
+	font-size: 3.75rem;
+	margin-left: 1rem;
+}
+
+.error__msg {
+	font-size: 2.5rem;
+	font-weight: 700;
+	max-width: 50rem;
+	margin: 0 auto;
+}
