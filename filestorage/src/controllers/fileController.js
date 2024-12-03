@@ -78,10 +78,20 @@ const handleFileUploadEnd = async (socket, cb) => {
 
 	const { writeStream, fileID, fileName, comment, uploadedBytes, totalSize } =
 		upload;
+	
 	if (!writeStream || writeStream.writableEnded) {
 		return cb({ status: 'error', message: 'Upload already finalized' });
 	}
 
+	if (uploadedBytes !== totalSize) {
+		await logError(
+			`File size mismatch for ${fileName}. Uploaded: ${uploadedBytes}, Expected: ${totalSize}`,
+		);
+		return cb({
+			status: 'error',
+			message: `File size mismatch. Uploaded: ${uploadedBytes}, Expected: ${totalSize}`,
+		});
+	}
 	try {
 		writeStream.end(async () => {
 			const newFile = {
@@ -109,18 +119,41 @@ const handleFileUploadEnd = async (socket, cb) => {
 const handleClientDisconnect = async (socket) => {
 	try {
 		const upload = activeUploads.get(socket.id);
-		if (upload) {
-			const { filePath, writeStream } = upload;
+		if (!upload) {
+			return await logInfo(
+				`Client disconnected with sid ${socket.id}, no active upload`,
+			);
+		}
+		const { filePath, writeStream, uploadedBytes, totalSize } = upload;
 
-			writeStream.end(() => {
-				fs.unlink(filePath, (err) => {
-					if (err) console.error(`Error deleting file ${filePath}:`, err);
-					else console.log(`Partially uploaded file ${filePath} deleted.`);
-				});
+		const deleteFile =  (path) => {
+			fs.unlink(path, async  (err) => {
+				if (err) {
+					await logError(`Error deleting file ${path}:`, err);
+				} else {
+					await logInfo(`Successfully deleted file ${path}.`);
+				}
 			});
+		};
+
+		if (uploadedBytes !== totalSize) {
+			await logError(
+				`File size mismatch on disconnect for ${filePath}. Uploaded: ${uploadedBytes}, Expected: ${totalSize}`,
+			);
+			deleteFile(filePath);
+		} else {
+			writeStream.end(() => deleteFile(filePath));
+		}
+
+			// writeStream.end(() => {
+			// 	fs.unlink(filePath, (err) => {
+			// 		if (err) console.error(`Error deleting file ${filePath}:`, err);
+			// 		else console.log(`Partially uploaded file ${filePath} deleted.`);
+			// 	});
+			// });
 
 			activeUploads.delete(socket.id);
-		}
+		
 		await logInfo(`Client disconnected with sid ${socket.id}`);
 	} catch (error) {
 		console.error(`Error during client disconnection: ${error.message}`);
