@@ -2,99 +2,80 @@ const socket = io({ autoConnect: false });
 let socketConnected = false;
 const CHUNK_SIZE = 10 * 1024; // 10KB
 
-const uploadForm = document.getElementById('uploadForm');
-const commentField = document.getElementById('commentField');
-const fileInput = document.getElementById('fileInput');
-const uploadButton = document.getElementById('uploadButton');
-const progressText = document.getElementById('progressText');
-const progressCircle = document.querySelector('.progress-circle');
-const fileList = document.getElementById('fileList');
+const elements = {
+	uploadForm: document.getElementById('uploadForm'),
+	commentField: document.getElementById('commentField'),
+	fileInput: document.getElementById('fileInput'),
+	uploadButton: document.getElementById('uploadButton'),
+	progressText: document.getElementById('progressText'),
+	progressCircle: document.querySelector('.progress-circle'),
+	fileList: document.getElementById('fileList'),
+};
 
 const circleRadius = 45;
 const circumference = 2 * Math.PI * circleRadius;
 
-if (progressCircle) {
-	progressCircle.style.strokeDasharray = `${circumference}`;
-	progressCircle.style.strokeDashoffset = `${circumference}`;
+if (elements.progressCircle) {
+	elements.progressCircle.style.strokeDasharray = `${circumference}`;
+	elements.progressCircle.style.strokeDashoffset = `${circumference}`;
 }
 
-uploadButton.addEventListener('click', async (event) => {
+// Event listeners
+elements.uploadButton.addEventListener('click', onUploadButtonClick);
+elements.fileInput.addEventListener('change', onFileInputChange);
+
+// Socket listeners
+socket.on('uploadProgress', onUploadProgress);
+socket.on('uploadError', onUploadError);
+
+function onUploadButtonClick(event) {
 	event.preventDefault();
 	if (!socketConnected) {
 		socket.connect();
-		uploadButton.disabled = false;
-		await handleUpload(event);
+		elements.uploadButton.disabled = false;
+		handleUpload(event);
 	}
+}
 
-	// socket.on('connect', async () => {
-	// 	console.log('Socket connected');
-	// 	// socketConnected = true;
-	// 	uploadButton.disabled = false;
-	// 	await handleUpload(event);
-	// });
-});
-
-// socket.on('disconnect', () => {
-// 	console.log('Socket disconnected');
-// 	socketConnected = false;
-// });
-
-// socket.on('uploadStart', ({ fileName, totalSize, message }) => {
-// 	console.log(message);
-// 	startUploadingChunks(fileName, totalSize);
-// });
-socket.on('uploadProgress', ({ progress }) => {
-	console.log(`Received progress update: ${progress}%`);
-	if (progress > 0 && progress <= 100) {
-		if (progressText.textContent !== `${progress}%`) updateProgress(progress);
-	}
-});
-
-// socket.on('uploadComplete', ({ message }) => {
-// 	console.log('Upload complete:', message);
-// 	showSuccess(message);
-// 	resetForm();
-// 	socketConnected = false;
-
-// 	loadFileList();
-// });
-
-socket.on('uploadError', ({ message }) => showError(`Error: ${message}`));
-
-fileInput.addEventListener('change', (event) => {
+function onFileInputChange(event) {
 	event.preventDefault();
-	console.log(`Files selected: ${fileInput.files.length}`);
-	uploadButton.disabled = !fileInput.files.length;
-});
+	elements.uploadButton.disabled = !elements.fileInput.files.length;
+}
+
+function onUploadProgress({ progress }) {
+	console.log(`Received progress update: ${progress}%`);
+	if (
+		progress > 0 &&
+		progress <= 100 &&
+		elements.progressText.textContent !== `${progress}%`
+	) {
+		updateProgress(progress);
+	}
+}
+
+function onUploadError({ message }) {
+	showError(`Error: ${message}`);
+}
 
 async function handleUpload(event) {
 	event.preventDefault();
-	const file = fileInput.files[0];
-	const comment = commentField.value.trim();
+	const file = elements.fileInput.files[0];
+	const comment = elements.commentField.value.trim();
 
-	if (!file) {
-		showError('Please select a file!');
-		return;
-	}
-	if (!comment) {
-		showError('Please specify a comment!');
+	if (!file || !comment) {
+		showError(file ? 'Please specify a comment!' : 'Please select a file!');
 		return;
 	}
 
 	try {
 		socket.emit(
 			'fileUploadStart',
-			{
-				fileName: file.name,
-				totalSize: file.size,
-				comment,
-			},
+			{ fileName: file.name, totalSize: file.size, comment },
 			(response) => {
 				if (response.status === 'ready') {
-					// showSuccess('!!!!!!RESPONSE!!!!!!!!!')
 					startUploadingChunks();
 				} else {
-					showError('ERROR!!!!!!!!fileUploadStart!!!!!!!!!!');
+					showError('File upload initialization failed!');
 				}
 			},
 		);
@@ -105,35 +86,30 @@ async function handleUpload(event) {
 }
 
 async function startUploadingChunks() {
-	const file = fileInput.files[0];
+	const file = elements.fileInput.files[0];
 	let offset = 0;
 
 	try {
 		while (offset < file.size) {
-			console.log('offset:', offset);
-			console.log('file.size', file.size);
 			const chunk = file.slice(offset, offset + CHUNK_SIZE);
 			const buffer = await chunk.arrayBuffer();
 			socket.emit('fileUploadChunk', buffer, (response) => {
 				if (response.status === 'success') {
 					updateProgress(response.progress);
-					// showSuccess(`!!!!!!RESPONSE!!!!!!!!! ${response.progress}`);
 				} else {
-					showError('ERROR!!!!!!!!startUploadingChunks!!!!!!!!!!');
+					showError('Error uploading chunk!');
 				}
 			});
 			offset += CHUNK_SIZE;
 		}
+
 		socket.emit('fileUploadEnd', (response) => {
 			if (response.status === 'finish') {
-				// showSuccess(`!!!!!!RESPONSE!!!!!!!!! ${response.status}`);
 				showSuccess(response.message);
 				resetForm();
-				// socketConnected = false;
-
 				loadFileList();
 			} else {
-				showError('ERROR!!!!!!!fileUploadEnd!!!!!!!!!!!');
+				showError('Error ending file upload!');
 			}
 		});
 	} catch (error) {
@@ -143,18 +119,18 @@ async function startUploadingChunks() {
 }
 
 function updateProgress(progress) {
-	progressText.textContent = `${Math.round(progress)}%`;
-	progressCircle.style.strokeDashoffset =
+	elements.progressText.textContent = `${Math.round(progress)}%`;
+	elements.progressCircle.style.strokeDashoffset =
 		circumference - (progress / 100) * circumference;
 }
 
 function resetForm() {
 	console.log('Resetting form...');
-	progressText.textContent = '👽';
-	progressCircle.style.strokeDashoffset = circumference;
-	commentField.value = '';
-	fileInput.value = '';
-	uploadButton.disabled = true;
+	elements.progressText.textContent = '👽';
+	elements.progressCircle.style.strokeDashoffset = circumference;
+	elements.commentField.value = '';
+	elements.fileInput.value = '';
+	elements.uploadButton.disabled = true;
 	socketConnected = false;
 }
 
@@ -169,16 +145,14 @@ async function loadFileList() {
 }
 
 function renderFileList(files) {
-	fileList.innerHTML = '';
+	elements.fileList.innerHTML = '';
 	files.forEach(({ fileName, comment }) => {
 		const listItem = document.createElement('li');
 		listItem.classList.add('file-item');
 		listItem.innerHTML = `<a href="/api/v1/files/${fileName}" download>${fileName}</a><span class="comment">Comment: ${comment}</span>`;
-		fileList.appendChild(listItem);
+		elements.fileList.appendChild(listItem);
 	});
 }
-
-window.addEventListener('load', loadFileList);
 
 function showSuccess(message) {
 	alert(message);
@@ -187,3 +161,5 @@ function showSuccess(message) {
 function showError(message) {
 	alert(message);
 }
+
+window.addEventListener('load', loadFileList);

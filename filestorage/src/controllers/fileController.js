@@ -1,18 +1,19 @@
 const path = require('path');
 const fs = require('fs');
 const fileService = require('../services/fileService');
+const { logError, logInfo } = require('../../utils/logger');
+const AppError = require('../../utils/appError');
 
 const { DateTime } = require('luxon');
 const { v4: uuidv4 } = require('uuid');
-
 const uploadDir = path.resolve(__dirname, '../../uploads');
 const activeUploads = new Map();
 
 // UPLOAD via WS
 const handleFileUploadStart = async (socket, data, cb) => {
 	try {
-		if (!data || !data.fileName || !data.totalSize || !data.comment) {
-			throw new Error('Invalid upload start data');
+		if (!data || !data?.fileName || !data?.totalSize || !data?.comment) {
+			throw new AppError('Invalid upload start data', 400);
 		}
 
 		const fileID = uuidv4();
@@ -33,14 +34,14 @@ const handleFileUploadStart = async (socket, data, cb) => {
 		});
 
 		cb({ status: 'ready', message: 'Upload initialized' });
-		await logInfo('Upload initialized');
+		await logInfo(`Sid ${socket.id}: Upload initialized`);
 	} catch (error) {
 		await logError('Error in fileUploadStart:', error);
 		cb({ status: 'error', message: error.message });
 	}
 };
 
-const handleFileUploadChunk = (socket, chunk, cb) => {
+const handleFileUploadChunk = async (socket, chunk, cb) => {
 	const upload = activeUploads.get(socket.id);
 	if (!upload) {
 		return cb({ status: 'error', message: 'Upload not initialized' });
@@ -60,23 +61,23 @@ const handleFileUploadChunk = (socket, chunk, cb) => {
 
 			upload.uploadedBytes += buffer.length;
 			const progress = Math.round((upload.uploadedBytes / totalSize) * 100);
-			console.log(progress);
 			cb({ status: 'success', progress });
 		});
 	} catch (error) {
 		cb({ status: 'error', message: 'Error writing file chunk' });
+		await logError('Error writing file chunk');
 	}
 };
 
 const handleFileUploadEnd = async (socket, cb) => {
 	const upload = activeUploads.get(socket.id);
-	console.log('handleFileUploadEnd', activeUploads);
 
 	if (!upload) {
 		return cb({ status: 'error', message: 'Upload not initialized' });
 	}
 
-	const { writeStream, fileID, fileName, comment } = upload;
+	const { writeStream, fileID, fileName, comment, uploadedBytes, totalSize } =
+		upload;
 	if (!writeStream || writeStream.writableEnded) {
 		return cb({ status: 'error', message: 'Upload already finalized' });
 	}
@@ -96,31 +97,36 @@ const handleFileUploadEnd = async (socket, cb) => {
 
 			activeUploads.delete(socket.id);
 			cb({ status: 'finish', message: 'File upload complete' });
+			await logInfo(`Sid ${socket.id}: File upload complete`);
 			socket.disconnect();
 		});
 	} catch (error) {
 		cb({ status: 'error', message: 'Error completing upload' });
+		await logError('Error completing upload');
 	}
 };
 
-const handleClientDisconnect = (socket) => {
-	const upload = activeUploads.get(socket.id);
-	if (upload) {
-		const { filePath, writeStream } = upload;
+const handleClientDisconnect = async (socket) => {
+	try {
+		const upload = activeUploads.get(socket.id);
+		if (upload) {
+			const { filePath, writeStream } = upload;
 
-		writeStream.end(() => {
-			fs.unlink(filePath, (err) => {
-				if (err) console.error(`Error deleting file ${filePath}:`, err);
-				else console.log(`Partially uploaded file ${filePath} deleted.`);
+			writeStream.end(() => {
+				fs.unlink(filePath, (err) => {
+					if (err) console.error(`Error deleting file ${filePath}:`, err);
+					else console.log(`Partially uploaded file ${filePath} deleted.`);
+				});
 			});
-		});
 
-		activeUploads.delete(socket.id);
+			activeUploads.delete(socket.id);
+		}
+		await logInfo(`Client disconnected with sid ${socket.id}`);
+	} catch (error) {
+		console.error(`Error during client disconnection: ${error.message}`);
+		await logError(`Error during client disconnection: ${error.message}`);
 	}
-
-	console.log(`Client disconnected with sid ${socket.id}`);
 };
-
 
 // UPLOAD via HTTP
 const uploadFileHttp = async (req, res, next) => {
@@ -129,14 +135,10 @@ const uploadFileHttp = async (req, res, next) => {
 		const { comment } = req.body;
 
 		if (!file) {
-			return res
-				.status(400)
-				.json({ status: 'error', message: 'No file uploaded' });
+			throw new AppError('No file uploaded', 400);
 		}
 		if (!comment) {
-			return res
-				.status(400)
-				.json({ status: 'error', message: 'No comment provided' });
+			throw new AppError('No comment provided', 400);
 		}
 		const createdAt = DateTime.now().toUTC();
 		const fileID = uuidv4();
@@ -152,10 +154,17 @@ const uploadFileHttp = async (req, res, next) => {
 			},
 		});
 	} catch (error) {
-		res.status(500).json({
-			status: 'error',
-			message: `Error uploading file: ${error.message}`,
-		});
+		if (error instanceof AppError) {
+			res.status(error.statusCode).json({
+				status: 'error',
+				message: error.message,
+			});
+		} else {
+			res.status(500).json({
+				status: 'error',
+				message: `Error uploading file: ${error.message}`,
+			});
+		}
 	}
 };
 
@@ -180,7 +189,6 @@ const getFileList = async (req, res, next) => {
 const downloadFile = async (req, res, next) => {
 	try {
 		const { filename } = req.params;
-		console.log(filename);
 		const filePath = await fileService.getFilePath(filename);
 		res.download(filePath, filename, (error) => {
 			if (error) {
