@@ -1,7 +1,7 @@
 const express = require('express');
 const { uploadMiddleware } = require('../services/fileService');
 const {
-	uploadFile,
+	uploadFileHttp,
 	getFileList,
 	downloadFile,
 } = require('../controllers/fileController');
@@ -9,7 +9,7 @@ const {
 const router = express.Router();
 
 router.get('/', getFileList);
-router.post('/', uploadMiddleware.single('file'), uploadFile);
+router.post('/', uploadMiddleware.single('file'), uploadFileHttp);
 router.route('/:filename').get(downloadFile);
 
 module.exports = router;
