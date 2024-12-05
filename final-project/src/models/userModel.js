@@ -9,13 +9,19 @@ const sequelize = getSequelizeInstance();
 const User = sequelize.define(
 	'User',
 	{
+		id: {
+			type: DataTypes.SMALLINT,
+			primaryKey: true,
+			autoIncrement: true,
+			allowNull: false,
+		},
 		name: {
 			type: DataTypes.STRING,
 			allowNull: false,
-			// validate: {
-			// 	len: [3, 40],
-			// 	is: /^[a-zA-Z\s]+$/i,
-			// },
+			validate: {
+				len: [3, 40],
+				is: /^[a-zA-Z0-9._\s]+$/i,
+			},
 		},
 		email: {
 			type: DataTypes.STRING,

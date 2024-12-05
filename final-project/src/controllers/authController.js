@@ -7,6 +7,17 @@ const sendEmail = require('../../utils/email'); // for reset password
 
 const AppError = require('../../utils/appError');
 const { catchAsync } = require('../../utils/catchAsync');
+const userInfoFields = [
+	'id',
+	'name',
+	'email',
+	'photo',
+	'role',
+	'active',
+	'createdAt',
+	'updatedAt',
+	'passwordChangedAt',
+];
 
 // Generate token
 const signToken = (id) =>
@@ -15,7 +26,7 @@ const signToken = (id) =>
 	});
 
 const createSendToken = (user, statusCode, res) => {
-	const token = signToken(user._id);
+	const token = signToken(user.id);
 
 	const cookieOptions = {
 		expires: new Date(
@@ -50,7 +61,14 @@ const signup = catchAsync(async (req, res, next) => {
 		role: req.body.role,
 	});
 
-	createSendToken(newUser, 201, res);
+	const userData = {};
+	userInfoFields.forEach((field) => {
+		if (newUser[field] !== undefined) {
+			userData[field] = newUser[field];
+		}
+	});
+
+	createSendToken(userData, 201, res);
 });
 
 const login = catchAsync(async (req, res, next) => {
@@ -61,9 +79,9 @@ const login = catchAsync(async (req, res, next) => {
 		return next(new AppError('Please provide email and password!', 400));
 	}
 	// 2. Check if user exists and password is correct
-  const user = await User.findOne({
+	const user = await User.findOne({
 		where: { email },
-		attributes: ['password', 'id', 'name', 'email', 'photo', 'role', 'active', ],
+		attributes: ['password', ...userInfoFields],
 	});
 
 	if (!user || !(await user.correctPassword(password, user.password))) {
@@ -239,7 +257,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
 const updatePassword = catchAsync(async (req, res, next) => {
 	// 1. Get user from collection
 	const user = await User.findByPk(req.user.id, {
-		attributes: [ 'password'],
+		attributes: ['password', 'id', 'name', 'email', 'photo', 'role', 'active'],
 	});
 
 	// 2. Check if POSTed current password is correct
