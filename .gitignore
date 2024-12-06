@@ -2,3 +2,4 @@
 _server.log
 check
 .env
+.parcel-cache
