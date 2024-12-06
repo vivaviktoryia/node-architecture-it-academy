@@ -123,9 +123,11 @@ const checkToken = catchAsync(async (req, res, next) => {
 	const decodedToken = await promisify(jwt.verify)(
 		token,
 		process.env.JWT_SECRET,
-	);
+  );
+   
 	// 3. Check if user still exists
-	const currentUser = await User.findByPk(decodedToken.id);
+  const currentUser = await User.findByPk(decodedToken.id);
+
 	if (!currentUser) {
 		return next(
 			new AppError(
