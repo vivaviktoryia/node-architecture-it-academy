@@ -2,9 +2,10 @@ const { DataTypes } = require('sequelize');
 const { getSequelizeInstance } = require('../../config/db');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const { logError, logInfo } = require('../../utils/logger');
 
+const { Tour } = require('./tourModel');
 const sequelize = getSequelizeInstance();
-// const Tour = require('./tourModel');
 
 const User = sequelize.define(
 	'User',
@@ -117,13 +118,30 @@ User.prototype.createPasswordResetToken = function () {
 	return resetToken;
 };
 
-// User.belongsToMany(Tour, { through: 'Users-Tours' });
+// Users_Tours => User.belongsToMany(Tour, { through: 'Users_Tours' });
+Tour.belongsToMany(User, {
+	through: 'Users_Tours',
+	as: 'users',
+	foreignKey: 'tourId',
+	timestamps: false,
+});
 
-// sequelize
-// 	.sync({ force: true })
-// 	.then(() => {
-// 		console.log('User created or reset');
-// 	})
-// 	.catch((error) => console.log('Error creating tables:', error));
+User.belongsToMany(Tour, {
+	through: 'Users_Tours',
+	as: 'tours',
+	foreignKey: 'userId',
+	timestamps: false,
+});
 
-module.exports = User;
+sequelize
+	.sync()
+	.then(() => {
+		logInfo(
+			`Tables ${JSON.stringify(
+				Object.keys(sequelize.models).join(', '),
+			)} created or reset`,
+		);
+	})
+	.catch((error) => logError('Error creating tables:', error));
+
+module.exports = { User };
