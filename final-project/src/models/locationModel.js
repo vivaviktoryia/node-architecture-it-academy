@@ -11,13 +11,32 @@ const Location = sequelize.define('Location', {
 		autoIncrement: true,
 		allowNull: false,
 	},
-	name: {
+	description: {
 		type: DataTypes.STRING,
 		allowNull: false,
+	},
+	type: {
+		type: DataTypes.STRING,
+		allowNull: false,
+		defaultValue: 'Point',
+		validate: {
+			isIn: [['Point']],
+		},
 	},
 	coordinates: {
 		type: DataTypes.GEOMETRY('POINT'),
 		allowNull: false,
+	},
+	createdAt: {
+		type: DataTypes.DATE,
+		defaultValue: DataTypes.NOW,
+		allowNull: false,
+	},
+	updatedAt: {
+		type: DataTypes.DATE,
+		defaultValue: DataTypes.NOW,
+		allowNull: false,
+		onUpdate: DataTypes.NOW,
 	},
 });
 

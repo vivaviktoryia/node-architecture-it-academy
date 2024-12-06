@@ -1,116 +1,29 @@
-const Tour = require('../models/tourModel');
+const { Tour } = require('../models/tourModel');
+const { Location } = require('../models/locationModel');
 const {
-  deleteOne,
-  updateOne,
-  createOne,
-  getOne,
-  getAll,
+	deleteOne,
+	updateOne,
+	createOne,
+	getOne,
+	getAll,
 } = require('./handlerFactory');
-
-// const APIFeatures = require('../utils/apiFeatures');
 
 const { catchAsync } = require('../../utils/catchAsync');
 const AppError = require('../../utils/appError');
 
 // MIDDLEWARE
 const aliasTopTours = async (req, res, next) => {
-  req.query.limit = '5';
-  req.query.sort = '-ratingsAverage, price';
-  req.query.fields = 'name,price,difficulty,ratingsAverage';
-  next();
+	req.query.limit = '5';
+	req.query.sort = 'ratingsAverage, price';
+	req.query.fields = 'name,price,difficulty,ratingsAverage';
+	next();
 };
 
 // GET
 const getAllTours = getAll(Tour);
+const getAllLocations = getAll(Location);
 
-const getTour = getOne(Tour, {
-  path: 'reviews',
-  select: 'review', // Specify the fields you want to include
-});
-
-const getToursWithin = catchAsync(async (req, res, next) => {
-  const { distance, latlng, unit } = req.params;
-  const [lat, lng] = latlng.split(',');
-
-  const normalizedUnit = unit.toLowerCase().trim();
-
-  if (!lat || !lng) {
-    return next(
-      new AppError('No coords specified in the format lat,lng!', 400),
-    );
-  }
-
-  if (normalizedUnit !== 'mi' && normalizedUnit !== 'km') {
-    return next(
-      new AppError('Wrong unit of measure specified! Allowed: km, mi.', 400),
-    );
-  }
-
-  const radius =
-    normalizedUnit === 'mi' ? distance / 3963.2 : distance / 6378.1; // distance / radious of Earth (mi or km)
-
-  const tours = await Tour.find({
-    startLocation: {
-      $geoWithin: { $centerSphere: [[lng, lat], radius] },
-    },
-  });
-
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      data: tours,
-    },
-  });
-});
-
-const getDistances = catchAsync(async (req, res, next) => {
-  const { latlng, unit } = req.params;
-  const [lat, lng] = latlng.split(',');
-
-  const normalizedUnit = unit.toLowerCase().trim();
-
-  if (!lat || !lng) {
-    return next(
-      new AppError('No coords specified in the format lat,lng!', 400),
-    );
-  }
-
-  if (normalizedUnit !== 'mi' && normalizedUnit !== 'km') {
-    return next(
-      new AppError('Wrong unit of measure specified! Allowed: km, mi.', 400),
-    );
-  }
-
-  const multiplier = normalizedUnit === 'mi' ? 0.000621371 : 0.001;
-
-  // needs to have index in schema
-  const distances = await Tour.aggregate([
-    {
-      $geoNear: {
-        near: {
-          type: 'Point',
-          coordinates: [+lng, +lat],
-        },
-        distanceField: 'distance',
-        distanceMultiplier: multiplier,
-      },
-    },
-    {
-      $project: {
-        distance: 1,
-        name: 1,
-      },
-    },
-  ]);
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      data: distances,
-    },
-  });
-});
+const getTour = getOne(Tour);
 
 // POST
 const createTour = createOne(Tour);
@@ -121,110 +34,115 @@ const updateTour = updateOne(Tour);
 // DELETE
 const deleteTour = deleteOne(Tour);
 
-const getTourStats = catchAsync(async (req, res, next) => {
-  const stats = await Tour.aggregate([
-    {
-      $match: { ratingsAverage: { $gte: 4.5 } },
-    },
-    {
-      $group: {
-        _id: { $toUpper: '$difficulty' },
-        // _id: '$difficulty',
-        // _id: null,
-        numTours: { $sum: 1 },
-        numRatings: { $sum: '$ratingsQuantity' },
-        avgRating: { $avg: '$ratingsAverage' },
-        avgPrice: { $avg: '$price' },
-        minPrice: { $min: '$price' },
-        maxPrice: { $max: '$price' },
-      },
-    },
-    {
-      $project: {
-        numTours: 1, // means that will include in output
-        numRatings: 1,
-        avgRating: { $round: ['$avgRating', 1] }, // Round to 1 decimal place
-        avgPrice: { $round: ['$avgPrice', 2] }, // Round to 2 decimal places
-        minPrice: 1,
-        maxPrice: 1,
-      },
-    },
-    {
-      $sort: {
-        numTours: 1,
-      },
-    },
-    // {
-    //   $match: { _id: { $ne: 'EASY' } },
-    // },
-  ]);
-  res.status(200).json({
-    status: 'success',
-    data: {
-      stats,
-    },
-  });
+// TODO
+const getToursWithin = catchAsync(async (req, res, next) => {
+	const { distance, latlng, unit } = req.params;
+	const [lat, lng] = latlng.split(',');
+
+	const normalizedUnit = unit.toLowerCase().trim();
+
+	if (!lat || !lng) {
+		return next(
+			new AppError('No coords specified in the format lat,lng!', 400),
+		);
+	}
+
+	if (normalizedUnit !== 'mi' && normalizedUnit !== 'km') {
+		return next(
+			new AppError('Wrong unit of measure specified! Allowed: km, mi.', 400),
+		);
+	}
+
+	const radius =
+    normalizedUnit === 'mi' ? distance / 3963.2 : distance / 6378.1; // distance / radious of Earth (mi or km)
+  
+	const tours = await Location.findAll({
+		where: Sequelize.where(
+			Sequelize.fn(
+				'ST_Distance_Sphere',
+				Sequelize.col('startLocation'),
+				Sequelize.fn('ST_GeomFromText', `POINT(${lng} ${lat})`),
+			),
+			{ [Sequelize.Op.lte]: radius },
+		),
+	});
+
+	res.status(200).json({
+		status: 'success',
+		results: tours.length,
+		data: {
+			data: tours,
+		},
+	});
 });
 
-const getMonthlyPlan = catchAsync(async (req, res, next) => {
-  const year = +req.params.year;
+const getDistances = catchAsync(async (req, res, next) => {
+	const { latlng, unit } = req.params;
+	const [lat, lng] = latlng.split(',');
 
-  const plan = await Tour.aggregate([
-    {
-      $unwind: '$startDates', // decompose eevery element of array - generate separate documents
-    },
-    {
-      $match: {
-        startDates: {
-          $gte: new Date(`${year}-01-01`),
-          $lte: new Date(`${year}-12-31`),
-        },
-      },
-    },
-    {
-      $group: {
-        _id: { $month: '$startDates' },
-        numTourStarts: { $sum: 1 },
-        tours: { $push: '$name' },
-      },
-    },
-    {
-      $addFields: {
-        month: '$_id',
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-      },
-    },
-    {
-      $sort: {
-        month: 1,
-      },
-    },
-    {
-      $limit: 12,
-    },
-  ]);
+	const normalizedUnit = unit.toLowerCase().trim();
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      plan,
-    },
-  });
+	if (!lat || !lng) {
+		return next(
+			new AppError('No coords specified in the format lat,lng!', 400),
+		);
+	}
+
+	if (normalizedUnit !== 'mi' && normalizedUnit !== 'km') {
+		return next(
+			new AppError('Wrong unit of measure specified! Allowed: km, mi.', 400),
+		);
+	}
+
+	const multiplier = normalizedUnit === 'mi' ? 0.000621371 : 0.001;
+
+	const distances = await Location.findAll({
+		attributes: [
+			'id', // Add other attributes you need
+			'name',
+			[
+				Sequelize.fn(
+					'ST_Distance_Sphere',
+					Sequelize.col('startLocation'),
+					Sequelize.fn('ST_GeomFromText', `POINT(${lng} ${lat})`),
+				),
+				'distance',
+			],
+		],
+		where: Sequelize.where(
+			Sequelize.fn(
+				'ST_Distance_Sphere',
+				Sequelize.col('startLocation'),
+				Sequelize.fn('ST_GeomFromText', `POINT(${lng} ${lat})`),
+			),
+			{ [Sequelize.Op.gte]: 0 }, // Filter based on distance if necessary
+		),
+	});
+
+	// Adjust the distances using the multiplier
+	const adjustedDistances = distances.map((tour) => ({
+		id: tour.id,
+		name: tour.name,
+		distance: tour.distance * multiplier,
+	}));
+
+	res.status(200).json({
+		status: 'success',
+		data: {
+			data: adjustedDistances,
+		},
+	});
 });
+
 
 module.exports = {
-  getAllTours,
-  getTourStats,
-  getMonthlyPlan,
-  getToursWithin,
-  getDistances,
-  createTour,
-  getTour,
-  updateTour,
-  deleteTour,
-  aliasTopTours,
+	getAllTours,
+	getToursWithin,
+	getDistances,
+	createTour,
+	getTour,
+	updateTour,
+	deleteTour,
+	aliasTopTours,
+	getAllLocations,
 };

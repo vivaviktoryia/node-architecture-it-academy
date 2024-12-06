@@ -2,7 +2,7 @@ const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
-const User = require('../models/userModel');
+const { User } = require('../models/userModel');
 const sendEmail = require('../../utils/email'); // for reset password
 
 const AppError = require('../../utils/appError');
@@ -123,10 +123,10 @@ const checkToken = catchAsync(async (req, res, next) => {
 	const decodedToken = await promisify(jwt.verify)(
 		token,
 		process.env.JWT_SECRET,
-  );
-   
+	);
+
 	// 3. Check if user still exists
-  const currentUser = await User.findByPk(decodedToken.id);
+	const currentUser = await User.findByPk(decodedToken.id);
 
 	if (!currentUser) {
 		return next(

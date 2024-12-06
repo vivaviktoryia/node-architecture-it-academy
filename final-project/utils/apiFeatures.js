@@ -1,66 +1,80 @@
-const createdAtField = '-createdAt';
+const createdAtField = 'createdAt';
 const excludedFields = ['page', 'sort', 'limit', 'fields'];
 
 class APIFeatures {
-  constructor(query, queryString) {
-    this.query = query;
-    this.queryString = queryString; // queryString = req.query;
-  }
+	constructor(initialQueryOptions, queryString) {
+		this.query = { ...initialQueryOptions };
+		this.queryString = queryString; // req.query
+	}
 
-  filter() {
-    // FILTERING
-    const queryObj = { ...this.queryString };
-    excludedFields.forEach(el => delete queryObj[el]);
+	filter() {
+		// Basic filtering
+		const queryObj = { ...this.queryString };
+		excludedFields.forEach((el) => delete queryObj[el]);
 
-    // ADVANCED FILTERING
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+		// Advanced filtering
+		Object.keys(queryObj).forEach((key) => {
+			const value = queryObj[key];
+			if (typeof value === 'object' && value !== null) {
+				Object.keys(value).forEach((operator) => {
+					const numericValue = Number(value[operator]);
 
-    this.query.find(JSON.parse(queryStr));
+					if (!isNaN(numericValue)) {
+						this.query.where = {
+							...this.query.where,
+							[key]: { [`$${operator}`]: numericValue },
+						};
+					} else {
+						console.log(
+							'Error: The value is not a valid number:',
+							value[operator],
+						);
+					}
+				});
+			} else {
+				const queryValue = !isNaN(value) ? Number(value) : value;
+				this.query.where = {
+					...this.query.where,
+					[key]: queryValue,
+				};
+			}
+		});
 
-    //  this.query = await Tour.find()
-    //   .where('duration')
-    //   .gte(5)
-    //   .where('difficulty')
-    //   .equals('easy');
+		return this;
+	}
 
-    return this; // provide access to different methods to call on the object
-  }
+	sort() {
+		if (this.queryString.sort) {
+			const sortBy = this.queryString.sort
+				.split(',')
+				.map((field) => [field, 'ASC']);
+			this.query.order = sortBy;
+		} else {
+			this.query.order = [[createdAtField, 'DESC']]; // Default sorting
+		}
+		return this;
+	}
 
-  // SORTING
-  sort() {
-    if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split(',').join(' ');
-      this.query = this.query.sort(sortBy);
-    } else {
-      this.query = this.query.sort(createdAtField); // default sorting
-    }
-    return this;
-  }
+	limitFields() {
+		if (this.queryString.fields) {
+			this.query.attributes = this.queryString.fields.split(',');
+		}
+		return this;
+	}
 
-  // FIELD LIMITING
-  limitFields() {
-    if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(',').join(' ');
-      this.query = this.query.select(fields);
-    } else {
-      this.query = this.query.select('-__v'); // to exclude fields need to add '-'
-    }
-    return this;
-  }
+	paginate() {
+		const page = +this.queryString.page || 1;
+		const limit = +this.queryString.limit || 20;
+		const offset = (page - 1) * limit;
 
-  // PAGINATION
-  paginate() {
-    const page = +this.queryString.page || 1;
-    const limit = +this.queryString.limit || 20;
-    const skip = (page - 1) * limit;
+		this.page = page;
+		this.limit = limit;
 
-    this.page = page; // Set the page property
-    this.limit = limit; // Set the limit property
+		this.query.limit = limit;
+		this.query.offset = offset;
 
-    this.query = this.query.skip(skip).limit(limit);
-    return this;
-  }
+		return this;
+	}
 }
 
 module.exports = APIFeatures;
