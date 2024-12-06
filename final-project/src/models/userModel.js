@@ -6,7 +6,6 @@ const crypto = require('crypto');
 const sequelize = getSequelizeInstance();
 // const Tour = require('./tourModel');
 
-sequelize.sync({ force: true });
 const User = sequelize.define(
 	'User',
 	{

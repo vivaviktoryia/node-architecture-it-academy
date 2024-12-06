@@ -1,9 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { getSequelizeInstance } = require('../../config/db');
 
-const Tour = require('./tourModel');
 const sequelize = getSequelizeInstance();
-sequelize.sync({ force: true });
 
 const Location = sequelize.define('Location', {
 	id: {
@@ -21,14 +19,5 @@ const Location = sequelize.define('Location', {
 		allowNull: false,
 	},
 });
-
-// Tour.belongsToMany(Location, { through: 'Tours-Locations' });
-
-// sequelize
-// 	.sync({ force: true })
-// 	.then(() => {
-// 		console.log('Tour created or reset');
-// 	})
-// 	.catch((error) => console.log('Error creating tables:', error));
 
 module.exports = Location;

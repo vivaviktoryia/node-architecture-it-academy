@@ -1,13 +1,11 @@
 const { DataTypes } = require('sequelize');
 const { getSequelizeInstance } = require('../../config/db');
 
+const sequelize = getSequelizeInstance();
+
 const User = require('./userModel');
 const Location  = require('./locationModel');
 const Image  = require('./imageModel');
-
-const sequelize = getSequelizeInstance();
-
-sequelize.sync({ force: true });
 
 const Tour = sequelize.define(
 	'Tour',
@@ -176,10 +174,16 @@ const Tour = sequelize.define(
 );
 
 Tour.belongsToMany(User, { through: 'Users-Tours' });
-Tour.belongsToMany(Location, { through: 'Locations-Tours' });
+User.belongsToMany(Tour, { through: 'Users-Tours' });
+
+Tour.belongsToMany(Location, { through: 'Tours-Locations' });
+Location.belongsToMany(Tour, { through: 'Tours-Locations' });
+
+Tour.belongsToMany(Image, { through: 'Images-Locations' });
+Image.belongsToMany(Tour, { through: 'Images-Locations' });
 
 sequelize
-	.sync({ force: true })
+	.sync({ alter: true })
 	.then(() => {
 		console.log('User created or reset');
 	})

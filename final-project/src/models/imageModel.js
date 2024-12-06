@@ -1,7 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { getSequelizeInstance } = require('../../config/db');
 
-const Tour = require('./tourModel');
 const sequelize = getSequelizeInstance();
 
 const Image = sequelize.define('Image', {
@@ -19,11 +18,5 @@ const Image = sequelize.define('Image', {
 		},
 	},
 });
-
-// Image.sync({ force: true })
-// 	.then(() => {
-// 		console.log('Image created or reset');
-// 	})
-// 	.catch((error) => console.log('Error creating tables:', error));
 
 module.exports = Image;
