@@ -17,11 +17,16 @@ const createOne = (Model) =>
 
 const updateOne = (Model) =>
 	catchAsync(async (req, res, next) => {
-		const updatedRecord = await Model.update(req.body, {
+		const updatedRowsCount = await Model.update(req.body, {
 			where: { id: req.params.id },
-			returning: true,
 		});
 
+		if (updatedRowsCount[0] === 0) {
+			return next(new AppError('Record with that ID not found', 404));
+		}
+
+		const updatedRecord = await Model.findByPk(req.params.id);
+		
 		if (!updatedRecord) {
 			return next(new AppError('Record  with that ID not found', 404));
 		}
@@ -50,11 +55,10 @@ const deleteOne = (Model) =>
 		});
 	});
 
-const getOne = (Model, includeOptions) =>
+const getOne = (Model) =>
 	catchAsync(async (req, res, next) => {
 		const queryOptions = {
 			where: { id: req.params.id },
-			include: includeOptions || undefined,
 		};
 
 		const record = await Model.findOne(queryOptions);
@@ -66,7 +70,6 @@ const getOne = (Model, includeOptions) =>
 		res.status(200).json({
 			status: 'success',
 			data: {
-				requestedTime: req.requestTime,
 				data: record,
 			},
 		});
@@ -90,9 +93,15 @@ const getAll = (Model) =>
 			.limitFields()
 			.paginate();
 
-		const records = await features.query;
-
-		// SEND RESPONSE
+		const { where, order, attributes, limit, offset } = features.query;
+		const records = await Model.findAll({
+			where,
+			order,
+			attributes,
+			limit,
+			offset,
+		});
+		
 		res.status(200).json({
 			status: 'success',
 			results: records.length,

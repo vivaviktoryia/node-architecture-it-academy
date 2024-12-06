@@ -28,7 +28,7 @@ const getSequelizeInstance = () => {
 		dialect,
 		port,
 		pool: poolConfig,
-		logging: process.env.DB_LOGGING === true,
+		logging: process.env.DB_LOGGING === 'true',
 		timezone: process.env.DB_TIMEZONE || '+00:00',
 	});
 

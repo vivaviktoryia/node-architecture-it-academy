@@ -1,35 +1,38 @@
 const express = require('express');
 
 const {
-  getAllTours,
-  createTour,
-  getTour,
-  updateTour,
-  deleteTour,
-  aliasTopTours,
-  getTourStats,
-  getMonthlyPlan,
-  getToursWithin,
-  getDistances,
+	getAllTours,
+	createTour,
+	getTour,
+	updateTour,
+	deleteTour,
+	aliasTopTours,
+	getToursWithin,
+	getDistances,
+	getAllLocations,
 } = require('../controllers/tourController');
 
 const { checkToken, restrictTo } = require('../controllers/authController');
 
-// const reviewRouter = require('./reviewRoutes');
-
 const router = express.Router();
 
-// router.use('/:tourId/reviews', reviewRouter);
-
-// for every parameter need to create its own middleware
-// router.param('id', checkId);
-
-router.route('/top-5-cheap').get(aliasTopTours, getAllTours); // adding allias through middleware
-
-router.route('/tour-stats').get(getTourStats);
 router
-  .route('/monthly-plan/:year')
-  .get(checkToken, restrictTo('admin', 'lead-guide', 'guide'), getMonthlyPlan);
+	.route('/')
+	.get(getAllTours)
+  .post(checkToken, restrictTo('admin'), createTour);
+  
+router.route('/locations').get(getAllLocations);
+	
+
+router
+	.route('/:id')
+	.get(getTour)
+	.patch(checkToken, restrictTo('admin'), updateTour)
+	.delete(checkToken, restrictTo('admin'), deleteTour);
+
+
+// TODO
+router.route('/top-5-cheap').get(aliasTopTours, getAllTours); // adding allias through middleware
 
 router
   .route('/tours-within/:distance/center/:latlng/unit/:unit')
@@ -39,15 +42,6 @@ router
 
 router.route('/distances/:latlng/unit/:unit').get(getDistances);
 
-router
-  .route('/')
-  .get(getAllTours)
-  .post(checkToken, restrictTo('admin', 'lead-guide'), createTour);
 
-router
-  .route('/:id')
-  .get(getTour)
-  .patch(checkToken, restrictTo('admin', 'lead-guide'), updateTour)
-  .delete(checkToken, restrictTo('admin', 'lead-guide'), deleteTour);
 
 module.exports = router;
