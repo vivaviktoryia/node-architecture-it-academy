@@ -1,11 +1,10 @@
 const { DataTypes } = require('sequelize');
 const { getSequelizeInstance } = require('../../config/db');
+const { logError, logInfo } = require('../../utils/logger');
 
+const { Location } = require('./locationModel');
+const { Image } = require('./imageModel');
 const sequelize = getSequelizeInstance();
-
-const User = require('./userModel');
-const Location  = require('./locationModel');
-const Image  = require('./imageModel');
 
 const Tour = sequelize.define(
 	'Tour',
@@ -130,10 +129,10 @@ const Tour = sequelize.define(
 			onUpdate: DataTypes.NOW,
 		},
 		startDate: {
-            type: DataTypes.DATE,
-            allowNull: false,
+			type: DataTypes.DATE,
+			allowNull: false,
 		},
-		
+
 		// 	startLocation: {
 		// 		type: DataTypes.JSONB, // Stores the GeoJSON object
 		// 		validate: {
@@ -173,21 +172,45 @@ const Tour = sequelize.define(
 	},
 );
 
-Tour.belongsToMany(User, { through: 'Users-Tours' });
-User.belongsToMany(Tour, { through: 'Users-Tours' });
+// Tours_Locations
+Tour.belongsToMany(Location, {
+	through: 'Tours_Locations',
+	as: 'locations',
+	foreignKey: 'tourId',
+	timestamps: false,
+});
 
-Tour.belongsToMany(Location, { through: 'Tours-Locations' });
-Location.belongsToMany(Tour, { through: 'Tours-Locations' });
+Location.belongsToMany(Tour, {
+	through: 'Tours_Locations',
+	as: 'tours',
+	foreignKey: 'locationId',
+	timestamps: false,
+});
 
-Tour.belongsToMany(Image, { through: 'Images-Locations' });
-Image.belongsToMany(Tour, { through: 'Images-Locations' });
+// Tours_Images
+Tour.belongsToMany(Image, {
+	through: 'Tours_Images',
+	as: 'images',
+	foreignKey: 'tourId',
+	timestamps: false,
+});
+
+Image.belongsToMany(Tour, {
+	through: 'Tours_Images',
+	as: 'tours',
+	foreignKey: 'imageId',
+	timestamps: false,
+});
 
 sequelize
-	.sync({ alter: true })
+	.sync()
 	.then(() => {
-		console.log('User created or reset');
+		logInfo(
+			`Tables ${JSON.stringify(
+				Object.keys(sequelize.models).join(', '),
+			)} created or reset`,
+		);
 	})
-	.catch((error) => console.log('Error creating tables:', error));
+	.catch((error) => logError('Error creating tables:', error));
 
-
-module.exports = Tour;
+module.exports = { Tour };

@@ -52,7 +52,6 @@ async function checkDatabaseConnection() {
 	}
 }
 
-
 module.exports = {
 	getSequelizeInstance,
 	checkDatabaseConnection,

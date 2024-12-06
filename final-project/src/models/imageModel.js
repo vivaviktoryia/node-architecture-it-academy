@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { getSequelizeInstance } = require('../../config/db');
+const { logError, logInfo } = require('../../utils/logger');
 
 const sequelize = getSequelizeInstance();
 
@@ -19,4 +20,15 @@ const Image = sequelize.define('Image', {
 	},
 });
 
-module.exports = Image;
+sequelize
+	.sync()
+	.then(() => {
+		logInfo(
+			`Tables ${JSON.stringify(
+				Object.keys(sequelize.models).join(', '),
+			)} created or reset`,
+		);
+	})
+	.catch((error) => logError('Error creating tables:', error));
+
+module.exports = { Image };
