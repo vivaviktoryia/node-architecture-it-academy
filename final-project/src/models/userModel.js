@@ -1,21 +1,28 @@
 const { DataTypes } = require('sequelize');
 const { getSequelizeInstance } = require('../../config/db');
-
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
 const sequelize = getSequelizeInstance();
+// const Tour = require('./tourModel');
 
+sequelize.sync({ force: true });
 const User = sequelize.define(
 	'User',
 	{
+		id: {
+			type: DataTypes.SMALLINT,
+			primaryKey: true,
+			autoIncrement: true,
+			allowNull: false,
+		},
 		name: {
 			type: DataTypes.STRING,
 			allowNull: false,
-			// validate: {
-			// 	len: [3, 40],
-			// 	is: /^[a-zA-Z\s]+$/i,
-			// },
+			validate: {
+				len: [3, 40],
+				is: /^[a-zA-Z0-9._\s]+$/i,
+			},
 		},
 		email: {
 			type: DataTypes.STRING,
@@ -111,8 +118,13 @@ User.prototype.createPasswordResetToken = function () {
 	return resetToken;
 };
 
-// User.sync({ force: true }) // Это удалит таблицу, если она уже существует, и создаст новую
-// 	.then(() => console.log('User table created or reset'))
-// 	.catch((error) => console.log('Error creating table:', error));
+// User.belongsToMany(Tour, { through: 'Users-Tours' });
+
+// sequelize
+// 	.sync({ force: true })
+// 	.then(() => {
+// 		console.log('User created or reset');
+// 	})
+// 	.catch((error) => console.log('Error creating tables:', error));
 
 module.exports = User;

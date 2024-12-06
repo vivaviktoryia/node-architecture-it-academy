@@ -6,6 +6,7 @@ const AppError = require('./utils/appError');
 
 const viewRouter = require('./src/routes/viewRoutes');
 const userRouter = require('./src/routes/userRoutes');
+const tourRouter = require('./src/routes/tourRoutes');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ROUTES:
 app.use('/', viewRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/tours', tourRouter);
 
 app.all('*', (req, res, next) => {
 	next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

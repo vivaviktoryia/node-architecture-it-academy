@@ -33,7 +33,7 @@ router.get('/logout', logout);
 
 router.use(checkToken);
 
-// router.patch('/updateMyPassword', updatePassword);
+router.patch('/updateMyPassword', updatePassword);
 // router.get('/me', getMe, getUser);
 // router.patch('/updateMe', uploadUserPhoto, updateMe);
 // router.delete('/deleteMe', deleteMe);
