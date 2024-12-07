@@ -2,7 +2,7 @@ const { Tour } = require('../models/tourModel');
 const { User } = require('../models/userModel');
 const { Location } = require('../models/locationModel');
 const { Image } = require('../models/imageModel');
-// const { Review } = require('../models/reviewModel');
+const { Review } = require('../models/reviewModel');
 
 const AppError = require('../../utils/appError');
 const { catchAsync } = require('../../utils/catchAsync');
@@ -19,6 +19,11 @@ const getOverview = catchAsync(async (req, res, next) => {
 			{
 				model: Image,
 				as: 'images',
+				required: false,
+			},
+			{
+				model: Review,
+				as: 'reviews',
 				required: false,
 			},
 		],
@@ -43,15 +48,25 @@ const getTour = catchAsync(async (req, res, next) => {
 				as: 'images',
 				required: false,
 			},
-			// {
-			// 	model: Review,
-			// 	attributes: ['review', 'rating', 'user'], // Select specific fields to include
-			// },
+			{
+				model: Review,
+				as: 'reviews',
+				// 	attributes: ['review', 'rating', 'user'], // Select specific fields to include
+				include: [
+					{
+						model: User,
+						as: 'user',
+						attributes: ['name', 'photo'], // Укажите необходимые поля
+					},
+				],
+				required: false,
+			},
 		],
 	});
 	if (!tour) {
 		return next(new AppError('There is no Tour with that name!', 404));
 	}
+	console.log(tour.reviews.user);
 	res
 		.status(200)
 		.set(

@@ -114,9 +114,6 @@ const Tour = sequelize.define(
 				notNull: { msg: 'A tour must have a Cover image' },
 			},
 		},
-		// images: {
-		// 	type: DataTypes.ARRAY(DataTypes.STRING),
-		// },
 		createdAt: {
 			type: DataTypes.DATE,
 			defaultValue: DataTypes.NOW,
@@ -132,30 +129,9 @@ const Tour = sequelize.define(
 			type: DataTypes.DATE,
 			allowNull: false,
 		},
-
-		// 	startLocation: {
-		// 		type: DataTypes.JSONB, // Stores the GeoJSON object
-		// 		validate: {
-		// 			isGeoJSON(value) {
-		// 				if (
-		// 					!value ||
-		// 					value.type !== 'Point' ||
-		// 					!Array.isArray(value.coordinates)
-		// 				) {
-		// 					throw new Error('Start location must be a valid GeoJSON Point');
-		// 				}
-		// 			},
-		// 		},
-		// 	},
-		// 	locations: {
-		// 		type: DataTypes.ARRAY(DataTypes.JSONB), // Stores an array of GeoJSON objects
-		// 	},
-		// },
-		// {
 		// indexes: [
 		// 	{ fields: ['price', 'ratingsAverage'] },
 		// 	{ fields: ['slug'] },
-		// 	// { fields: ['startLocation'], using: 'GIST' },
 		// ],
 	},
 	{
