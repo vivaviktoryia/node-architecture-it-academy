@@ -1,6 +1,8 @@
 const path = require('path');
 const express = require('express');
 const { setupMorgan } = require('./utils/logger');
+const cookieParser = require('cookie-parser');
+
 const globalErrorHandler = require('./src/controllers/errorController');
 const AppError = require('./utils/appError');
 
@@ -16,6 +18,9 @@ app.set('views', path.join(__dirname, 'views'));
 // body parser
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// cookieParser
+app.use(cookieParser());
 
 // Logger
 setupMorgan(app);

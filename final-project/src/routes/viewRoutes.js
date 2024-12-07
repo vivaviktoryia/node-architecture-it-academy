@@ -9,16 +9,16 @@ const {
 	// updateUserData,
 } = require('../controllers/viewsController');
 
-// const { isLoggedIn, checkToken } = require('../controllers/authController');
+const { isLoggedIn, checkToken } = require('../controllers/authController');
 
 const router = express.Router();
 
-// router.get('/me', checkToken, getAccount);
+router.get('/me', checkToken, getAccount);
 
 // without API
 // router.post('/submit-user-data', checkToken, updateUserData);
 
-// router.use(isLoggedIn);
+router.use(isLoggedIn);
 
 router.get('/', getOverview);
 router.get('/tour/:slug', getTour);

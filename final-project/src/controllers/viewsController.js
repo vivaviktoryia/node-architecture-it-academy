@@ -1,11 +1,3 @@
-// const getOverview = (req, res, next) => {
-// 	res.render('overview');
-// };
-
-// module.exports = {
-// 	getOverview,
-// };
-
 const { Tour } = require('../models/tourModel');
 const { User } = require('../models/userModel');
 

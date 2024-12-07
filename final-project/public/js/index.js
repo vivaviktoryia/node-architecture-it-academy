@@ -1,5 +1,4 @@
 /* eslint-disable */
-import '@babel/polyfill';
 import { signup, login, logout } from './login';
 import { updateSettings } from './updateSettings';
 import { displayMap } from './mapbox';

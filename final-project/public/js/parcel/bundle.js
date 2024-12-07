@@ -1,13 +1,4 @@
-require("@babel/polyfill");
-var $hZpXk$axios = require("axios");
-
-
-function $parcel$interopDefault(a) {
-  return a && a.__esModule ? a.default : a;
-}
-/* eslint-disable */ 
-/* eslint-disable */ 
-/*eslint-disable */ const $c67cb762f0198593$export$516836c6a9dfc573 = ()=>{
+/* eslint-disable */ /* eslint-disable */ /*eslint-disable */ const $c67cb762f0198593$export$516836c6a9dfc573 = ()=>{
     const el = document.querySelector('.alert');
     if (el) el.parentElement.removeChild(el);
 };
@@ -21,54 +12,61 @@ const $c67cb762f0198593$export$5e5cfdaa6ca4292c = (type, msg)=>{
 
 const $70af9284e599e604$export$7200a869094fec36 = async (name, email, password)=>{
     try {
-        const res = await (0, ($parcel$interopDefault($hZpXk$axios)))({
+        const res = await fetch('/api/v1/users/signup', {
             method: 'POST',
-            url: '/api/v1/users/signup',
-            data: {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
                 name: name,
                 email: email,
                 password: password
-            }
+            })
         });
-        if (res.data.status === 'success') {
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
             (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', 'Logged in successfully!');
             window.setTimeout(()=>{
                 location.assign('/');
             }, 1500);
-        }
+        } else throw new Error(data.message);
     } catch (err) {
-        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', err.response.data.message);
+        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', err.message);
     }
 };
 const $70af9284e599e604$export$596d806903d1f59e = async (email, password)=>{
     try {
-        const res = await (0, ($parcel$interopDefault($hZpXk$axios)))({
+        const res = await fetch('/api/v1/users/login', {
             method: 'POST',
-            url: '/api/v1/users/login',
-            data: {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
                 email: email,
                 password: password
-            }
+            })
         });
-        if (res.data.status === 'success') {
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
             (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', 'Logged in successfully!');
             window.setTimeout(()=>{
                 location.assign('/');
             }, 1500);
-        }
+        } else throw new Error(data.message);
     } catch (err) {
-        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', err.response.data.message);
+        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', err.message);
     }
 };
 const $70af9284e599e604$export$a0973bcfe11b05c9 = async ()=>{
     try {
-        const res = await (0, ($parcel$interopDefault($hZpXk$axios)))({
-            method: 'GET',
-            url: '/api/v1/users/logout'
+        const res = await fetch('/api/v1/users/logout', {
+            method: 'GET'
         });
-        if (res.data.status === 'success') window.setTimeout(()=>{
+        const data = await res.json();
+        if (res.ok && data.status === 'success') window.setTimeout(()=>{
             location.assign('/');
         }, 1500);
+        else throw new Error('Error during logout');
     } catch (err) {
         console.log(err);
         (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', 'Error Logged Out! Try Again!');
@@ -77,21 +75,23 @@ const $70af9284e599e604$export$a0973bcfe11b05c9 = async ()=>{
 
 
 /* eslint-disable */ 
-
 const $936fcc27ffb6bbb1$export$f558026a994b6051 = async (data, type)=>{
     try {
         const dataType = type.trim().toLowerCase().charAt(0).toUpperCase() + type.slice(1);
         const url = `/api/v1/users/${dataType === 'Password' ? 'updateMyPassword' : 'updateMe'}`;
         if (dataType !== 'Password' && dataType !== 'Data') return (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', 'Invalid type provided!');
-        const res = await (0, ($parcel$interopDefault($hZpXk$axios)))({
+        const res = await fetch(url, {
             method: 'PATCH',
-            url: url,
-            data: data
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
         });
-        console.log(res);
-        if (res.data.status === 'success') (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', `${dataType} updated successfully!`);
+        const responseData = await res.json();
+        if (res.ok && responseData.status === 'success') (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', `${dataType} updated successfully!`);
+        else throw new Error(responseData.message || 'Error updating data!');
     } catch (err) {
-        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', err.response?.data?.message || 'Error updating data!');
+        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', err.message);
     }
 };
 
