@@ -11,12 +11,9 @@ const Image = sequelize.define('Image', {
 		autoIncrement: true,
 		allowNull: false,
 	},
-	url: {
+	fileName: {
 		type: DataTypes.STRING,
-		allowNull: false,
-		validate: {
-			isUrl: { msg: 'Image URL must be valid' },
-		},
+		allowNull: false,		
 	},
 });
 

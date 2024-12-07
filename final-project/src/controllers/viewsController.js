@@ -1,26 +1,53 @@
 const { Tour } = require('../models/tourModel');
 const { User } = require('../models/userModel');
+const { Location } = require('../models/locationModel');
+const { Image } = require('../models/imageModel');
+// const { Review } = require('../models/reviewModel');
 
 const AppError = require('../../utils/appError');
 const { catchAsync } = require('../../utils/catchAsync');
 
-// const getOverview = catchAsync(async (req, res, next) => {
-// 	// GET tour data
-// 	const tours = await Tour.find();
-// 	res.status(200).render('overview', {
-// 		title: 'All Tours',
-// 		tours,
-// 	});
-// });
-
-const getOverview = (req, res, next) => {
-	res.render('test');
-};
+const getOverview = catchAsync(async (req, res, next) => {
+	// GET tour data
+	const tours = await Tour.findAll({
+		include: [
+			{
+				model: Location,
+				as: 'locations',
+				required: false,
+			},
+			{
+				model: Image,
+				as: 'images',
+				required: false,
+			},
+		],
+	});
+	res.status(200).render('overview', {
+		title: 'All Tours',
+		tours,
+	});
+});
 
 const getTour = catchAsync(async (req, res, next) => {
-	const tour = await Tour.findOne({ slug: req.params.slug }).populate({
-		path: 'reviews',
-		fields: 'review rating user',
+	const tour = await Tour.findOne({
+		where: { slug: req.params.slug },
+		include: [
+			{
+				model: Location,
+				as: 'locations',
+				required: false,
+			},
+			{
+				model: Image,
+				as: 'images',
+				required: false,
+			},
+			// {
+			// 	model: Review,
+			// 	attributes: ['review', 'rating', 'user'], // Select specific fields to include
+			// },
+		],
 	});
 	if (!tour) {
 		return next(new AppError('There is no Tour with that name!', 404));

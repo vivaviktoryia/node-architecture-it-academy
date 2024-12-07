@@ -96,29 +96,34 @@ const $936fcc27ffb6bbb1$export$f558026a994b6051 = async (data, type)=>{
 };
 
 
-/*eslint-disable */ const $f60945d37f8e594c$export$4c5dd147b21b9176 = (locations)=>{
-    mapboxgl.accessToken = 'pk.eyJ1Ijoidml2YXZpa3RvcnlpYSIsImEiOiJjbHo4ZXczZ2cwMDUwMmtzYTByNmVqenJwIn0.Dl-Sgygd-puOem9UETCBjg';
-    var map = new mapboxgl.Map({
+/*eslint-disable */ const $f60945d37f8e594c$var$MAPBOX_ACCESS_TOKEN = 'pk.eyJ1Ijoidml2YXZpa3RvcnlpYSIsImEiOiJjbHo4ZXczZ2cwMDUwMmtzYTByNmVqenJwIn0.Dl-Sgygd-puOem9UETCBjg';
+const $f60945d37f8e594c$export$4c5dd147b21b9176 = (locations)=>{
+    mapboxgl.accessToken = $f60945d37f8e594c$var$MAPBOX_ACCESS_TOKEN;
+    const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/navigation-day-v1',
         scrollZoom: false
     });
     const bounds = new mapboxgl.LngLatBounds();
-    locations.forEach((loc)=>{
-        // Create marker
-        const el = document.createElement('div');
-        el.className = 'marker';
-        // add marker
-        new mapboxgl.Marker({
-            element: el,
-            anchor: 'bottom'
-        }).setLngLat(loc.coordinates).addTo(map);
-        // add popup
-        new mapboxgl.Popup({
-            offset: 30
-        }).setLngLat(loc.coordinates).setHTML(`<p>Day ${loc.day}: ${loc.description}  </p>`).addTo(map);
-        // extend map bounds to include current location
-        bounds.extend(loc.coordinates);
+    locations.forEach((loc, index)=>{
+        const dayNumber = index + 1;
+        // Extract coordinates if they're inside a GeoJSON Point object
+        const coordinates = loc.coordinates && loc.coordinates.type === 'Point' ? loc.coordinates.coordinates : loc.coordinates;
+        if (coordinates && !isNaN(coordinates[0]) && !isNaN(coordinates[1])) {
+            // Create marker
+            const el = document.createElement('div');
+            el.className = 'marker';
+            // Add marker
+            new mapboxgl.Marker({
+                element: el,
+                anchor: 'bottom'
+            }).setLngLat(coordinates).addTo(map);
+            // Add popup
+            new mapboxgl.Popup({
+                offset: 30
+            }).setLngLat(coordinates).setHTML(`<p>Day ${dayNumber}: ${loc.description}  </p>`).addTo(map);
+            bounds.extend(coordinates);
+        } else console.error('Invalid coordinates:', coordinates);
     });
     map.fitBounds(bounds, {
         padding: {

@@ -18,11 +18,11 @@ block content
                         .card__data
                             svg.card__icon
                                 use(xlink:href='/img/icons.svg#icon-map-pin')
-                            span #{tour.startLocation.description}
+                            span #{tour.locations && tour.locations[0] ? tour.locations[0].description : 'No location available'}
                         .card__data
                             svg.card__icon
                                 use(xlink:href='/img/icons.svg#icon-calendar')
-                            span #{tour.startDates[0].toLocaleString('en-us', {month: 'long', year: 'numeric'})}
+                            span #{tour.startDate.toLocaleString('en-us', {month: 'long', year: 'numeric'})}
                         .card__data
                             svg.card__icon
                                 use(xlink:href='/img/icons.svg#icon-flag')
