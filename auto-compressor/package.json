@@ -4,7 +4,8 @@
   "main": "autoCompressor.js",
   "scripts": {
     "example": "node autoCompressor.js ./folder-to-check",
-    "compress": "node autoCompressor.js"
+    "compress": "node autoCompressor.js",
+    "compress:all": "node autoGz.js"
   },
   "author": "Vik",
   "license": "ISC",
