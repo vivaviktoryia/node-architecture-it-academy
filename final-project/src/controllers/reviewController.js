@@ -1,16 +1,16 @@
-const {Review} = require('../models/reviewModel');
+const { Review } = require('../models/reviewModel');
 const {
-  deleteOne,
-  updateOne,
-  createOne,
-  getOne,
-  getAll,
+	deleteOne,
+	updateOne,
+	createOne,
+	getOne,
+	getAll,
 } = require('./handlerFactory');
 
 const setTourUserIds = (req, res, next) => {
-  if (!req.body.tour) req.body.tour = req.params.tourId;
-  if (!req.body.user) req.body.user = req.user.id;
-  next();
+	if (!req.body.tour) req.body.tour = req.params.tourId;
+	if (!req.body.user) req.body.user = req.user.id;
+	next();
 };
 
 // GET - '/api/v1/tours/:tourId/reviews'
@@ -23,10 +23,10 @@ const deleteReview = deleteOne(Review);
 const updateReview = updateOne(Review);
 
 module.exports = {
-  getReview,
-  getAllReviews,
-  createReview,
-  setTourUserIds,
-  deleteReview,
-  updateReview,
+	getReview,
+	getAllReviews,
+	createReview,
+	setTourUserIds,
+	deleteReview,
+	updateReview,
 };

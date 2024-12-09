@@ -1,4 +1,4 @@
-const { Location } = require('../models/locationModel');
+const { Location } = require('../models');
 const { createOne, getOne, getAll, updateOne } = require('./handlerFactory');
 
 // GET

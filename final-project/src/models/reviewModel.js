@@ -1,10 +1,10 @@
 const { DataTypes } = require('sequelize');
-const { getSequelizeInstance } = require('../../config/db');
+const { sequelize } = require('../../config/db');
 const { logError, logInfo } = require('../../utils/logger');
 
-const { User } = require('./userModel');
-const { Tour } = require('./tourModel');
-const sequelize = getSequelizeInstance();
+// const { User } = require('./userModel');
+// const { Tour } = require('./tourModel');
+// const sequelize = getSequelizeInstance();
 
 const Review = sequelize.define('Review', {
 	id: {
@@ -39,23 +39,23 @@ const Review = sequelize.define('Review', {
 	},
 });
 
-// Users_Reviews
-User.hasMany(Review, { foreignKey: 'userId', as: 'reviews' });
-Review.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+// // Users_Reviews
+// User.hasMany(Review, { foreignKey: 'userId', as: 'reviews' });
+// Review.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
-// Tours_Reviews
-Tour.hasMany(Review, { foreignKey: 'tourId', as: 'reviews' });
-Review.belongsTo(Tour, { foreignKey: 'tourId' });
+// // Tours_Reviews
+// Tour.hasMany(Review, { foreignKey: 'tourId', as: 'reviews' });
+// Review.belongsTo(Tour, { foreignKey: 'tourId' });
 
-sequelize
-	.sync()
-	.then(() => {
-		logInfo(
-			`Tables ${JSON.stringify(
-				Object.keys(sequelize.models).join(', '),
-			)} created or reset`,
-		);
-	})
-	.catch((error) => logError('Error creating tables:', error));
+// sequelize
+// 	.sync()
+// 	.then(() => {
+// 		logInfo(
+// 			`Tables ${JSON.stringify(
+// 				Object.keys(sequelize.models).join(', '),
+// 			)} created or reset`,
+// 		);
+// 	})
+// 	.catch((error) => logError('Error creating tables:', error));
 
 module.exports = { Review };

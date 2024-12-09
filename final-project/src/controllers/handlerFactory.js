@@ -3,7 +3,7 @@ const { catchAsync } = require('../../utils/catchAsync');
 
 const APIFeatures = require('../../utils/apiFeatures');
 
-const createOne = (Model) =>
+const createOne2 = (Model) =>
 	catchAsync(async (req, res, next) => {
 		const newRecord = await Model.create(req.body);
 
@@ -14,6 +14,71 @@ const createOne = (Model) =>
 			},
 		});
 	});
+
+const createOne = (Model, associations = []) =>
+	catchAsync(async (req, res, next) => {
+		const sequelize = Model.sequelize; // Получаем экземпляр Sequelize
+		console.log(sequelize.models);
+		const { images, locations, ...recordData } = req.body;
+
+		// Проверка данных для обязательных связей
+		if (associations.includes('images') && (!images || images.length < 3)) {
+			return next(new Error('Model must have at least 3 images.'));
+		}
+		if (
+			associations.includes('locations') &&
+			(!locations || locations.length < 1)
+		) {
+			return next(new Error('Model must have at least 1 location.'));
+		}
+
+		// Используем транзакцию для создания записи и связей
+		const transaction = await sequelize.transaction();
+
+		try {
+			// Создаем запись
+			const newRecord = await Model.create(recordData, { transaction });
+console.log('💥💥💥💥',associations);
+			// Обрабатываем связи, если они указаны
+			if (associations.includes('images')) {
+				const existingImages = await sequelize.models.Image.findAll({
+					where: { id: images },
+				});
+				console.log(existingImages);
+				if (existingImages.length !== images.length) {
+					throw new Error('Some images were not found.');
+				}
+				await newRecord.addImages(existingImages, { transaction });
+			}
+
+			if (associations.includes('locations')) {
+				const existingLocations = await sequelize.models.Location.findAll({
+					where: { id: locations },
+				});
+				if (existingLocations.length !== locations.length) {
+					throw new Error('Some locations were not found.');
+				}
+				await newRecord.addLocations(existingLocations, { transaction });
+			}
+
+			// Сохраняем изменения
+			await transaction.commit();
+
+			res.status(201).json({
+				status: 'success',
+				data: {
+					data: newRecord,
+				},
+			});
+		} catch (error) {
+			// Откатываем транзакцию в случае ошибки
+			await transaction.rollback();
+			next(error);
+		}
+	});
+
+
+
 
 const updateOne = (Model) =>
 	catchAsync(async (req, res, next) => {
