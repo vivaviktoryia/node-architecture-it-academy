@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.get('/me', checkToken, getAccount);
 
-// without API
+// with API
 // router.post('/submit-user-data', checkToken, updateUserData);
 
 router.use(isLoggedIn);

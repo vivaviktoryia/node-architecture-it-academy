@@ -16,7 +16,7 @@ const Location = sequelize.define('Location', {
 		allowNull: false,
 	},
 	type: {
-		type: DataTypes.STRING,
+		type: DataTypes.CHAR,
 		allowNull: false,
 		defaultValue: 'Point',
 		validate: {

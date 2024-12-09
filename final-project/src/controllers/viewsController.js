@@ -66,7 +66,7 @@ const getTour = catchAsync(async (req, res, next) => {
 	if (!tour) {
 		return next(new AppError('There is no Tour with that name!', 404));
 	}
-	console.log(tour.reviews.user);
+	// console.log(tour);
 	res
 		.status(200)
 		.set(

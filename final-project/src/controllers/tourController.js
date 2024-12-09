@@ -21,7 +21,6 @@ const aliasTopTours = async (req, res, next) => {
 
 // GET
 const getAllTours = getAll(Tour);
-const getAllLocations = getAll(Location);
 
 const getTour = getOne(Tour);
 
@@ -144,5 +143,4 @@ module.exports = {
 	updateTour,
 	deleteTour,
 	aliasTopTours,
-	getAllLocations,
 };

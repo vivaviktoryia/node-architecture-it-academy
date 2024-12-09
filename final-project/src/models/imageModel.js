@@ -13,12 +13,13 @@ const Image = sequelize.define('Image', {
 	},
 	fileName: {
 		type: DataTypes.STRING,
-		allowNull: false,		
+		unique: true,
+		allowNull: false,
 	},
 });
 
 sequelize
-	.sync()
+	.sync({forse: true})
 	.then(() => {
 		logInfo(
 			`Tables ${JSON.stringify(

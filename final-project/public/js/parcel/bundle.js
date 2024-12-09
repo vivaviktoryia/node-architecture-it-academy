@@ -2,11 +2,11 @@
     const el = document.querySelector('.alert');
     if (el) el.parentElement.removeChild(el);
 };
-const $c67cb762f0198593$export$5e5cfdaa6ca4292c = (type, msg)=>{
+const $c67cb762f0198593$export$5e5cfdaa6ca4292c = (type, msg, time = 7)=>{
     $c67cb762f0198593$export$516836c6a9dfc573();
     const markup = `<div class="alert alert--${type}">${msg}</div>`;
     document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
-    window.setTimeout($c67cb762f0198593$export$516836c6a9dfc573, 5000);
+    window.setTimeout($c67cb762f0198593$export$516836c6a9dfc573, time * 1000);
 };
 
 
@@ -136,6 +136,30 @@ const $f60945d37f8e594c$export$4c5dd147b21b9176 = (locations)=>{
 };
 
 
+/* eslint-disable */ 
+const $144e4d4c31c55431$export$8d5bdbf26681c0c2 = async ()=>{
+    try {
+        const response = await fetch('/api/v1/bookings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const responseData = await response.json();
+        if (response.ok && responseData.status === 'success') {
+            (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', 'Booking is successful!');
+            setTimeout(()=>location.assign('/'), 1500);
+        } else if (response.status === 409) throw new Error('No spots available for booking at the moment!');
+        else throw new Error(responseData.message || 'Booking failed');
+    } catch (error) {
+        console.error('Error during booking:', error);
+        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', error.message || 'Something went wrong, please try again.');
+        throw error;
+    }
+};
+
+
+
 const $d0f7ce18c37ad6f6$var$mapBox = document.getElementById('map');
 const $d0f7ce18c37ad6f6$var$loginForm = document.querySelector('.form--login');
 const $d0f7ce18c37ad6f6$var$signupForm = document.querySelector('.form--signup');
@@ -143,6 +167,7 @@ const $d0f7ce18c37ad6f6$var$logOutBtn = document.querySelector('.nav__el--logout
 const $d0f7ce18c37ad6f6$var$userDataForm = document.querySelector('.form-user-data');
 const $d0f7ce18c37ad6f6$var$passwordForm = document.querySelector('.form-user-password');
 const $d0f7ce18c37ad6f6$var$savePasswordBtn = document.querySelector('.btn--save-password');
+const $d0f7ce18c37ad6f6$var$bookBtn = document.getElementById('book-tour');
 if ($d0f7ce18c37ad6f6$var$mapBox) {
     const locations = JSON.parse($d0f7ce18c37ad6f6$var$mapBox.dataset.locations);
     (0, $f60945d37f8e594c$export$4c5dd147b21b9176)(locations);
@@ -191,6 +216,20 @@ if ($d0f7ce18c37ad6f6$var$passwordForm) $d0f7ce18c37ad6f6$var$passwordForm.addEv
     document.getElementById('password').value = '';
     document.getElementById('password-confirm').value = '';
 });
+if ($d0f7ce18c37ad6f6$var$bookBtn) $d0f7ce18c37ad6f6$var$bookBtn.addEventListener('click', async ({ currentTarget: button })=>{
+    const setButtonState = (text)=>button.textContent = text;
+    try {
+        setButtonState('Processing...');
+        await new Promise((resolve)=>setTimeout(resolve, 3000));
+        await (0, $144e4d4c31c55431$export$8d5bdbf26681c0c2)();
+    } catch (error) {
+        console.error('Booking failed:', error);
+    } finally{
+        setButtonState('Book tour now!');
+    }
+});
+const $d0f7ce18c37ad6f6$var$alertMessage = document.querySelector('body').dataset.alert;
+if ($d0f7ce18c37ad6f6$var$alertMessage) (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', $d0f7ce18c37ad6f6$var$alertMessage, 10);
 
 
 //# sourceMappingURL=bundle.js.map

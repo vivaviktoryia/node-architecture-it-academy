@@ -20,15 +20,15 @@ const Tour = sequelize.define(
 			allowNull: false,
 			unique: true,
 			validate: {
-				notNull: { msg: 'A tour must have a name' },
-				notEmpty: { msg: 'A tour must have a name' },
+				notNull: { msg: 'A tour should have a name' },
+				notEmpty: { msg: 'A tour should have a name' },
 				len: {
 					args: [5, 40],
-					msg: 'A tour name must be between 5 and 40 characters',
+					msg: 'A tour name should be between 5 and 40 characters',
 				},
 				isAlphaSpace(value) {
 					if (!/^[a-zA-Z\s]+$/.test(value)) {
-						throw new Error('Tour name must only contain characters');
+						throw new Error('Tour name should only contain characters');
 					}
 				},
 			},
@@ -40,23 +40,27 @@ const Tour = sequelize.define(
 			type: DataTypes.SMALLINT,
 			allowNull: false,
 			validate: {
-				notNull: { msg: 'A tour must have a duration' },
-				isInt: { msg: 'Duration must be a number' },
+				notNull: { msg: 'A tour should have a duration' },
+				isInt: { msg: 'Duration should be a number' },
 			},
+		},
+		startDate: {
+			type: DataTypes.DATE,
+			allowNull: false,
 		},
 		maxGroupSize: {
 			type: DataTypes.SMALLINT,
 			allowNull: false,
 			validate: {
-				notNull: { msg: 'A tour must have a Group Size' },
-				isInt: { msg: 'Group size must be a number' },
+				notNull: { msg: 'A tour should have a Group Size' },
+				isInt: { msg: 'Group size should be a number' },
 			},
 		},
 		difficulty: {
 			type: DataTypes.ENUM('easy', 'medium', 'difficult'),
 			allowNull: false,
 			validate: {
-				notNull: { msg: 'A tour must have a difficulty' },
+				notNull: { msg: 'A tour should have a difficulty' },
 				isIn: {
 					args: [['easy', 'medium', 'difficult']],
 					msg: 'Difficulty is either: easy, medium, difficult',
@@ -67,12 +71,12 @@ const Tour = sequelize.define(
 			type: DataTypes.FLOAT,
 			defaultValue: 4.5,
 			validate: {
-				min: { args: 1, msg: 'Rating must be above 1.0' },
-				max: { args: 5, msg: 'Rating must be below 5.0' },
+				min: { args: 1, msg: 'Rating should be above 1.0' },
+				max: { args: 5, msg: 'Rating should be below 5.0' },
 			},
-			set(value) {
-				this.setDataValue('ratingsAverage', Math.round(value * 10) / 10);
-			},
+			// set(value) {
+			// 	this.setDataValue('ratingsAverage', Math.round(value * 10) / 10);
+			// },
 		},
 		ratingsQuantity: {
 			type: DataTypes.SMALLINT,
@@ -82,8 +86,8 @@ const Tour = sequelize.define(
 			type: DataTypes.FLOAT,
 			allowNull: false,
 			validate: {
-				notNull: { msg: 'A tour must have a price' },
-				isFloat: { msg: 'Price must be a number' },
+				notNull: { msg: 'A tour should have a price' },
+				isFloat: { msg: 'Price should be a number' },
 			},
 		},
 		priceDiscount: {
@@ -100,7 +104,7 @@ const Tour = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			validate: {
-				notNull: { msg: 'A tour must have a summary' },
+				notNull: { msg: 'A tour should have a summary' },
 				notEmpty: { msg: 'Summary cannot be empty' },
 			},
 		},
@@ -111,7 +115,7 @@ const Tour = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			validate: {
-				notNull: { msg: 'A tour must have a Cover image' },
+				notNull: { msg: 'A tour should have a Cover Image' },
 			},
 		},
 		createdAt: {
@@ -124,10 +128,6 @@ const Tour = sequelize.define(
 			defaultValue: DataTypes.NOW,
 			allowNull: false,
 			onUpdate: DataTypes.NOW,
-		},
-		startDate: {
-			type: DataTypes.DATE,
-			allowNull: false,
 		},
 		// indexes: [
 		// 	{ fields: ['price', 'ratingsAverage'] },
@@ -150,14 +150,14 @@ const Tour = sequelize.define(
 
 // Tours_Locations
 Tour.belongsToMany(Location, {
-	through: 'Tours_Locations',
+	through: 'Tours_To_Locations',
 	as: 'locations',
 	foreignKey: 'tourId',
 	timestamps: false,
 });
 
 Location.belongsToMany(Tour, {
-	through: 'Tours_Locations',
+	through: 'Tours_To_Locations',
 	as: 'tours',
 	foreignKey: 'locationId',
 	timestamps: false,
@@ -165,14 +165,14 @@ Location.belongsToMany(Tour, {
 
 // Tours_Images
 Tour.belongsToMany(Image, {
-	through: 'Tours_Images',
+	through: 'Tours_To_Images',
 	as: 'images',
 	foreignKey: 'tourId',
 	timestamps: false,
 });
 
 Image.belongsToMany(Tour, {
-	through: 'Tours_Images',
+	through: 'Tours_To_Images',
 	as: 'tours',
 	foreignKey: 'imageId',
 	timestamps: false,

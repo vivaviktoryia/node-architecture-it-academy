@@ -120,14 +120,14 @@ User.prototype.createPasswordResetToken = function () {
 
 // Users_Tours => User.belongsToMany(Tour, { through: 'Users_Tours' });
 Tour.belongsToMany(User, {
-	through: 'Users_Tours',
+	through: 'Users_To_Tours',
 	as: 'users',
 	foreignKey: 'tourId',
 	timestamps: false,
 });
 
 User.belongsToMany(Tour, {
-	through: 'Users_Tours',
+	through: 'Users_To_Tours',
 	as: 'tours',
 	foreignKey: 'userId',
 	timestamps: false,
