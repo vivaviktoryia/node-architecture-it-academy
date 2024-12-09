@@ -1,26 +1,26 @@
 const express = require('express');
 
 const {
-  getAllUsers,
-  getUser,
-  getMe,
-  createUser,
-  updateUser,
-  updateMe,
-  uploadUserPhoto,
-  deleteUser,
-  deleteMe,
+	getAllUsers,
+	getUser,
+	getMe,
+	createUser,
+	updateUser,
+	updateMe,
+	uploadUserPhoto,
+	deleteUser,
+	deleteMe,
 } = require('../controllers/userController');
 
 const {
-  signup,
-  login,
-  logout,
-  forgotPassword,
-  resetPassword,
-  updatePassword,
-  checkToken,
-  restrictTo,
+	signup,
+	login,
+	logout,
+	forgotPassword,
+	resetPassword,
+	updatePassword,
+	checkToken,
+	restrictTo,
 } = require('../controllers/authController');
 
 const router = express.Router();

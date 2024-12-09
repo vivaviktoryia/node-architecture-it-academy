@@ -16,7 +16,7 @@ block content
     section.section-header
         .header__hero
             .header__hero-overlay &nbsp;
-            img.header__hero-img(src=`/img/tours/${tour.imageCover}` alt=`${tour.name}`)
+            img.header__hero-img(src=`/img/tours/${tour.imageCover || 'default-cover.jpg'}` alt=`${tour.name}`)
 
         .heading-box
             h1.heading-primary
@@ -53,9 +53,9 @@ block content
 
 
     section.section-pictures
-        each img, i in tour.images
+        each img, i in  (tour.images.length ? tour.images : [{}, {}, {}]) 
             .picture-box
-                img.picture-box__img(src=`/img/tours/${img.fileName}` alt=`${tour.name} ${i+1}` class = `picture-box__img--${i+1}`)
+                img.picture-box__img(src=`/img/tours/${img && img.fileName ? img.fileName[i] : 'default-' + (i+1) + '.jpg'}` alt=`${tour.name || 'Default Tour'} ${i+1}` class = `picture-box__img--${i+1}`)
 
 
     section.section-map
@@ -70,9 +70,12 @@ block content
         .cta
             .cta__img.cta__img--logo
                 img(src='/img/logo-white.png' alt='My logo')
-            img.cta__img.cta__img--1(src=`/img/tours/${tour.images[1].fileName}` alt='Tour pic')
-            img.cta__img.cta__img--2(src=`/img/tours/${tour.images[0].fileName}` alt='Tour pic')
+            img.cta__img.cta__img--1(src=`/img/tours/${tour.images[1] && tour.images[1].fileName ? tour.images[1].fileName : 'default-2.jpg' }` alt='Tour pic')
+            img.cta__img.cta__img--2(src=`/img/tours/${tour.images[0] && tour.images[0].fileName ? tour.images[0].fileName : 'default-1.jpg'}` alt='Tour pic')
             .cta__content
                 h2.heading-secondary What are you waiting for?
                 p.cta__text=` ${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
-                button.btn.btn--green.span-all-rows Book tour now!
+                if user
+                    button.btn.btn--green.span-all-rows#book-tour Book tour now!
+                else
+                    a.btn.btn--green.span-all-rows(href='/login') Log in to book tour

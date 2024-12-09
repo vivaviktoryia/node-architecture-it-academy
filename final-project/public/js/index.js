@@ -2,6 +2,8 @@
 import { signup, login, logout } from './login';
 import { updateSettings } from './updateSettings';
 import { displayMap } from './mapbox';
+import { bookTour } from './bookTour';
+import { displayAlert } from './alert';
 
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
@@ -10,6 +12,7 @@ const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const passwordForm = document.querySelector('.form-user-password');
 const savePasswordBtn = document.querySelector('.btn--save-password');
+const bookBtn = document.getElementById('book-tour');
 
 if (mapBox) {
   const locations = JSON.parse(mapBox.dataset.locations);
@@ -69,3 +72,22 @@ if (passwordForm) {
     document.getElementById('password-confirm').value = '';
   });
 }
+
+if (bookBtn) {
+	bookBtn.addEventListener('click', async ({ currentTarget: button }) => {
+		const setButtonState = (text) => (button.textContent = text);
+
+		try {
+      setButtonState('Processing...');
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+			await bookTour();
+		} catch (error) {
+			console.error('Booking failed:', error);
+		} finally {
+			setButtonState('Book tour now!');
+		}
+	});
+}
+
+  const alertMessage = document.querySelector('body').dataset.alert;
+	if (alertMessage) displayAlert('success', alertMessage, 10);
