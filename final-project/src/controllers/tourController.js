@@ -1,5 +1,5 @@
-const { Tour } = require('../models/tourModel');
-const { Location } = require('../models/locationModel');
+const { Tour, Location, Image } = require('../models');
+
 const {
 	deleteOne,
 	updateOne,
@@ -25,7 +25,7 @@ const getAllTours = getAll(Tour);
 const getTour = getOne(Tour);
 
 // POST
-const createTour = createOne(Tour);
+const createTour = createOne(Tour, ['images', 'locations']);
 
 // PATCH
 const updateTour = updateOne(Tour);

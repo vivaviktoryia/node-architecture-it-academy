@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
-const { getSequelizeInstance } = require('../../config/db');
 const { logError, logInfo } = require('../../utils/logger');
+const { sequelize } = require('../../config/db');
 
-const sequelize = getSequelizeInstance();
+// const sequelize = getSequelizeInstance();
 
 const Location = sequelize.define('Location', {
 	id: {
@@ -40,15 +40,15 @@ const Location = sequelize.define('Location', {
 	},
 });
 
-sequelize
-	.sync()
-	.then(() => {
-		logInfo(
-			`Tables ${JSON.stringify(
-				Object.keys(sequelize.models).join(', '),
-			)} created or reset`,
-		);
-	})
-	.catch((error) => logError('Error creating tables:', error));
+// sequelize
+// 	.sync()
+// 	.then(() => {
+// 		logInfo(
+// 			`Tables ${JSON.stringify(
+// 				Object.keys(sequelize.models).join(', '),
+// 			)} created or reset`,
+// 		);
+// 	})
+// 	.catch((error) => logError('Error creating tables:', error));
 
 module.exports = {Location};

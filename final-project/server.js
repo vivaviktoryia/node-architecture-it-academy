@@ -1,8 +1,9 @@
 const dotenv = require('dotenv');
+dotenv.config({ path: `${__dirname}/config.env` });
 const { checkDatabaseConnection } = require('./config/db');
+const { sequelize } = require('./src/models');
 const { logError, logInfo } = require('./utils/logger');
 
-dotenv.config({ path: `${__dirname}/config.env` });
 
 checkDatabaseConnection();
 
@@ -13,6 +14,17 @@ const server = app.listen(port, async () => {
 	const logLine = `Web server running on port ${port}, process.pid = ${process.pid}`;
 	await logInfo(logLine);
 });
+
+sequelize
+	.sync()
+	.then(() => {
+		logInfo(
+			`Tables ${JSON.stringify(
+				Object.keys(sequelize.models).join(', '),
+			)} created or reset`,
+		);
+	})
+	.catch((error) => logError('Error creating tables:', error));
 
 process.on('uncaughtException', async (err) => {
 	const logLine = `UNCAUGHT EXCEPTION! 💥 ${err.name}: ${err.message}`;

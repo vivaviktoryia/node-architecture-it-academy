@@ -149,7 +149,7 @@ const $144e4d4c31c55431$export$8d5bdbf26681c0c2 = async ()=>{
         if (response.ok && responseData.status === 'success') {
             (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', 'Booking is successful!');
             setTimeout(()=>location.assign('/'), 1500);
-        } else if (response.status === 409) throw new Error('No spots available for booking at the moment!');
+        } else if (response.status === 409) throw new Error("No spots available for booking at the moment!\uD83D\uDE43");
         else throw new Error(responseData.message || 'Booking failed');
     } catch (error) {
         console.error('Error during booking:', error);

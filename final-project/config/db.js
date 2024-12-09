@@ -2,7 +2,6 @@ const { Sequelize } = require('sequelize');
 const { logError, logInfo } = require('../utils/logger');
 const AppError = require('../utils/appError');
 
-const getSequelizeInstance = () => {
 	const dialect = process.env.DB_CLIENT || 'mariadb';
 	const host = process.env.DB_HOST || 'localhost';
 	const port = process.env.DB_PORT || 3306;
@@ -32,12 +31,7 @@ const getSequelizeInstance = () => {
 		timezone: process.env.DB_TIMEZONE || '+00:00',
 	});
 
-	return sequelize;
-};
-
 async function checkDatabaseConnection() {
-	const sequelize = getSequelizeInstance();
-
 	try {
 		await sequelize.authenticate();
 		await logInfo(
@@ -53,6 +47,6 @@ async function checkDatabaseConnection() {
 }
 
 module.exports = {
-	getSequelizeInstance,
+	sequelize,
 	checkDatabaseConnection,
 };

@@ -1,10 +1,6 @@
 const { DataTypes } = require('sequelize');
-const { getSequelizeInstance } = require('../../config/db');
+const { sequelize } = require('../../config/db');
 const { logError, logInfo } = require('../../utils/logger');
-
-const { Location } = require('./locationModel');
-const { Image } = require('./imageModel');
-const sequelize = getSequelizeInstance();
 
 const Tour = sequelize.define(
 	'Tour',
@@ -147,46 +143,5 @@ const Tour = sequelize.define(
 		},
 	},
 );
-
-// Tours_Locations
-Tour.belongsToMany(Location, {
-	through: 'Tours_To_Locations',
-	as: 'locations',
-	foreignKey: 'tourId',
-	timestamps: false,
-});
-
-Location.belongsToMany(Tour, {
-	through: 'Tours_To_Locations',
-	as: 'tours',
-	foreignKey: 'locationId',
-	timestamps: false,
-});
-
-// Tours_Images
-Tour.belongsToMany(Image, {
-	through: 'Tours_To_Images',
-	as: 'images',
-	foreignKey: 'tourId',
-	timestamps: false,
-});
-
-Image.belongsToMany(Tour, {
-	through: 'Tours_To_Images',
-	as: 'tours',
-	foreignKey: 'imageId',
-	timestamps: false,
-});
-
-sequelize
-	.sync()
-	.then(() => {
-		logInfo(
-			`Tables ${JSON.stringify(
-				Object.keys(sequelize.models).join(', '),
-			)} created or reset`,
-		);
-	})
-	.catch((error) => logError('Error creating tables:', error));
 
 module.exports = { Tour };

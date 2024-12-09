@@ -1,8 +1,4 @@
-const { Tour } = require('../models/tourModel');
-const { User } = require('../models/userModel');
-const { Location } = require('../models/locationModel');
-const { Image } = require('../models/imageModel');
-const { Review } = require('../models/reviewModel');
+const { Tour, User, Location, Image, Review } = require('../models');
 
 const AppError = require('../../utils/appError');
 const { catchAsync } = require('../../utils/catchAsync');

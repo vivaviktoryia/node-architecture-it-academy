@@ -1,5 +1,5 @@
 const multer = require('multer');
-const { User } = require('../models/userModel');
+const { User } = require('../models');
 const { deleteOne, updateOne, getOne, getAll } = require('./handlerFactory');
 
 const AppError = require('../../utils/appError');

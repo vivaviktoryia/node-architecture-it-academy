@@ -14,7 +14,7 @@ export const bookTour = async () => {
 			displayAlert('success', 'Booking is successful!');
 			setTimeout(() => location.assign('/'), 1500);
 		} else if (response.status === 409) {
-			throw new Error('No spots available for booking at the moment!');
+			throw new Error('No spots available for booking at the moment!🙃');
 		} else {
 			throw new Error(responseData.message || 'Booking failed');
 		}
