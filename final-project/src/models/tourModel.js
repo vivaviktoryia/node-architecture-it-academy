@@ -19,8 +19,8 @@ const Tour = sequelize.define(
 				notNull: { msg: 'A tour should have a name' },
 				notEmpty: { msg: 'A tour should have a name' },
 				len: {
-					args: [5, 40],
-					msg: 'A tour name should be between 5 and 40 characters',
+					args: [2, 50],
+					msg: 'A tour name should be between 2 and 50 characters',
 				},
 				isAlphaSpace(value) {
 					if (!/^[a-zA-Z\s]+$/.test(value)) {
@@ -70,9 +70,6 @@ const Tour = sequelize.define(
 				min: { args: 1, msg: 'Rating should be above 1.0' },
 				max: { args: 5, msg: 'Rating should be below 5.0' },
 			},
-			// set(value) {
-			// 	this.setDataValue('ratingsAverage', Math.round(value * 10) / 10);
-			// },
 		},
 		ratingsQuantity: {
 			type: DataTypes.SMALLINT,
@@ -106,6 +103,12 @@ const Tour = sequelize.define(
 		},
 		description: {
 			type: DataTypes.STRING,
+			validate: {
+				len: {
+					args: [2, 500],
+					msg: 'Description should be between 2 and 500 characters.',
+				},
+			},
 		},
 		imageCover: {
 			type: DataTypes.STRING,
@@ -125,12 +128,9 @@ const Tour = sequelize.define(
 			allowNull: false,
 			onUpdate: DataTypes.NOW,
 		},
-		// indexes: [
-		// 	{ fields: ['price', 'ratingsAverage'] },
-		// 	{ fields: ['slug'] },
-		// ],
 	},
 	{
+		indexes: [{ fields: ['slug'] }],
 		hooks: {
 			beforeCreate: (tour) => {
 				tour.slug = tour.name.toLowerCase().replace(/ /g, '-');

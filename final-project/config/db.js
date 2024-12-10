@@ -27,10 +27,10 @@ const AppError = require('../utils/appError');
 		dialect,
 		port,
 		pool: poolConfig,
-		// logging: process.env.DB_LOGGING === 'true',
+		logging: process.env.DB_LOGGING === 'true',
 		timezone: process.env.DB_TIMEZONE || '+00:00',
 	});
-
+	
 async function checkDatabaseConnection() {
 	try {
 		await sequelize.authenticate();

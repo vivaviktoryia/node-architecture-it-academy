@@ -55,11 +55,21 @@ Image.belongsToMany(Tour, {
 
 // Users_Reviews
 User.hasMany(Review, { foreignKey: 'userId', as: 'reviews' });
-Review.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+Review.belongsTo(User, {
+	foreignKey: 'userId',
+	as: 'user',
+	onDelete: 'CASCADE',
+	onUpdate: 'CASCADE',
+});
 
 // Tours_Reviews
 Tour.hasMany(Review, { foreignKey: 'tourId', as: 'reviews' });
-Review.belongsTo(Tour, { foreignKey: 'tourId' });
+Review.belongsTo(Tour, {
+	foreignKey: 'tourId',
+	as: 'tour',
+	onDelete: 'CASCADE',
+	onUpdate: 'CASCADE',
+});
 
 module.exports = {
 	sequelize,

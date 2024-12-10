@@ -1,12 +1,12 @@
 const AppError = require('../../utils/appError');
 const { catchAsync } = require('../../utils/catchAsync');
-
 const APIFeatures = require('../../utils/apiFeatures');
 
 const createOne = (Model, associationsConfig = {}) =>
 	catchAsync(async (req, res, next) => {
 		const sequelize = Model.sequelize;
 		const { ...recordData } = req.body;
+
 		const transaction = await sequelize.transaction();
 
 		try {
@@ -21,10 +21,13 @@ const createOne = (Model, associationsConfig = {}) =>
 				const assocData = req.body[assocName];
 
 				if (required && (!assocData || assocData.length < minLength)) {
-					throw new Error(
-						`${assocName} should have at least ${minLength} ${
-							minLength === 1 ? 'item' : 'items'
-						}.`,
+					return next(
+						new AppError(
+							`${assocName} should have at least ${minLength} ${
+								minLength === 1 ? 'item' : 'items'
+							}.`,
+							400,
+						),
 					);
 				}
 			}
@@ -45,7 +48,9 @@ const createOne = (Model, associationsConfig = {}) =>
 					});
 
 					if (existingRecords.length !== assocData.length) {
-						throw new Error(`Some ${assocName} records were not found.`);
+						return next(
+							new AppError(`Some ${assocName} records were not found.`, 404),
+						);
 					}
 
 					const addMethod = through
@@ -57,7 +62,6 @@ const createOne = (Model, associationsConfig = {}) =>
 					responseData.associations[assocName] = existingRecords;
 				}
 			}
-
 			await transaction.commit();
 
 			res.status(201).json({
@@ -82,7 +86,7 @@ const updateOne = (Model, associations = {}) =>
 			});
 
 			if (updatedRowsCount === 0) {
-				throw new AppError('Record with that ID not found', 404);
+				return next(new AppError('Record with that ID not found', 404));
 			}
 
 			const updatedRecord = await Model.findByPk(req.params.id, {
@@ -90,26 +94,28 @@ const updateOne = (Model, associations = {}) =>
 			});
 
 			if (!updatedRecord) {
-				throw new AppError('Record with that ID not found', 404);
+				return next(new AppError('Record with that ID not found', 404));
 			}
 
 			for (const [assocName, assocConfig] of Object.entries(associations)) {
-				const assocData = req.body[assocName];
+				const assocKey = assocConfig.foreignKey;
+				const assocData = req.body[assocKey];
+
 				if (!assocData) continue;
 
 				const associatedModel = sequelize.models[assocConfig.model];
+
 				const existingAssoc = await associatedModel.findAll({
 					where: { id: assocData },
 				});
-
-				if (existingAssoc.length !== assocData.length) {
-					throw new AppError(`Some ${assocName} were not found`, 400);
+				if (existingAssoc.length === 0) {
+					return next(new AppError(`Some ${assocName} were not found`, 400));
 				}
-
+				const associatedIds = existingAssoc.map((assoc) => assoc.id);
 				const setMethod = `set${
 					assocName.charAt(0).toUpperCase() + assocName.slice(1)
 				}`;
-				await updatedRecord[setMethod](existingAssoc, { transaction });
+				await updatedRecord[setMethod](associatedIds, { transaction });
 			}
 
 			await transaction.commit();
@@ -146,17 +152,25 @@ const deleteOne = (Model, associationsConfig = {}) =>
 		const transaction = await sequelize.transaction();
 
 		try {
+			const includeConfig = Object.keys(associationsConfig).map((assocName) => {
+				const options = associationsConfig[assocName];
+				const model = sequelize.models[options.model];
+
+				if (!model) {
+					return next(new AppError('Invalid model name:', options.model, 400));
+				}
+
+				return {
+					model,
+					as: assocName,
+					required: false,
+				};
+			});
+
 			const recordToDelete = await Model.findOne({
 				where: { id },
 				transaction,
-				include: Object.keys(associationsConfig).map((assocName) => {
-					return {
-						model: sequelize.models[associationsConfig[assocName].model],
-						as: assocName,
-						required: false,
-						through: { attributes: [] },
-					};
-				}),
+				include: includeConfig,
 			});
 
 			if (!recordToDelete) {
@@ -167,15 +181,19 @@ const deleteOne = (Model, associationsConfig = {}) =>
 				const assocData = recordToDelete[assocName];
 
 				if (assocData) {
-					if (!options.deleteAssociated) {
-						await recordToDelete[
-							`remove${assocName.charAt(0).toUpperCase() + assocName.slice(1)}`
-						](assocData, { transaction });
-					} else {
-						await recordToDelete[
-							`remove${assocName.charAt(0).toUpperCase() + assocName.slice(1)}`
-						](assocData, { transaction });
+					const removeMethodName = `remove${
+						assocName.charAt(0).toUpperCase() + assocName.slice(1)
+					}`;
 
+					if (typeof recordToDelete[removeMethodName] === 'function') {
+						await recordToDelete[removeMethodName](assocData, { transaction });
+					} else {
+						return next(new AppError(
+							`Method ${removeMethodName} does not exist on recordToDelete`,400
+						));
+					}
+
+					if (options.deleteAssociated) {
 						const associatedModel = sequelize.models[options.model];
 						await associatedModel.destroy({
 							where: {
