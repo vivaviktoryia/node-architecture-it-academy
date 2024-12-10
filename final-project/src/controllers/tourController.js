@@ -20,124 +20,68 @@ const aliasTopTours = async (req, res, next) => {
 };
 
 // GET
-const getAllTours = getAll(Tour);
+const getAllTours = getAll(Tour, {
+	images: { model: 'Image', through: true, attributes: ['id', 'fileName'] },
+	locations: {
+		model: 'Location',
+		through: true,
+		attributes: ['id', 'description', 'coordinates'],
+	},
+});
 
-const getTour = getOne(Tour);
+const getTour = getOne(Tour, {
+	images: { model: 'Image', through: true, attributes: ['id', 'fileName'] },
+	locations: {
+		model: 'Location',
+		through: true,
+		attributes: ['id', 'description', 'coordinates'],
+	},
+});
 
 // POST
-const createTour = createOne(Tour, ['images', 'locations']);
+const createTour = createOne(Tour, {
+	images: {
+		model: 'Image',
+		required: true,
+		minLength: 3,
+		attributes: ['id', 'fileName'],
+	},
+	locations: {
+		model: 'Location',
+		required: true,
+		minLength: 1,
+		attributes: ['id', 'description', 'coordinates'],
+	},
+});
 
 // PATCH
-const updateTour = updateOne(Tour);
+const updateTour = updateOne(Tour, {
+	images: {
+		model: 'Image',
+		through: true,
+		minLength: 3,
+		attributes: ['id', 'fileName'],
+	},
+	locations: {
+		model: 'Location',
+		through: true,
+		minLength: 1,
+		attributes: ['id', 'description', 'coordinates'],
+	},
+});
 
 // DELETE
-const deleteTour = deleteOne(Tour);
-
-// TODO
-const getToursWithin = catchAsync(async (req, res, next) => {
-	const { distance, latlng, unit } = req.params;
-	const [lat, lng] = latlng.split(',');
-
-	const normalizedUnit = unit.toLowerCase().trim();
-
-	if (!lat || !lng) {
-		return next(
-			new AppError('No coords specified in the format lat,lng!', 400),
-		);
-	}
-
-	if (normalizedUnit !== 'mi' && normalizedUnit !== 'km') {
-		return next(
-			new AppError('Wrong unit of measure specified! Allowed: km, mi.', 400),
-		);
-	}
-
-	const radius =
-    normalizedUnit === 'mi' ? distance / 3963.2 : distance / 6378.1; // distance / radious of Earth (mi or km)
-  
-	const tours = await Location.findAll({
-		where: Sequelize.where(
-			Sequelize.fn(
-				'ST_Distance_Sphere',
-				Sequelize.col('startLocation'),
-				Sequelize.fn('ST_GeomFromText', `POINT(${lng} ${lat})`),
-			),
-			{ [Sequelize.Op.lte]: radius },
-		),
-	});
-
-	res.status(200).json({
-		status: 'success',
-		results: tours.length,
-		data: {
-			data: tours,
-		},
-	});
+const deleteTour = deleteOne(Tour, {
+	images: { model: 'Image', as: 'images', deleteAssociated: false },
+	locations: {
+		model: 'Location',
+		as: 'locations',
+		deleteAssociated: false,
+	},
 });
-
-const getDistances = catchAsync(async (req, res, next) => {
-	const { latlng, unit } = req.params;
-	const [lat, lng] = latlng.split(',');
-
-	const normalizedUnit = unit.toLowerCase().trim();
-
-	if (!lat || !lng) {
-		return next(
-			new AppError('No coords specified in the format lat,lng!', 400),
-		);
-	}
-
-	if (normalizedUnit !== 'mi' && normalizedUnit !== 'km') {
-		return next(
-			new AppError('Wrong unit of measure specified! Allowed: km, mi.', 400),
-		);
-	}
-
-	const multiplier = normalizedUnit === 'mi' ? 0.000621371 : 0.001;
-
-	const distances = await Location.findAll({
-		attributes: [
-			'id', // Add other attributes you need
-			'name',
-			[
-				Sequelize.fn(
-					'ST_Distance_Sphere',
-					Sequelize.col('startLocation'),
-					Sequelize.fn('ST_GeomFromText', `POINT(${lng} ${lat})`),
-				),
-				'distance',
-			],
-		],
-		where: Sequelize.where(
-			Sequelize.fn(
-				'ST_Distance_Sphere',
-				Sequelize.col('startLocation'),
-				Sequelize.fn('ST_GeomFromText', `POINT(${lng} ${lat})`),
-			),
-			{ [Sequelize.Op.gte]: 0 }, // Filter based on distance if necessary
-		),
-	});
-
-	// Adjust the distances using the multiplier
-	const adjustedDistances = distances.map((tour) => ({
-		id: tour.id,
-		name: tour.name,
-		distance: tour.distance * multiplier,
-	}));
-
-	res.status(200).json({
-		status: 'success',
-		data: {
-			data: adjustedDistances,
-		},
-	});
-});
-
 
 module.exports = {
 	getAllTours,
-	getToursWithin,
-	getDistances,
 	createTour,
 	getTour,
 	updateTour,

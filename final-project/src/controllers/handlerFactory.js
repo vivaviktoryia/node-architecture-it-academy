@@ -3,127 +3,214 @@ const { catchAsync } = require('../../utils/catchAsync');
 
 const APIFeatures = require('../../utils/apiFeatures');
 
-const createOne2 = (Model) =>
+const createOne = (Model, associationsConfig = {}) =>
 	catchAsync(async (req, res, next) => {
-		const newRecord = await Model.create(req.body);
-
-		res.status(201).json({
-			status: 'success',
-			data: {
-				data: newRecord,
-			},
-		});
-	});
-
-const createOne = (Model, associations = []) =>
-	catchAsync(async (req, res, next) => {
-		const sequelize = Model.sequelize; // Получаем экземпляр Sequelize
-		console.log(sequelize.models);
-		const { images, locations, ...recordData } = req.body;
-
-		// Проверка данных для обязательных связей
-		if (associations.includes('images') && (!images || images.length < 3)) {
-			return next(new Error('Model must have at least 3 images.'));
-		}
-		if (
-			associations.includes('locations') &&
-			(!locations || locations.length < 1)
-		) {
-			return next(new Error('Model must have at least 1 location.'));
-		}
-
-		// Используем транзакцию для создания записи и связей
+		const sequelize = Model.sequelize;
+		const { ...recordData } = req.body;
 		const transaction = await sequelize.transaction();
 
 		try {
-			// Создаем запись
+			const responseData = {
+				mainRecord: null,
+				associations: {},
+			};
+
+			// Validate associations
+			for (const [assocName, options] of Object.entries(associationsConfig)) {
+				const { required = false, minLength = 0 } = options;
+				const assocData = req.body[assocName];
+
+				if (required && (!assocData || assocData.length < minLength)) {
+					throw new Error(
+						`${assocName} should have at least ${minLength} ${
+							minLength === 1 ? 'item' : 'items'
+						}.`,
+					);
+				}
+			}
+
+			// Create main record
 			const newRecord = await Model.create(recordData, { transaction });
-console.log('💥💥💥💥',associations);
-			// Обрабатываем связи, если они указаны
-			if (associations.includes('images')) {
-				const existingImages = await sequelize.models.Image.findAll({
-					where: { id: images },
-				});
-				console.log(existingImages);
-				if (existingImages.length !== images.length) {
-					throw new Error('Some images were not found.');
+			responseData.mainRecord = newRecord;
+
+			// Handle associations
+			for (const [assocName, options] of Object.entries(associationsConfig)) {
+				const { model, through, attributes } = options;
+				const assocData = req.body[assocName];
+
+				if (assocData) {
+					const existingRecords = await sequelize.models[model].findAll({
+						where: { id: assocData },
+						attributes: attributes || undefined,
+					});
+
+					if (existingRecords.length !== assocData.length) {
+						throw new Error(`Some ${assocName} records were not found.`);
+					}
+
+					const addMethod = through
+						? `add${assocName.charAt(0).toUpperCase() + assocName.slice(1)}`
+						: `set${assocName.charAt(0).toUpperCase() + assocName.slice(1)}`;
+					await newRecord[addMethod](existingRecords, { transaction });
+
+					// Add association data to the response
+					responseData.associations[assocName] = existingRecords;
 				}
-				await newRecord.addImages(existingImages, { transaction });
 			}
 
-			if (associations.includes('locations')) {
-				const existingLocations = await sequelize.models.Location.findAll({
-					where: { id: locations },
-				});
-				if (existingLocations.length !== locations.length) {
-					throw new Error('Some locations were not found.');
-				}
-				await newRecord.addLocations(existingLocations, { transaction });
-			}
-
-			// Сохраняем изменения
 			await transaction.commit();
 
 			res.status(201).json({
 				status: 'success',
-				data: {
-					data: newRecord,
-				},
+				data: responseData,
 			});
 		} catch (error) {
-			// Откатываем транзакцию в случае ошибки
 			await transaction.rollback();
 			next(error);
 		}
 	});
 
-
-
-
-const updateOne = (Model) =>
+const updateOne = (Model, associations = {}) =>
 	catchAsync(async (req, res, next) => {
-		const updatedRowsCount = await Model.update(req.body, {
-			where: { id: req.params.id },
-		});
+		const sequelize = Model.sequelize;
+		const transaction = await sequelize.transaction();
 
-		if (updatedRowsCount[0] === 0) {
-			return next(new AppError('Record with that ID not found', 404));
+		try {
+			const [updatedRowsCount] = await Model.update(req.body, {
+				where: { id: req.params.id },
+				transaction,
+			});
+
+			if (updatedRowsCount === 0) {
+				throw new AppError('Record with that ID not found', 404);
+			}
+
+			const updatedRecord = await Model.findByPk(req.params.id, {
+				transaction,
+			});
+
+			if (!updatedRecord) {
+				throw new AppError('Record with that ID not found', 404);
+			}
+
+			for (const [assocName, assocConfig] of Object.entries(associations)) {
+				const assocData = req.body[assocName];
+				if (!assocData) continue;
+
+				const associatedModel = sequelize.models[assocConfig.model];
+				const existingAssoc = await associatedModel.findAll({
+					where: { id: assocData },
+				});
+
+				if (existingAssoc.length !== assocData.length) {
+					throw new AppError(`Some ${assocName} were not found`, 400);
+				}
+
+				const setMethod = `set${
+					assocName.charAt(0).toUpperCase() + assocName.slice(1)
+				}`;
+				await updatedRecord[setMethod](existingAssoc, { transaction });
+			}
+
+			await transaction.commit();
+
+			const queryOptions = {
+				include: Object.entries(associations).map(
+					([assocName, assocConfig]) => ({
+						model: sequelize.models[assocConfig.model],
+						as: assocName,
+						attributes: assocConfig.attributes || undefined,
+						through: assocConfig.through ? { attributes: [] } : undefined,
+					}),
+				),
+				attributes: req.query.fields ? req.query.fields.split(',') : undefined,
+			};
+
+			const result = await Model.findByPk(req.params.id, queryOptions);
+
+			res.status(200).json({
+				status: 'success',
+				data: result,
+			});
+		} catch (error) {
+			await transaction.rollback();
+			next(error);
 		}
-
-		const updatedRecord = await Model.findByPk(req.params.id);
-		
-		if (!updatedRecord) {
-			return next(new AppError('Record  with that ID not found', 404));
-		}
-
-		res.status(200).json({
-			status: 'success',
-			data: {
-				data: updatedRecord,
-			},
-		});
 	});
 
-const deleteOne = (Model) =>
+const deleteOne = (Model, associationsConfig = {}) =>
 	catchAsync(async (req, res, next) => {
-		const deletedRecord = await Model.destroy({
-			where: { id: req.params.id },
-		});
+		const sequelize = Model.sequelize;
+		const { id } = req.params;
 
-		if (!deletedRecord) {
-			return next(new AppError('Record with that ID not found', 404));
+		const transaction = await sequelize.transaction();
+
+		try {
+			const recordToDelete = await Model.findOne({
+				where: { id },
+				transaction,
+				include: Object.keys(associationsConfig).map((assocName) => {
+					return {
+						model: sequelize.models[associationsConfig[assocName].model],
+						as: assocName,
+						required: false,
+						through: { attributes: [] },
+					};
+				}),
+			});
+
+			if (!recordToDelete) {
+				return next(new AppError('Record with that ID not found', 404));
+			}
+
+			for (const [assocName, options] of Object.entries(associationsConfig)) {
+				const assocData = recordToDelete[assocName];
+
+				if (assocData) {
+					if (!options.deleteAssociated) {
+						await recordToDelete[
+							`remove${assocName.charAt(0).toUpperCase() + assocName.slice(1)}`
+						](assocData, { transaction });
+					} else {
+						await recordToDelete[
+							`remove${assocName.charAt(0).toUpperCase() + assocName.slice(1)}`
+						](assocData, { transaction });
+
+						const associatedModel = sequelize.models[options.model];
+						await associatedModel.destroy({
+							where: {
+								id: assocData.map((item) => item.id),
+							},
+							transaction,
+						});
+					}
+				}
+			}
+
+			await recordToDelete.destroy({ transaction });
+
+			await transaction.commit();
+
+			res.status(204).json({
+				status: 'success',
+				data: null,
+			});
+		} catch (error) {
+			await transaction.rollback();
+			next(error);
 		}
-
-		res.status(204).json({
-			status: 'success',
-			data: null,
-		});
 	});
 
-const getOne = (Model) =>
+const getOne = (Model, associations = {}) =>
 	catchAsync(async (req, res, next) => {
 		const queryOptions = {
 			where: { id: req.params.id },
+			include: Object.entries(associations).map(([assocName, assocConfig]) => ({
+				model: Model.sequelize.models[assocConfig.model],
+				as: assocName,
+				through: assocConfig.through ? { attributes: [] } : undefined,
+				attributes: assocConfig.attributes || undefined,
+			})),
 		};
 
 		const record = await Model.findOne(queryOptions);
@@ -134,21 +221,16 @@ const getOne = (Model) =>
 
 		res.status(200).json({
 			status: 'success',
-			data: {
-				data: record,
-			},
+			data: record,
 		});
 	});
 
-const getAll = (Model) =>
+const getAll = (Model, associations = {}) =>
 	catchAsync(async (req, res, next) => {
-		// Optional filtering for nested resources
 		const filter = req.params.tourId ? { tourId: req.params.tourId } : {};
 
-		// Count total records matching the filter
 		const totalRecords = await Model.count({ where: filter });
 
-		// EXECUTE QUERY
 		const features = new APIFeatures(
 			Model.findAll({ where: filter }),
 			req.query,
@@ -159,25 +241,151 @@ const getAll = (Model) =>
 			.paginate();
 
 		const { where, order, attributes, limit, offset } = features.query;
+
+		const include = Object.entries(associations).map(
+			([assocName, assocConfig]) => ({
+				model: Model.sequelize.models[assocConfig.model],
+				as: assocName,
+				through: assocConfig.through ? { attributes: [] } : undefined,
+				attributes: assocConfig.attributes || undefined,
+			}),
+		);
+
 		const records = await Model.findAll({
 			where,
 			order,
 			attributes,
 			limit,
 			offset,
+			include,
 		});
-		
+
 		res.status(200).json({
 			status: 'success',
 			results: records.length,
 			totalRecords,
-			data: {
-				data: records,
-			},
+			data: records,
 			page: features.page,
 			limit: features.limit,
 		});
 	});
+
+// 1 MODEL
+// POST
+// const createOne = (Model) =>
+// 	catchAsync(async (req, res, next) => {
+// 		const newRecord = await Model.create(req.body);
+
+// 		res.status(201).json({
+// 			status: 'success',
+// 			data: {
+// 				data: newRecord,
+// 			},
+// 		});
+// 	});
+
+// GET
+// const getAll = (Model) =>
+// 	catchAsync(async (req, res, next) => {
+// 		// Optional filtering for nested resources
+// 		const filter = req.params.tourId ? { tourId: req.params.tourId } : {};
+
+// 		// Count total records matching the filter
+// 		const totalRecords = await Model.count({ where: filter });
+
+// 		// EXECUTE QUERY
+// 		const features = new APIFeatures(
+// 			Model.findAll({ where: filter }),
+// 			req.query,
+// 		)
+// 			.filter()
+// 			.sort()
+// 			.limitFields()
+// 			.paginate();
+
+// 		const { where, order, attributes, limit, offset } = features.query;
+// 		const records = await Model.findAll({
+// 			where,
+// 			order,
+// 			attributes,
+// 			limit,
+// 			offset,
+// 		});
+
+// 		res.status(200).json({
+// 			status: 'success',
+// 			results: records.length,
+// 			totalRecords,
+// 			data: {
+// 				data: records,
+// 			},
+// 			page: features.page,
+// 			limit: features.limit,
+// 		});
+// 	});
+
+// GET
+// const getOne = (Model) =>
+// 	catchAsync(async (req, res, next) => {
+// 		const queryOptions = {
+// 			where: { id: req.params.id },
+// 		};
+
+// 		const record = await Model.findOne(queryOptions);
+
+// 		if (!record) {
+// 			return next(new AppError('Record with that ID not found', 404));
+// 		}
+
+// 		res.status(200).json({
+// 			status: 'success',
+// 			data: {
+// 				data: record,
+// 			},
+// 		});
+// 	});
+
+// PATCH
+// const updateOne = (Model) =>
+// 	catchAsync(async (req, res, next) => {
+// 		const updatedRowsCount = await Model.update(req.body, {
+// 			where: { id: req.params.id },
+// 		});
+
+// 		if (updatedRowsCount[0] === 0) {
+// 			return next(new AppError('Record with that ID not found', 404));
+// 		}
+
+// 		const updatedRecord = await Model.findByPk(req.params.id);
+
+// 		if (!updatedRecord) {
+// 			return next(new AppError('Record  with that ID not found', 404));
+// 		}
+
+// 		res.status(200).json({
+// 			status: 'success',
+// 			data: {
+// 				data: updatedRecord,
+// 			},
+// 		});
+// 	});
+
+// DELETE
+// const deleteOne = (Model) =>
+// 	catchAsync(async (req, res, next) => {
+// 		const deletedRecord = await Model.destroy({
+// 			where: { id: req.params.id },
+// 		});
+
+// 		if (!deletedRecord) {
+// 			return next(new AppError('Record with that ID not found', 404));
+// 		}
+
+// 		res.status(204).json({
+// 			status: 'success',
+// 			data: null,
+// 		});
+// 	});
 
 module.exports = {
 	deleteOne,
