@@ -4,7 +4,6 @@ const { checkDatabaseConnection } = require('./config/db');
 const { sequelize } = require('./src/models');
 const { logError, logInfo } = require('./utils/logger');
 
-
 checkDatabaseConnection();
 
 const app = require('./app');
