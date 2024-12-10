@@ -4,6 +4,7 @@ import { updateSettings } from './updateSettings';
 import { displayMap } from './mapbox';
 import { bookTour } from './bookTour';
 import { displayAlert } from './alert';
+import { fetchAndRenderTours } from './fetchTours';
 
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
@@ -13,64 +14,65 @@ const userDataForm = document.querySelector('.form-user-data');
 const passwordForm = document.querySelector('.form-user-password');
 const savePasswordBtn = document.querySelector('.btn--save-password');
 const bookBtn = document.getElementById('book-tour');
+const toursContainer = document.querySelector('.card-container');
 
 if (mapBox) {
-  const locations = JSON.parse(mapBox.dataset.locations);
-  displayMap(locations);
+	const locations = JSON.parse(mapBox.dataset.locations);
+	displayMap(locations);
 }
 
 if (loginForm) {
-  loginForm.addEventListener('submit', event => {
-    event.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    login(email, password);
-    document.getElementById('email').value = '';
-    document.getElementById('password').value = '';
-  });
+	loginForm.addEventListener('submit', (event) => {
+		event.preventDefault();
+		const email = document.getElementById('email').value;
+		const password = document.getElementById('password').value;
+		login(email, password);
+		document.getElementById('email').value = '';
+		document.getElementById('password').value = '';
+	});
 }
 
 if (signupForm) {
-  signupForm.addEventListener('submit', event => {
-    event.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const name = document.getElementById('name').value;
-    signup(name, email, password);
-    document.getElementById('name').value = '';
-    document.getElementById('email').value = '';
-    document.getElementById('password').value = '';
-  });
+	signupForm.addEventListener('submit', (event) => {
+		event.preventDefault();
+		const email = document.getElementById('email').value;
+		const password = document.getElementById('password').value;
+		const name = document.getElementById('name').value;
+		signup(name, email, password);
+		document.getElementById('name').value = '';
+		document.getElementById('email').value = '';
+		document.getElementById('password').value = '';
+	});
 }
 
 if (logOutBtn) logOutBtn.addEventListener('click', logout);
 
 if (userDataForm) {
-  userDataForm.addEventListener('submit', event => {
-    event.preventDefault();
-    const email = document.getElementById('email').value;
-    const name = document.getElementById('name').value;
-    updateSettings({ name, email }, 'data');
-  });
+	userDataForm.addEventListener('submit', (event) => {
+		event.preventDefault();
+		const email = document.getElementById('email').value;
+		const name = document.getElementById('name').value;
+		updateSettings({ name, email }, 'data');
+	});
 }
 
 if (passwordForm) {
-  passwordForm.addEventListener('submit', async event => {
-    event.preventDefault();
+	passwordForm.addEventListener('submit', async (event) => {
+		event.preventDefault();
 
-    savePasswordBtn.textContent = 'Updating...';
-    const passwordCurrent = document.getElementById('password-current').value;
-    const password = document.getElementById('password').value;
-    const passwordConfirm = document.getElementById('password-confirm').value;
-    await updateSettings(
-      { passwordCurrent, password, passwordConfirm },
-      'password',
-    );
-    savePasswordBtn.textContent = 'Save password';
-    document.getElementById('password-current').value = '';
-    document.getElementById('password').value = '';
-    document.getElementById('password-confirm').value = '';
-  });
+		savePasswordBtn.textContent = 'Updating...';
+		const passwordCurrent = document.getElementById('password-current').value;
+		const password = document.getElementById('password').value;
+		const passwordConfirm = document.getElementById('password-confirm').value;
+		await updateSettings(
+			{ passwordCurrent, password, passwordConfirm },
+			'password',
+		);
+		savePasswordBtn.textContent = 'Save password';
+		document.getElementById('password-current').value = '';
+		document.getElementById('password').value = '';
+		document.getElementById('password-confirm').value = '';
+	});
 }
 
 if (bookBtn) {
@@ -78,8 +80,8 @@ if (bookBtn) {
 		const setButtonState = (text) => (button.textContent = text);
 
 		try {
-      setButtonState('Processing...');
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+			setButtonState('Processing...');
+			await new Promise((resolve) => setTimeout(resolve, 3000));
 			await bookTour();
 		} catch (error) {
 			console.error('Booking failed:', error);
@@ -89,5 +91,9 @@ if (bookBtn) {
 	});
 }
 
-  const alertMessage = document.querySelector('body').dataset.alert;
-	if (alertMessage) displayAlert('success', alertMessage, 10);
+const alertMessage = document.querySelector('body').dataset.alert;
+if (alertMessage) displayAlert('success', alertMessage, 10);
+
+if (toursContainer) {
+	fetchAndRenderTours();
+}

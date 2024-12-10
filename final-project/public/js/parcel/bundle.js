@@ -160,6 +160,84 @@ const $144e4d4c31c55431$export$8d5bdbf26681c0c2 = async ()=>{
 
 
 
+
+const $c7a0accfc35e5a18$export$c75d4cf74fa48403 = (tours)=>{
+    const cardContainer = document.querySelector('.card-container');
+    tours.forEach((tour)=>{
+        const tourElement = document.createElement('div');
+        tourElement.classList.add('card');
+        tourElement.innerHTML = `
+            <div class="card__header">
+                <div class="card__picture">
+                    <div class="card__picture-overlay">&nbsp;</div>
+                    <img class="card__picture-img" src="/img/tours/${tour.imageCover || 'default-cover.jpg'}" alt="${tour.name}" />
+                </div>
+                <h3 class="heading-tertirary">
+                    <span>${tour.name}</span>
+                </h3>
+            </div>
+
+            <div class="card__details">
+                <h4 class="card__sub-heading">${tour.difficulty} ${tour.duration}-day tour</h4>
+                <p class="card__text">${tour.summary}</p>
+                <div class="card__data">
+                    <svg class="card__icon">
+                        <use xlink:href="/img/icons.svg#icon-map-pin"></use>
+                    </svg>
+                    <span>${tour.locations && tour.locations[0] ? tour.locations[0].description : 'No location available'}</span>
+                </div>
+                <div class="card__data">
+                    <svg class="card__icon">
+                        <use xlink:href="/img/icons.svg#icon-calendar"></use>
+                    </svg>
+                    <span>${new Date(tour.startDate).toLocaleString('en-us', {
+            month: 'long',
+            year: 'numeric'
+        })}</span>
+                </div>
+                <div class="card__data">
+                    <svg class="card__icon">
+                        <use xlink:href="/img/icons.svg#icon-flag"></use>
+                    </svg>
+                    <span>${tour.locations.length} ${tour.locations.length === 1 ? 'stop' : 'stops'}</span>
+                </div>
+                <div class="card__data">
+                    <svg class="card__icon">
+                        <use xlink:href="/img/icons.svg#icon-user"></use>
+                    </svg>
+                    <span>${tour.maxGroupSize} people</span>
+                </div>
+            </div>
+
+            <div class="card__footer">
+                <p>
+                    <span class="card__footer-value">$${tour.price}</span> 
+                    <span class="card__footer-text"> per person</span>
+                </p>
+                <p class="card__ratings">
+                    <span class="card__footer-value">${tour.ratingsAverage}</span> 
+                    <span class="card__footer-text">rating (${tour.ratingsQuantity})</span>
+                </p>
+                <a class="btn btn--green btn--small" href="/tour/${tour.slug}">Details</a>
+            </div>
+        `;
+        cardContainer.appendChild(tourElement);
+    });
+};
+
+
+const $7298424caa41a876$export$11765089634545e1 = async ()=>{
+    try {
+        const response = await fetch('/api/v1/tours');
+        if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+        const responseData = await response.json();
+        (0, $c7a0accfc35e5a18$export$c75d4cf74fa48403)(responseData.data);
+    } catch (error) {
+        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', error.message);
+    }
+};
+
+
 const $d0f7ce18c37ad6f6$var$mapBox = document.getElementById('map');
 const $d0f7ce18c37ad6f6$var$loginForm = document.querySelector('.form--login');
 const $d0f7ce18c37ad6f6$var$signupForm = document.querySelector('.form--signup');
@@ -168,6 +246,7 @@ const $d0f7ce18c37ad6f6$var$userDataForm = document.querySelector('.form-user-da
 const $d0f7ce18c37ad6f6$var$passwordForm = document.querySelector('.form-user-password');
 const $d0f7ce18c37ad6f6$var$savePasswordBtn = document.querySelector('.btn--save-password');
 const $d0f7ce18c37ad6f6$var$bookBtn = document.getElementById('book-tour');
+const $d0f7ce18c37ad6f6$var$toursContainer = document.querySelector('.card-container');
 if ($d0f7ce18c37ad6f6$var$mapBox) {
     const locations = JSON.parse($d0f7ce18c37ad6f6$var$mapBox.dataset.locations);
     (0, $f60945d37f8e594c$export$4c5dd147b21b9176)(locations);
@@ -230,6 +309,7 @@ if ($d0f7ce18c37ad6f6$var$bookBtn) $d0f7ce18c37ad6f6$var$bookBtn.addEventListene
 });
 const $d0f7ce18c37ad6f6$var$alertMessage = document.querySelector('body').dataset.alert;
 if ($d0f7ce18c37ad6f6$var$alertMessage) (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', $d0f7ce18c37ad6f6$var$alertMessage, 10);
+if ($d0f7ce18c37ad6f6$var$toursContainer) (0, $7298424caa41a876$export$11765089634545e1)();
 
 
 //# sourceMappingURL=bundle.js.map
