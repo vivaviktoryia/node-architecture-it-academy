@@ -45,12 +45,14 @@ class APIFeatures {
 
 	sort() {
 		if (this.queryString.sort) {
-			const sortBy = this.queryString.sort
-				.split(',')
-				.map((field) => [field, 'ASC']);
+			const sortBy = this.queryString.sort.split(',').map((field) => {
+				const direction = field.startsWith('-') ? 'DESC' : 'ASC';
+				const fieldName = field.replace('-', ''); 
+				return [fieldName, direction];
+			});
 			this.query.order = sortBy;
 		} else {
-			this.query.order = [[createdAtField, 'DESC']]; // Default sorting
+			this.query.order = [[createdAtField, 'DESC']];
 		}
 		return this;
 	}
