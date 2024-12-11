@@ -10,7 +10,7 @@ GRANT ALL PRIVILEGES ON amcm_db.* TO 'amcm_user'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 
 npx create-strapi@latest
-
+nameserver 127.0.0.53
 
 //  npm install strapi-plugin-io 
 npm error peer @strapi/strapi@"^4.14.6" from strapi-plugin-io@2.0.6
