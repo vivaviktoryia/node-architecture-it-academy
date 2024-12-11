@@ -5,7 +5,10 @@
   "scripts": {
     "start": "nodemon server.js ",
     "watch:js": "parcel watch ./public/js/index.js --dist-dir ./public/js/parcel",
-    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/parcel"
+    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/parcel",
+    "backup:db:with-data": "node database/scripts/backup.js backup",
+    "backup:db:without-data": "node database/scripts/backup.js backup --without-data",
+    "db:setup": "node database/scripts/backup.js restore database/backup/INIT_final_project_backup.sql"
   },
   "author": "Viktoryia",
   "license": "ISC",

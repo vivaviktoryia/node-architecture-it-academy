@@ -39,4 +39,4 @@ const Location = sequelize.define('Location', {
 	},
 });
 
-module.exports = {Location};
+module.exports = { Location };
