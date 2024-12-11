@@ -6,6 +6,22 @@ C:\Windows\System32\drivers\etc\hosts - can be managed
 ::1             localhost
 
 
+// Installation MAriaDb on remote server (ubuntu/linux)
+sudo systemctl status mariadb
+
+sudo nano /etc/apt/sources.list
+
+sudo nano /etc/apt/sources.list.d/mariadb.list
+SHOW VARIABLES LIKE 'lower_case_table_names';
+
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'lexus_ita';
+FLUSH PRIVILEGES;
+
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+// NOTE! LINUX - case sensitive!!! Change from 0 to 1 to avoid this issue!
+lower_case_table_names = 1
+
+
 // Request Body Parser - Middleware
 express.json({ limit: '10kb' }); // content-type: application/json -> JSON.parse(req.body)
 express.text(); // content-type: text/plain -> parse req.body
