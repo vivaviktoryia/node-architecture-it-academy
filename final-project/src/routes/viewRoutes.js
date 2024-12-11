@@ -6,7 +6,6 @@ const {
 	getLoginForm,
 	getSignupForm,
 	getAccount,
-	// updateUserData,
 } = require('../controllers/viewsController');
 
 const {
@@ -20,9 +19,6 @@ const { isLoggedIn, checkToken } = require('../controllers/authController');
 const router = express.Router();
 
 router.get('/me', checkToken, getAccount);
-
-// with API
-// router.post('/submit-user-data', checkToken, updateUserData);
 
 router.use(isLoggedIn);
 

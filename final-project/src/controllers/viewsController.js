@@ -10,37 +10,38 @@ const getOverview = catchAsync(async (req, res, next) => {
 });
 
 const getTour = catchAsync(async (req, res, next) => {
-	// const tour = await Tour.findOne({
-	// 	where: { slug: req.params.slug },
-	// 	include: [
-	// 		{
-	// 			model: Location,
-	// 			as: 'locations',
-	// 			required: false,
-	// 		},
-	// 		{
-	// 			model: Image,
-	// 			as: 'images',
-	// 			required: false,
-	// 		},
-	// 		{
-	// 			model: Review,
-	// 			as: 'reviews',
-	// 			// 	attributes: ['review', 'rating', 'user'], // Select specific fields to include
-	// 			include: [
-	// 				{
-	// 					model: User,
-	// 					as: 'user',
-	// 					attributes: ['name', 'photo'],
-	// 				},
-	// 			],
-	// 			required: false,
-	// 		},
-	// 	],
-	// });
-	// if (!tour) {
-	// 	return next(new AppError('There is no Tour with that name!', 404));
-	// }
+	const tour = await Tour.findOne({
+		where: { slug: req.params.slug },
+		include: [
+			{
+				model: Location,
+				as: 'locations',
+				required: false,
+			},
+			{
+				model: Image,
+				as: 'images',
+				required: false,
+			},
+			{
+				model: Review,
+				as: 'reviews',
+				// 	attributes: ['review', 'rating', 'user'], // Select specific fields to include
+				include: [
+					{
+						model: User,
+						as: 'user',
+						attributes: ['name', 'photo'],
+					},
+				],
+				required: false,
+			},
+		],
+	});
+	if (!tour) {
+		return next(new AppError('There is no Tour with that name!', 404));
+	}
+	console.log('💥💥💥💥', tour.images.fileName);
 	res
 		.status(200)
 		.set(
@@ -77,31 +78,10 @@ const getSignupForm = catchAsync(async (req, res, next) => {
 	});
 });
 
-// Utilized without API
-const updateUserData = catchAsync(async (req, res, next) => {
-	const updatedUser = await User.findByIdAndUpdate(
-		req.user.id,
-		{
-			name: req.body.name,
-			email: req.body.email,
-		},
-		{
-			new: true,
-			runValidators: true,
-		},
-	);
-
-	res.status(200).render('account', {
-		title: 'Your account',
-		user: updatedUser,
-	});
-});
-
 module.exports = {
 	getOverview,
 	getTour,
 	getLoginForm,
 	getSignupForm,
 	getAccount,
-	updateUserData,
 };

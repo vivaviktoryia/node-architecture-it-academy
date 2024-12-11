@@ -5,7 +5,10 @@
   "scripts": {
     "start": "nodemon server.js ",
     "watch:js": "parcel watch ./public/js/index.js --dist-dir ./public/js/parcel",
-    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/parcel"
+    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/parcel",
+    "backup:db:with-data": "node database/scripts/backup.js backup",
+    "backup:db:without-data": "node database/scripts/backup.js backup --without-data",
+    "db:setup": "node database/scripts/backup.js restore database/backup/INIT_final_project_backup.sql"
   },
   "author": "Viktoryia",
   "license": "ISC",
@@ -28,6 +31,7 @@
     "regenerator-runtime": "^0.14.1",
     "rotating-file-stream": "^3.2.5",
     "sequelize": "^6.37.5",
+    "sharp": "^0.33.5",
     "socket.io": "^4.8.1"
   },
   "devDependencies": {

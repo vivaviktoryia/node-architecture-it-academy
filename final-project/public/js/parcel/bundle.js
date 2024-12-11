@@ -78,20 +78,22 @@ const $70af9284e599e604$export$a0973bcfe11b05c9 = async ()=>{
 const $936fcc27ffb6bbb1$export$f558026a994b6051 = async (data, type)=>{
     try {
         const dataType = type.trim().toLowerCase().charAt(0).toUpperCase() + type.slice(1);
+        if (![
+            'Data',
+            'Password'
+        ].includes(dataType)) throw new Error('Invalid type was provided!');
         const url = `/api/v1/users/${dataType === 'Password' ? 'updateMyPassword' : 'updateMe'}`;
-        if (dataType !== 'Password' && dataType !== 'Data') return (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', 'Invalid type provided!');
         const res = await fetch(url, {
             method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+            body: data
         });
         const responseData = await res.json();
-        if (res.ok && responseData.status === 'success') (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', `${dataType} updated successfully!`);
-        else throw new Error(responseData.message || 'Error updating data!');
-    } catch (err) {
-        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', err.message);
+        if (res.ok && responseData.status === 'success') {
+            (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', `${dataType} updated successfully!`);
+            location.reload(true);
+        } else throw new Error(responseData.message || 'Error updating data!');
+    } catch (error) {
+        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', error.message);
     }
 };
 
@@ -272,12 +274,14 @@ if ($d0f7ce18c37ad6f6$var$signupForm) $d0f7ce18c37ad6f6$var$signupForm.addEventL
 if ($d0f7ce18c37ad6f6$var$logOutBtn) $d0f7ce18c37ad6f6$var$logOutBtn.addEventListener('click', (0, $70af9284e599e604$export$a0973bcfe11b05c9));
 if ($d0f7ce18c37ad6f6$var$userDataForm) $d0f7ce18c37ad6f6$var$userDataForm.addEventListener('submit', (event)=>{
     event.preventDefault();
-    const email = document.getElementById('email').value;
-    const name = document.getElementById('name').value;
-    (0, $936fcc27ffb6bbb1$export$f558026a994b6051)({
-        name: name,
-        email: email
-    }, 'data');
+    const formData = new FormData();
+    const fields = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        photo: document.getElementById('photo').files[0]
+    };
+    Object.entries(fields).forEach(([key, value])=>formData.append(key, value));
+    (0, $936fcc27ffb6bbb1$export$f558026a994b6051)(formData, 'data');
 });
 if ($d0f7ce18c37ad6f6$var$passwordForm) $d0f7ce18c37ad6f6$var$passwordForm.addEventListener('submit', async (event)=>{
     event.preventDefault();

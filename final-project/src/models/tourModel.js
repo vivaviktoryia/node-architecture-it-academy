@@ -102,11 +102,12 @@ const Tour = sequelize.define(
 			},
 		},
 		description: {
-			type: DataTypes.STRING,
+			type: DataTypes.STRING(500),
+			allowNull: false,
 			validate: {
 				len: {
 					args: [2, 500],
-					msg: 'Description should be between 2 and 500 characters.',
+					msg: 'A tour description should be between 2 and 500 characters',
 				},
 			},
 		},
