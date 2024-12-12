@@ -35,7 +35,7 @@ function renderTourHeader(tour) {
 }
 
 function renderTourDescription(tour) {
-	document.getElementById('tour-description').textContent = tour.description;
+	document.getElementById('tour-description').innerHTML = tour.description;
 
 	const date = new Date(tour.startDate).toLocaleString('en-us', {
 		month: 'long',

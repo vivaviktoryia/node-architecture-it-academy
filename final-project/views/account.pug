@@ -13,19 +13,16 @@ block content
     .user-view
       nav.user-view__menu
         ul.side-nav
-          +navItem('#', 'Settings', 'settings', true)
+          +navItem('/me', 'Settings', 'settings', true)
           +navItem('#', 'My bookings', 'briefcase')
           +navItem('#', 'My reviews', 'star')
-          +navItem('#', 'Billing', 'credit-card')
+          //- +navItem('#', 'Billing', 'credit-card')
 
         - if (user.role === 'admin')
           .admin-nav
             h5.admin-nav__heading Admin
             ul.side-nav
-              +navItem('#', 'Manage tours', 'map')
-              +navItem('#', 'Manage users', 'users')
-              +navItem('#', 'Manage reviews', 'star')
-              +navItem('#', 'Manage bookings', 'briefcase')
+              +navItem('/admin/tours', 'Manage tours', 'map')
 
       .user-view__content
         .user-view__form-container
@@ -61,5 +58,3 @@ block content
               input#password-confirm.form__input(type='password', placeholder='••••••••', required, minlength='8')
             .form__group.right
               button.btn.btn--small.btn--green.btn--save-password Save password
-
-        

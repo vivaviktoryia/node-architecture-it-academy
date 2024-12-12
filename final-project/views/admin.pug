@@ -1,0 +1,97 @@
+extends base
+
+block append head
+  script(src="https://cdn.tiny.cloud/1/bqgl6tfbuwuyx2hwr6iobci5xdoxe1e1rg2n1pzfhz1zmra0/tinymce/5/tinymce.min.js")
+  script(src="/js/textEditor.js")
+
+
+mixin navItem(link, text, icon, active)
+  li(class=`${active ? 'side-nav--active' : ''}`)
+    a(href=`${link}`)
+      svg
+        use(xlink:href=`/img/icons.svg#icon-${icon}`)
+      | #{text}
+
+
+block content
+  main.main
+    .admin-view
+      nav.admin-view__menu
+        ul.side-nav
+          +navItem('/me', 'Settings', 'settings', true)
+
+        - if (user.role === 'admin')
+          .admin-nav
+            h5.admin-nav__heading Manage tours
+            ul.side-nav
+              +navItem('/admin/tours', 'Edit structure', 'edit')
+              +navItem('/admin/tours', 'Add tour', 'map')
+
+
+      .admin-view__content
+        if (page === 'manageTours')
+          .admin-view__form-container
+            h2.heading-secondary.ma-bt-md Manage Tours
+
+            form.form.form-add-tour-data(action='/api/v1/tours' method='POST')
+              h3.heading-tertiary.ma-bt-sm Add New Tour
+              .form__group
+                label.form__label(for='tourName') Tour Name
+                input#tourName.form__input(type='text' placeholder='Tour name', required, name='name' value='Default Tour Name')
+              .form__group
+                label.form__label(for='tourDuration') Duration (days)
+                input#tourDuration.form__input(type='number' placeholder='Duration', required, min="1" name='duration' value='7')
+              .form__group
+                label.form__label(for='tourGroupSize') Max Group Size
+                input#tourGroupSize.form__input(type='number' placeholder='Group size', required, min="1" name='maxGroupSize' value='7')
+              .form__group
+                label.form__label(for='tourDifficulty') Difficulty
+                select#tourDifficulty.form__input(name='difficulty', required)
+                  option(value='easy') Easy
+                  option(value='medium') Medium
+                  option(value='difficult') Difficult
+              .form__group
+                label.form__label(for='tourPrice') Price
+                input#tourPrice.form__input(type='number' placeholder='Price', required, min="1" name='price' value='121')
+              .form__group
+                label.form__label(for='tourPriceDiscount') Price Discount
+                input#tourPriceDiscount.form__input(type='number' placeholder='Discount' min="0" name='priceDiscount' value='0')
+              .form__group
+                label.form__label(for='tourSummary') Summary
+                textarea#tourSummary.form__input(placeholder='Summary', required, name='summary' value='Default tour summary text')
+              .form__group
+                label.form__label(for='tourDescription') Description
+                textarea#tourDescription.form__input--editable(placeholder='Description', required, name='description' value='Default tour description text')                
+              .form__group
+                label.form__label(for='tourImageCover') Cover Image
+                input#coverImageDefault.form__input( name='imageCover' value='default-cover.jpg')
+
+              .form__group
+                label.form__label(for='tourStartDate') Start Date
+                input#tourStartDate.form__input(type='date', required, name='startDate')
+              .form__group
+                label.form__label(for='tourImages') Images (Select at least 3)
+                select#tourImages.form__input(name='images', multiple required)
+                  each image in images
+                    option(value=image.id) #{image.fileName}
+                input#hiddenImages.form__input(type='hidden' name='selectedImages' value='[]')
+              .form__group
+                label.form__label(for='tourLocations') Locations (Select at least 2)
+                select#tourLocations.form__input(name='locations', required, multiple)
+                  each location in locations
+                    option(value=location.id) #{location.description}
+                input#hiddenLocations.form__input(type='hidden' name='selectedLocations' value='[]')
+              .form__group.right
+                button.btn.btn--small.btn--green Add Tour
+
+        if (page === 'seeAllTours')
+          .admin-view__tour-list
+            h2.heading-secondary.ma-bt-md All Tours
+            each tour in tours
+              .tour-card
+                .tour-card__header
+                  h3.heading-tertiary= tour.name
+                .tour-card__details
+                  p= tour.summary
+                  p Price: $#{tour.price}
+                a.btn.btn--green.btn--small(href=`/admin/tours/${tour.id}`) View Tour

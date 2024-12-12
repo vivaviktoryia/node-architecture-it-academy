@@ -39,7 +39,7 @@ export const login = async (email, password) => {
 		const data = await res.json();
 
 		if (res.ok && data.status === 'success') {
-			displayAlert('success', 'Logged in successfully!');
+			displayAlert('success', 'Logged In Successfully!😉');
 			window.setTimeout(() => {
 				location.assign('/');
 			}, 1500);
@@ -60,12 +60,13 @@ export const logout = async () => {
 		const data = await res.json();
 
 		if (res.ok && data.status === 'success') {
+			displayAlert('success', 'Logged Out Successfully!👋');
 			window.setTimeout(() => {
 				location.assign('/');
 			}, 1500);
 			// location.reload(true);
 		} else {
-			throw new Error('Error during logout');
+			throw new Error('Error During Logout');
 		}
 	} catch (err) {
 		console.log(err);

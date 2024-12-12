@@ -48,7 +48,7 @@ const $70af9284e599e604$export$596d806903d1f59e = async (email, password)=>{
         });
         const data = await res.json();
         if (res.ok && data.status === 'success') {
-            (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', 'Logged in successfully!');
+            (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', "Logged In Successfully!\uD83D\uDE09");
             window.setTimeout(()=>{
                 location.assign('/');
             }, 1500);
@@ -63,10 +63,13 @@ const $70af9284e599e604$export$a0973bcfe11b05c9 = async ()=>{
             method: 'GET'
         });
         const data = await res.json();
-        if (res.ok && data.status === 'success') window.setTimeout(()=>{
-            location.assign('/');
-        }, 1500);
-        else throw new Error('Error during logout');
+        if (res.ok && data.status === 'success') {
+            (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', "Logged Out Successfully!\uD83D\uDC4B");
+            window.setTimeout(()=>{
+                location.assign('/');
+            }, 1500);
+        // location.reload(true);
+        } else throw new Error('Error During Logout');
     } catch (err) {
         console.log(err);
         (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', 'Error Logged Out! Try Again!');
@@ -92,6 +95,25 @@ const $936fcc27ffb6bbb1$export$f558026a994b6051 = async (data, type)=>{
             (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', `${dataType} updated successfully!`);
             location.reload(true);
         } else throw new Error(responseData.message || 'Error updating data!');
+    } catch (error) {
+        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', error.message);
+    }
+};
+
+
+/* eslint-disable */ 
+const $c88b9e826f4b699d$export$a07e6cda5297cf4b = async (data)=>{
+    try {
+        const res = await fetch('/api/v1/tours', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        const responseData = await res.json();
+        if (res.ok && responseData.status === 'success') (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', `Tour added successfully!`, 10);
+        else throw new Error(responseData.message || 'Error updating data!');
     } catch (error) {
         (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', error.message);
     }
@@ -391,7 +413,7 @@ function $3fa2a398896b9956$var$renderTourHeader(tour) {
     document.getElementById('tour-location').textContent = tour.locations && tour.locations[0] ? tour.locations[0].description : 'No location available';
 }
 function $3fa2a398896b9956$var$renderTourDescription(tour) {
-    document.getElementById('tour-description').textContent = tour.description;
+    document.getElementById('tour-description').innerHTML = tour.description;
     const date = new Date(tour.startDate).toLocaleString('en-us', {
         month: 'long',
         year: 'numeric'
@@ -602,6 +624,7 @@ const $d0f7ce18c37ad6f6$var$loginForm = document.querySelector('.form--login');
 const $d0f7ce18c37ad6f6$var$signupForm = document.querySelector('.form--signup');
 const $d0f7ce18c37ad6f6$var$logOutBtn = document.querySelector('.nav__el--logout');
 const $d0f7ce18c37ad6f6$var$userDataForm = document.querySelector('.form-user-data');
+const $d0f7ce18c37ad6f6$var$tourDataForm = document.querySelector('.form-add-tour-data');
 const $d0f7ce18c37ad6f6$var$passwordForm = document.querySelector('.form-user-password');
 const $d0f7ce18c37ad6f6$var$savePasswordBtn = document.querySelector('.btn--save-password');
 const $d0f7ce18c37ad6f6$var$bookBtn = document.getElementById('book-tour');
@@ -641,6 +664,48 @@ if ($d0f7ce18c37ad6f6$var$userDataForm) $d0f7ce18c37ad6f6$var$userDataForm.addEv
     };
     Object.entries(fields).forEach(([key, value])=>formData.append(key, value));
     (0, $936fcc27ffb6bbb1$export$f558026a994b6051)(formData, 'data');
+});
+if ($d0f7ce18c37ad6f6$var$tourDataForm) $d0f7ce18c37ad6f6$var$tourDataForm.addEventListener('submit', (event)=>{
+    event.preventDefault();
+    const selectedImages = Array.from(document.getElementById('tourImages').selectedOptions).map((option)=>parseInt(option.value, 10));
+    const selectedLocations = Array.from(document.getElementById('tourLocations').selectedOptions).map((option)=>parseInt(option.value, 10));
+    const maxImages = 3;
+    const minLocations = 2;
+    if (selectedImages.length > maxImages) {
+        alert(`Pls select only ${maxImages} images`);
+        return;
+    }
+    if (selectedLocations.length < minLocations) {
+        alert(`Pls select at least ${minLocations} locations.`);
+        return;
+    }
+    const fields = {
+        name: document.getElementById('tourName').value,
+        duration: parseInt(document.getElementById('tourDuration').value, 10),
+        maxGroupSize: parseInt(document.getElementById('tourGroupSize').value, 10),
+        difficulty: document.getElementById('tourDifficulty').value,
+        price: parseFloat(document.getElementById('tourPrice').value),
+        priceDiscount: parseFloat(document.getElementById('tourPriceDiscount').value),
+        summary: document.getElementById('tourSummary').value,
+        // description: document.getElementById('tourDescription').value,
+        description: tinymce.get('tourDescription').getContent(),
+        imageCover: 'default-cover.jpg',
+        startDate: document.getElementById('tourStartDate').value,
+        images: selectedImages.length === 3 ? selectedImages : [
+            1,
+            2,
+            3
+        ],
+        locations: selectedLocations.length === 3 ? selectedLocations : [
+            11,
+            12,
+            13
+        ]
+    };
+    (0, $c88b9e826f4b699d$export$a07e6cda5297cf4b)(fields);
+    $d0f7ce18c37ad6f6$var$tourDataForm.reset();
+    document.getElementById('tourImages').selectedIndex = -1;
+    document.getElementById('tourLocations').selectedIndex = -1;
 });
 if ($d0f7ce18c37ad6f6$var$passwordForm) $d0f7ce18c37ad6f6$var$passwordForm.addEventListener('submit', async (event)=>{
     event.preventDefault();
