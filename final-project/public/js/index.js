@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { signup, login, logout } from './login';
 import { updateSettings } from './updateSettings';
+import { addTour } from './addTour';
 import { displayMap } from './mapbox';
 import { bookTour } from './bookTour';
 import { displayAlert } from './alert';
@@ -13,6 +14,7 @@ const loginForm = document.querySelector('.form--login');
 const signupForm = document.querySelector('.form--signup');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
+const tourDataForm = document.querySelector('.form-add-tour-data');
 const passwordForm = document.querySelector('.form-user-password');
 const savePasswordBtn = document.querySelector('.btn--save-password');
 const bookBtn = document.getElementById('book-tour');
@@ -79,6 +81,60 @@ if (userDataForm) {
 	});
 }
 
+if (tourDataForm) {
+	tourDataForm.addEventListener('submit', (event) => {
+		event.preventDefault();
+
+		const selectedImages = Array.from(
+			document.getElementById('tourImages').selectedOptions,
+		).map((option) => parseInt(option.value, 10));
+
+		const selectedLocations = Array.from(
+			document.getElementById('tourLocations').selectedOptions,
+		).map((option) => parseInt(option.value, 10));
+
+		const maxImages = 3;
+		const minLocations = 2;
+
+		if (selectedImages.length > maxImages) {
+			alert(`Pls select only ${maxImages} images`);
+			return;
+		}
+
+		if (selectedLocations.length < minLocations) {
+			alert(`Pls select at least ${minLocations} locations.`);
+			return;
+		}
+
+		const fields = {
+			name: document.getElementById('tourName').value,
+			duration: parseInt(document.getElementById('tourDuration').value, 10),
+			maxGroupSize: parseInt(
+				document.getElementById('tourGroupSize').value,
+				10,
+			),
+			difficulty: document.getElementById('tourDifficulty').value,
+			price: parseFloat(document.getElementById('tourPrice').value),
+			priceDiscount: parseFloat(
+				document.getElementById('tourPriceDiscount').value,
+			),
+			summary: document.getElementById('tourSummary').value,
+			// description: document.getElementById('tourDescription').value,
+			description: tinymce.get('tourDescription').getContent(),
+			imageCover: 'default-cover.jpg',
+			startDate: document.getElementById('tourStartDate').value,
+			images: selectedImages.length === 3 ? selectedImages : [1, 2, 3],
+			locations:
+				selectedLocations.length === 3 ? selectedLocations : [11, 12, 13],
+		};
+
+		addTour(fields);
+		tourDataForm.reset();
+		document.getElementById('tourImages').selectedIndex = -1; 
+		document.getElementById('tourLocations').selectedIndex = -1; 
+	});
+}
+
 if (passwordForm) {
 	passwordForm.addEventListener('submit', async (event) => {
 		event.preventDefault();
@@ -116,7 +172,6 @@ if (bookBtn) {
 
 const alertMessage = document.querySelector('body').dataset.alert;
 if (alertMessage) displayAlert('success', alertMessage, 10);
-
 
 // if (mapBox) {
 // 	const locationsData = mapBox.dataset.locations;

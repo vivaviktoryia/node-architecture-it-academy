@@ -51,10 +51,27 @@ const getSignupForm = catchAsync(async (req, res, next) => {
 	});
 });
 
+
+const manageTours = catchAsync(async (req, res, next) => {
+	const locations = await Location.findAll({
+  attributes: ['id', 'description'], 
+});
+	const images = await Image.findAll({ attributes: ['id', 'fileName'] }); 
+	console.log(locations.dataValues);
+	res.status(200).render('admin', {
+		title: 'Manage Tours',
+		page: 'manageTours',
+		images: images,
+		locations: locations,
+		tours: [],
+	});
+});
+
 module.exports = {
 	getOverview,
 	getTour,
 	getLoginForm,
 	getSignupForm,
 	getAccount,
+	manageTours,
 };

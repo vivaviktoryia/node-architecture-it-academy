@@ -6,6 +6,7 @@ const {
 	getLoginForm,
 	getSignupForm,
 	getAccount,
+	manageTours,
 } = require('../controllers/viewsController');
 
 const {
@@ -27,6 +28,8 @@ router.get('/tour/:slug', getTour);
 
 router.get('/login', getLoginForm);
 router.get('/signup', getSignupForm);
+
+router.get('/admin/tours', manageTours);
 
 // SSR
 router.get('/ssr', getOverview_SSR);
