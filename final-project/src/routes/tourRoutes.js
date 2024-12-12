@@ -7,6 +7,7 @@ const {
 	updateTour,
 	deleteTour,
 	aliasTopTours,
+	getTourBySlug,
 } = require('../controllers/tourController');
 
 const { checkToken, restrictTo } = require('../controllers/authController');
@@ -27,6 +28,8 @@ router
 	.get(getTour)
 	.patch(checkToken, restrictTo('admin'), updateTour)
 	.delete(checkToken, restrictTo('admin'), deleteTour);
+
+router.route('/slug/:slug').get(getTourBySlug);
 
 // TODO
 router.route('/top-5-cheap').get(aliasTopTours, getAllTours); // adding allias through middleware

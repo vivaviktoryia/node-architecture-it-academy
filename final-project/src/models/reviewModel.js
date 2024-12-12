@@ -83,10 +83,6 @@ const Review = sequelize.define(
 				}
 			},
 			afterUpdate: async (review, options) => {
-				console.log(
-					'💥💥💥💥💥After update hook triggered for review:',
-					review,
-				);
 				if (review.tourId) {
 					await Review.calcAverageRatings(review.tourId, options.transaction);
 				} else {

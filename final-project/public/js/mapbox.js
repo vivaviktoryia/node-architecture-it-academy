@@ -14,8 +14,8 @@ export const displayMap = (locations) => {
 
 	const bounds = new mapboxgl.LngLatBounds();
 
-  locations.forEach((loc, index) => {
-    const dayNumber = index + 1;
+	locations.forEach((loc, index) => {
+		const dayNumber = index + 1;
 		// Extract coordinates if they're inside a GeoJSON Point object
 		const coordinates =
 			loc.coordinates && loc.coordinates.type === 'Point'
@@ -28,7 +28,7 @@ export const displayMap = (locations) => {
 			el.className = 'marker';
 
 			// Add marker
-			new mapboxgl.Marker({
+			const marker = new mapboxgl.Marker({
 				element: el,
 				anchor: 'bottom',
 			})
@@ -36,12 +36,28 @@ export const displayMap = (locations) => {
 				.addTo(map);
 
 			// Add popup
-			new mapboxgl.Popup({
+			const popup = new mapboxgl.Popup({
 				offset: 30,
 			})
 				.setLngLat(coordinates)
-				.setHTML(`<p>Day ${dayNumber}: ${loc.description}  </p>`)
-				.addTo(map);
+				.setHTML(`<p>Day ${dayNumber}: ${loc.description}</p>`);
+
+			// Attach the popup to the marker
+			marker.setPopup(popup);
+
+			// Handle popup focus-related aria-hidden issue
+			const closeButton = popup._closeButton;
+			if (closeButton) {
+				// Remove aria-hidden when focused
+				closeButton.addEventListener('focus', () => {
+					closeButton.setAttribute('aria-hidden', 'false');
+				});
+
+				// Reapply aria-hidden when focus is lost
+				closeButton.addEventListener('blur', () => {
+					closeButton.setAttribute('aria-hidden', 'true');
+				});
+			}
 
 			bounds.extend(coordinates);
 		} else {
