@@ -4,7 +4,9 @@ import { updateSettings } from './updateSettings';
 import { displayMap } from './mapbox';
 import { bookTour } from './bookTour';
 import { displayAlert } from './alert';
-import { fetchAndRenderTours } from './fetchTours';
+import { fetchAllTours, fetchTourDataBySlug } from './fetchTours';
+import { renderAllTours } from './renderAllTours';
+import { renderTourDetails } from './renderTourDetails';
 
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
@@ -14,12 +16,8 @@ const userDataForm = document.querySelector('.form-user-data');
 const passwordForm = document.querySelector('.form-user-password');
 const savePasswordBtn = document.querySelector('.btn--save-password');
 const bookBtn = document.getElementById('book-tour');
+const tourDetailsBtn = document.getElementById('tour-details');
 const toursContainer = document.querySelector('.card-container');
-
-if (mapBox) {
-	const locations = JSON.parse(mapBox.dataset.locations);
-	displayMap(locations);
-}
 
 if (loginForm) {
 	loginForm.addEventListener('submit', (event) => {
@@ -46,6 +44,22 @@ if (signupForm) {
 }
 
 if (logOutBtn) logOutBtn.addEventListener('click', logout);
+
+if (toursContainer) {
+	fetchAllTours()
+		.then((toursData) => renderAllTours(toursData))
+		.catch((error) => displayAlert('error', error.message));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+	const slug = document.body.dataset.slug;
+
+	if (slug) {
+		fetchTourDataBySlug(slug)
+			.then((tourData) => renderTourDetails(tourData))
+			.catch((error) => displayAlert('error', error.message));
+	}
+});
 
 if (userDataForm) {
 	userDataForm.addEventListener('submit', (event) => {
@@ -103,6 +117,17 @@ if (bookBtn) {
 const alertMessage = document.querySelector('body').dataset.alert;
 if (alertMessage) displayAlert('success', alertMessage, 10);
 
-if (toursContainer) {
-	fetchAndRenderTours();
-}
+
+// if (mapBox) {
+// 	const locationsData = mapBox.dataset.locations;
+// 	if (locationsData) {
+// 		try {
+// 			const locations = JSON.parse(locationsData);
+// 			displayMap(locations);
+// 		} catch (error) {
+// 			console.error('Error parsing JSON data:', error);
+// 		}
+// 	} else {
+// 		console.error('No locations data found.');
+// 	}
+// }

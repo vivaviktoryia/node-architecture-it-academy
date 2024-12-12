@@ -116,14 +116,28 @@ const $f60945d37f8e594c$export$4c5dd147b21b9176 = (locations)=>{
             const el = document.createElement('div');
             el.className = 'marker';
             // Add marker
-            new mapboxgl.Marker({
+            const marker = new mapboxgl.Marker({
                 element: el,
                 anchor: 'bottom'
             }).setLngLat(coordinates).addTo(map);
             // Add popup
-            new mapboxgl.Popup({
+            const popup = new mapboxgl.Popup({
                 offset: 30
-            }).setLngLat(coordinates).setHTML(`<p>Day ${dayNumber}: ${loc.description}  </p>`).addTo(map);
+            }).setLngLat(coordinates).setHTML(`<p>Day ${dayNumber}: ${loc.description}</p>`);
+            // Attach the popup to the marker
+            marker.setPopup(popup);
+            // Handle popup focus-related aria-hidden issue
+            const closeButton = popup._closeButton;
+            if (closeButton) {
+                // Remove aria-hidden when focused
+                closeButton.addEventListener('focus', ()=>{
+                    closeButton.setAttribute('aria-hidden', 'false');
+                });
+                // Reapply aria-hidden when focus is lost
+                closeButton.addEventListener('blur', ()=>{
+                    closeButton.setAttribute('aria-hidden', 'true');
+                });
+            }
             bounds.extend(coordinates);
         } else console.error('Invalid coordinates:', coordinates);
     });
@@ -162,82 +176,425 @@ const $144e4d4c31c55431$export$8d5bdbf26681c0c2 = async ()=>{
 
 
 
+const $7298424caa41a876$export$8d4bd62767c5e70c = async ()=>{
+    const response = await fetch('/api/v1/tours');
+    if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+    const responseData = await response.json();
+    return responseData.data;
+};
+const $7298424caa41a876$export$8b533883f347e0c7 = async (slug)=>{
+    const response = await fetch(`/api/v1/tours/slug/${slug}`);
+    if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+    const responseData = await response.json();
+    return responseData.data.tour;
+};
+const $7298424caa41a876$export$a12efcda0f81b035 = async (tourId)=>{
+    const response = await fetch(`/api/v1/tours/${tourId}`);
+    if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+    const responseData = await response.json();
+    return responseData.data.tour;
+};
 
-const $c7a0accfc35e5a18$export$c75d4cf74fa48403 = (tours)=>{
+
+const $ad6885a941318777$export$9829cf11df3bb7b9 = (tours)=>{
     const cardContainer = document.querySelector('.card-container');
-    tours.forEach((tour)=>{
-        const tourElement = document.createElement('div');
-        tourElement.classList.add('card');
-        tourElement.innerHTML = `
-            <div class="card__header">
-                <div class="card__picture">
-                    <div class="card__picture-overlay">&nbsp;</div>
-                    <img class="card__picture-img" src="/img/tours/${tour.imageCover || 'default-cover.jpg'}" alt="${tour.name}" />
-                </div>
-                <h3 class="heading-tertirary">
-                    <span>${tour.name}</span>
-                </h3>
-            </div>
-
-            <div class="card__details">
-                <h4 class="card__sub-heading">${tour.difficulty} ${tour.duration}-day tour</h4>
-                <p class="card__text">${tour.summary}</p>
-                <div class="card__data">
-                    <svg class="card__icon">
-                        <use xlink:href="/img/icons.svg#icon-map-pin"></use>
-                    </svg>
-                    <span>${tour.locations && tour.locations[0] ? tour.locations[0].description : 'No location available'}</span>
-                </div>
-                <div class="card__data">
-                    <svg class="card__icon">
-                        <use xlink:href="/img/icons.svg#icon-calendar"></use>
-                    </svg>
-                    <span>${new Date(tour.startDate).toLocaleString('en-us', {
-            month: 'long',
-            year: 'numeric'
-        })}</span>
-                </div>
-                <div class="card__data">
-                    <svg class="card__icon">
-                        <use xlink:href="/img/icons.svg#icon-flag"></use>
-                    </svg>
-                    <span>${tour.locations.length} ${tour.locations.length === 1 ? 'stop' : 'stops'}</span>
-                </div>
-                <div class="card__data">
-                    <svg class="card__icon">
-                        <use xlink:href="/img/icons.svg#icon-user"></use>
-                    </svg>
-                    <span>${tour.maxGroupSize} people</span>
-                </div>
-            </div>
-
-            <div class="card__footer">
-                <p>
-                    <span class="card__footer-value">$${tour.price}</span> 
-                    <span class="card__footer-text"> per person</span>
-                </p>
-                <p class="card__ratings">
-                    <span class="card__footer-value">${tour.ratingsAverage}</span> 
-                    <span class="card__footer-text">rating (${tour.ratingsQuantity})</span>
-                </p>
-                <a class="btn btn--green btn--small" href="/tour/${tour.slug}">Details</a>
-            </div>
-        `;
-        cardContainer.appendChild(tourElement);
+    const existingCards = cardContainer.querySelectorAll('.card');
+    // Clear card container if no existing cards
+    if (existingCards.length === 0) cardContainer.innerHTML = '';
+    tours.forEach((tour, index)=>{
+        let cardElement;
+        // Reuse existing cards or create new ones
+        if (index < existingCards.length) cardElement = existingCards[index];
+        else {
+            cardElement = $ad6885a941318777$var$createCardElement();
+            cardContainer.appendChild(cardElement);
+        }
+        // Fill card content
+        $ad6885a941318777$var$fillCardContent(cardElement, tour);
     });
 };
-
-
-const $7298424caa41a876$export$11765089634545e1 = async ()=>{
-    try {
-        const response = await fetch('/api/v1/tours');
-        if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-        const responseData = await response.json();
-        (0, $c7a0accfc35e5a18$export$c75d4cf74fa48403)(responseData.data);
-    } catch (error) {
-        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', error.message);
-    }
+const $ad6885a941318777$var$createCardElement = ()=>{
+    const cardElement = document.createElement('div');
+    cardElement.classList.add('card');
+    cardElement.innerHTML = `
+    <div class="card__header"></div>
+    <div class="card__details"></div>
+    <div class="card__footer"></div>
+  `;
+    return cardElement;
 };
+const $ad6885a941318777$var$fillCardContent = (cardElement, tour)=>{
+    const header = cardElement.querySelector('.card__header');
+    const details = cardElement.querySelector('.card__details');
+    const footer = cardElement.querySelector('.card__footer');
+    // Fill header content
+    $ad6885a941318777$var$fillCardHeader(header, tour);
+    // Fill details content
+    $ad6885a941318777$var$fillCardDetails(details, tour);
+    // Fill footer content
+    $ad6885a941318777$var$fillCardFooter(footer, tour);
+};
+const $ad6885a941318777$var$fillCardHeader = (header, tour)=>{
+    header.innerHTML = `
+    <div class="card__picture">
+      <div class="card__picture-overlay">&nbsp;</div>
+      <img class="card__picture-img" src="/img/tours/${tour.imageCover || 'default-cover.jpg'}" alt="${tour.name}" />
+    </div>
+    <h3 class="heading-tertirary">
+      <span>${tour.name}</span>
+    </h3>
+  `;
+};
+const $ad6885a941318777$var$fillCardDetails = (details, tour)=>{
+    details.innerHTML = `
+    <h4 class="card__sub-heading">${tour.difficulty} ${tour.duration}-day tour</h4>
+    <p class="card__text">${tour.summary}</p>
+    <div class="card__data">
+      <svg class="card__icon">
+        <use xlink:href="/img/icons.svg#icon-map-pin"></use>
+      </svg>
+      <span>${tour.locations?.[0]?.description || 'No location available'}</span>
+    </div>
+    <div class="card__data">
+      <svg class="card__icon">
+        <use xlink:href="/img/icons.svg#icon-calendar"></use>
+      </svg>
+      <span>${new Date(tour.startDate).toLocaleString('en-us', {
+        month: 'long',
+        year: 'numeric'
+    })}</span>
+    </div>
+    <div class="card__data">
+      <svg class="card__icon">
+        <use xlink:href="/img/icons.svg#icon-flag"></use>
+      </svg>
+      <span>${tour.locations.length} ${tour.locations.length === 1 ? 'stop' : 'stops'}</span>
+    </div>
+    <div class="card__data">
+      <svg class="card__icon">
+        <use xlink:href="/img/icons.svg#icon-user"></use>
+      </svg>
+      <span>${tour.maxGroupSize} people</span>
+    </div>
+  `;
+};
+const $ad6885a941318777$var$fillCardFooter = (footer, tour)=>{
+    footer.innerHTML = `
+    <p>
+      <span class="card__footer-value">$${tour.price}</span>
+      <span class="card__footer-text"> per person</span>
+    </p>
+    <p class="card__ratings">
+      <span class="card__footer-value">${tour.ratingsAverage}</span>
+      <span class="card__footer-text">rating (${tour.ratingsQuantity})</span>
+    </p>
+    <a class="btn btn--green btn--small" id="tour-details" href="/tour/${tour.slug}">Details</a>
+  `;
+}; // export const renderTours = (tours) => {
+ // 	const cardContainer = document.querySelector('.card-container');
+ // 	tours.forEach((tour) => {
+ // 		const tourElement = document.createElement('div');
+ // 		tourElement.classList.add('card');
+ // 		tourElement.innerHTML = `
+ //             <div class="card__header">
+ //                 <div class="card__picture">
+ //                     <div class="card__picture-overlay">&nbsp;</div>
+ //                     <img class="card__picture-img" src="/img/tours/${
+ // 											tour.imageCover || 'default-cover.jpg'
+ // 										}" alt="${tour.name}" />
+ //                 </div>
+ //                 <h3 class="heading-tertirary">
+ //                     <span>${tour.name}</span>
+ //                 </h3>
+ //             </div>
+ //             <div class="card__details">
+ //                 <h4 class="card__sub-heading">${tour.difficulty} ${
+ // 			tour.duration
+ // 		}-day tour</h4>
+ //                 <p class="card__text">${tour.summary}</p>
+ //                 <div class="card__data">
+ //                     <svg class="card__icon">
+ //                         <use xlink:href="/img/icons.svg#icon-map-pin"></use>
+ //                     </svg>
+ //                     <span>${
+ // 											tour.locations && tour.locations[0]
+ // 												? tour.locations[0].description
+ // 												: 'No location available'
+ // 										}</span>
+ //                 </div>
+ //                 <div class="card__data">
+ //                     <svg class="card__icon">
+ //                         <use xlink:href="/img/icons.svg#icon-calendar"></use>
+ //                     </svg>
+ //                     <span>${new Date(tour.startDate).toLocaleString('en-us', {
+ // 											month: 'long',
+ // 											year: 'numeric',
+ // 										})}</span>
+ //                 </div>
+ //                 <div class="card__data">
+ //                     <svg class="card__icon">
+ //                         <use xlink:href="/img/icons.svg#icon-flag"></use>
+ //                     </svg>
+ //                     <span>${tour.locations.length} ${
+ // 			tour.locations.length === 1 ? 'stop' : 'stops'
+ // 		}</span>
+ //                 </div>
+ //                 <div class="card__data">
+ //                     <svg class="card__icon">
+ //                         <use xlink:href="/img/icons.svg#icon-user"></use>
+ //                     </svg>
+ //                     <span>${tour.maxGroupSize} people</span>
+ //                 </div>
+ //             </div>
+ //             <div class="card__footer">
+ //                 <p>
+ //                     <span class="card__footer-value">$${tour.price}</span>
+ //                     <span class="card__footer-text"> per person</span>
+ //                 </p>
+ //                 <p class="card__ratings">
+ //                     <span class="card__footer-value">${
+ // 											tour.ratingsAverage
+ // 										}</span>
+ //                     <span class="card__footer-text">rating (${
+ // 											tour.ratingsQuantity
+ // 										})</span>
+ //                 </p>
+ //                 <a class="btn btn--green btn--small" id="tour-details" href="/tour/${
+ // 									tour.slug
+ // 								}">Details</a>
+ //             </div>
+ //         `;
+ // 		cardContainer.appendChild(tourElement);
+ // 	});
+ // };
+
+
+
+const $3fa2a398896b9956$export$57685d4d62280076 = (tour)=>{
+    // SECTION HEADER
+    $3fa2a398896b9956$var$renderTourHeader(tour);
+    // SECTION DESCRIPTION
+    $3fa2a398896b9956$var$renderTourDescription(tour);
+    // SECTION PICTURES
+    $3fa2a398896b9956$var$renderTourPictures(tour);
+    // SECTION MAP
+    $3fa2a398896b9956$var$renderTourMap(tour);
+    // SECTION REVIEWS
+    $3fa2a398896b9956$var$renderTourReviews(tour);
+    // SECTION CTA
+    $3fa2a398896b9956$var$renderTourCTA(tour);
+};
+function $3fa2a398896b9956$var$renderTourHeader(tour) {
+    document.getElementById('tour-image').src = `/img/tours/${tour.imageCover || 'default-cover.jpg'}`;
+    document.getElementById('tour-name').textContent = tour.name;
+    document.getElementById('tour-duration').textContent = `${tour.duration}-days`;
+    document.getElementById('tour-location').textContent = tour.locations && tour.locations[0] ? tour.locations[0].description : 'No location available';
+}
+function $3fa2a398896b9956$var$renderTourDescription(tour) {
+    document.getElementById('tour-description').textContent = tour.description;
+    const date = new Date(tour.startDate).toLocaleString('en-us', {
+        month: 'long',
+        year: 'numeric'
+    });
+    const groupSize = `${tour.maxGroupSize} people`;
+    const rating = `${tour.ratingsAverage} / 5`;
+    const overviewData = [
+        {
+            label: 'Next date',
+            text: date,
+            icon: 'calendar'
+        },
+        {
+            label: 'Difficulty',
+            text: tour.difficulty,
+            icon: 'trending-up'
+        },
+        {
+            label: 'Participants',
+            text: groupSize,
+            icon: 'user'
+        },
+        {
+            label: 'Rating',
+            text: rating,
+            icon: 'star'
+        }
+    ];
+    overviewData.forEach((item, index)=>{
+        document.querySelectorAll('.overview-box__detail')[index].querySelector('span.overview-box__text').textContent = item.text;
+    });
+}
+function $3fa2a398896b9956$var$renderTourPictures(tour) {
+    const images = tour.images || [];
+    const imageElements = document.querySelectorAll('.picture-box__img');
+    images.forEach((img, index)=>{
+        imageElements[index].src = `/img/tours/${img.fileName || `default-${index + 1}.jpg`}`;
+        imageElements[index].alt = `${tour.name || 'Default Tour'} ${index + 1}`;
+    });
+}
+function $3fa2a398896b9956$var$renderTourMap(tour) {
+    if (tour.locations && Array.isArray(tour.locations) && tour.locations.length > 0) (0, $f60945d37f8e594c$export$4c5dd147b21b9176)(tour.locations);
+    else {
+        console.error('tour.locations not ready, waiting...');
+        const intervalId = setInterval(()=>{
+            if (tour.locations && Array.isArray(tour.locations) && tour.locations.length > 0) {
+                console.log('tour.locations now available:', tour.locations);
+                (0, $f60945d37f8e594c$export$4c5dd147b21b9176)(tour.locations);
+                clearInterval(intervalId);
+            }
+        }, 1000);
+    }
+}
+function $3fa2a398896b9956$var$renderTourReviews(tour) {
+    const reviewsContainer = document.getElementById('tour-reviews');
+    reviewsContainer.innerHTML = '';
+    tour.reviews.forEach((review)=>{
+        reviewsContainer.innerHTML += $3fa2a398896b9956$var$renderReviewCard(review);
+    });
+}
+function $3fa2a398896b9956$var$renderTourCTA(tour) {
+    const ctaText = document.getElementById('cta-text');
+    if (ctaText) ctaText.textContent = `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`;
+    const ctaContent = document.querySelector('.cta__content');
+    if (ctaContent) {
+        const existingImages = ctaContent.querySelectorAll('img.cta__img');
+        existingImages.forEach((img)=>img.remove());
+        const img1 = document.createElement('img');
+        img1.classList.add('cta__img', 'cta__img--1');
+        img1.src = `/img/tours/${tour.images[1] && tour.images[1].fileName ? tour.images[1].fileName : 'default-2.jpg'}`;
+        img1.alt = `${tour.name || 'Default Tour'} Image 1`;
+        const img2 = document.createElement('img');
+        img2.classList.add('cta__img', 'cta__img--2');
+        img2.src = `/img/tours/${tour.images[0] && tour.images[0].fileName ? tour.images[0].fileName : 'default-1.jpg'}`;
+        img2.alt = `${tour.name || 'Default Tour'} Image 2`;
+        ctaContent.appendChild(img1);
+        ctaContent.appendChild(img2);
+    }
+}
+function $3fa2a398896b9956$var$renderReviewCard(review) {
+    return `
+        <div class="reviews__card">
+            <div class="reviews__avatar">
+                <img class="reviews__avatar-img" src="/img/users/${review.user.photo || 'default.jpg'}" alt="${review.user.name}">
+                <h6 class="reviews__user">${review.user.name}</h6>
+            </div>
+            <p class="reviews__text">${review.review}</p>
+            <div class="reviews__rating">
+                ${[
+        1,
+        2,
+        3,
+        4,
+        5
+    ].map((star)=>{
+        return `
+                        <svg class="reviews__star reviews__star--${review.rating >= star ? 'active' : 'inactive'}">
+                            <use xlink:href="/img/icons.svg#icon-star"></use>
+                        </svg>
+                    `;
+    }).join('')}
+            </div>
+        </div>
+    `;
+} // export function renderTourDetails(tour) {
+ // 	// SECTION HEADER
+ // 	document.getElementById('tour-image').src = `/img/tours/${
+ // 		tour.imageCover || 'default-cover.jpg'
+ // 	}`;
+ // 	document.getElementById('tour-name').textContent = tour.name;
+ // 	document.getElementById(
+ // 		'tour-duration',
+ // 	).textContent = `${tour.duration}-days`;
+ // 	document.getElementById('tour-location').textContent =
+ // 		tour.locations && tour.locations[0]
+ // 			? tour.locations[0].description
+ // 			: 'No location available';
+ // 	//  SECTION DESCRIPTION
+ // 	document.getElementById('tour-description').textContent = tour.description;
+ // 	const date = new Date(tour.startDate).toLocaleString('en-us', {
+ // 		month: 'long',
+ // 		year: 'numeric',
+ // 	});
+ // 	const groupSize = `${tour.maxGroupSize} people`;
+ // 	const rating = `${tour.ratingsAverage} / 5`;
+ // 	const overviewData = [
+ // 		{ label: 'Next date', text: date, icon: 'calendar' },
+ // 		{ label: 'Difficulty', text: tour.difficulty, icon: 'trending-up' },
+ // 		{ label: 'Participants', text: groupSize, icon: 'user' },
+ // 		{ label: 'Rating', text: rating, icon: 'star' },
+ // 	];
+ // 	overviewData.forEach((item, index) => {
+ // 		document
+ // 			.querySelectorAll('.overview-box__detail')
+ // 			[index].querySelector('span.overview-box__text').textContent = item.text;
+ // 	});
+ // 	//  SECTION PICTURES
+ // 	const images = tour.images || [];
+ // 	const imageElements = document.querySelectorAll('.picture-box__img');
+ // 	images.forEach((img, index) => {
+ // 		imageElements[index].src = `/img/tours/${
+ // 			img.fileName || `default-${index + 1}.jpg`
+ // 		}`;
+ // 		imageElements[index].alt = `${tour.name || 'Default Tour'} ${index + 1}`;
+ // 	});
+ // 	//  SECTION MAP
+ // 	if (
+ // 		tour.locations &&
+ // 		Array.isArray(tour.locations) &&
+ // 		tour.locations.length > 0
+ // 	) {
+ // 		displayMap(tour.locations);
+ // 	} else {
+ // 		console.error('tour.locations not ready, waiting...');
+ // 		const intervalId = setInterval(() => {
+ // 			if (
+ // 				tour.locations &&
+ // 				Array.isArray(tour.locations) &&
+ // 				tour.locations.length > 0
+ // 			) {
+ // 				console.log('tour.locations now available:', tour.locations);
+ // 				displayMap(tour.locations);
+ // 				clearInterval(intervalId);
+ // 			}
+ // 		}, 1000);
+ // 	}
+ // 	// const mapBox = document.getElementById('map');
+ // 	// mapBox.setAttribute('data-locations', JSON.stringify(tour.locations));
+ // 	//  SECTION REVIEWS
+ // 	const reviewsContainer = document.getElementById('tour-reviews');
+ // 	reviewsContainer.innerHTML = '';
+ // 	tour.reviews.forEach((review) => {
+ // 		reviewsContainer.innerHTML += renderReviewCard(review);
+ // 	});
+ // 	//  SECTION CTA
+ // 	const ctaText = document.getElementById('cta-text');
+ // 	if (ctaText) {
+ // 		ctaText.textContent = `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`;
+ // 	}
+ // 	const ctaContent = document.querySelector('.cta__content');
+ // 	if (ctaContent) {
+ // 		const existingImages = ctaContent.querySelectorAll('img.cta__img');
+ // 		existingImages.forEach((img) => img.remove());
+ // 		const img1 = document.createElement('img');
+ // 		img1.classList.add('cta__img', 'cta__img--1');
+ // 		img1.src = `/img/tours/${
+ // 			tour.images[1] && tour.images[1].fileName
+ // 				? tour.images[1].fileName
+ // 				: 'default-2.jpg'
+ // 		}`;
+ // 		img1.alt = `${tour.name || 'Default Tour'} Image 1`;
+ // 		const img2 = document.createElement('img');
+ // 		img2.classList.add('cta__img', 'cta__img--2');
+ // 		img2.src = `/img/tours/${
+ // 			tour.images[0] && tour.images[0].fileName
+ // 				? tour.images[0].fileName
+ // 				: 'default-1.jpg'
+ // 		}`;
+ // 		img2.alt = `${tour.name || 'Default Tour'} Image 2`;
+ // 		ctaContent.appendChild(img1);
+ // 		ctaContent.appendChild(img2);
+ // 	}
+ // }
 
 
 const $d0f7ce18c37ad6f6$var$mapBox = document.getElementById('map');
@@ -248,11 +605,8 @@ const $d0f7ce18c37ad6f6$var$userDataForm = document.querySelector('.form-user-da
 const $d0f7ce18c37ad6f6$var$passwordForm = document.querySelector('.form-user-password');
 const $d0f7ce18c37ad6f6$var$savePasswordBtn = document.querySelector('.btn--save-password');
 const $d0f7ce18c37ad6f6$var$bookBtn = document.getElementById('book-tour');
+const $d0f7ce18c37ad6f6$var$tourDetailsBtn = document.getElementById('tour-details');
 const $d0f7ce18c37ad6f6$var$toursContainer = document.querySelector('.card-container');
-if ($d0f7ce18c37ad6f6$var$mapBox) {
-    const locations = JSON.parse($d0f7ce18c37ad6f6$var$mapBox.dataset.locations);
-    (0, $f60945d37f8e594c$export$4c5dd147b21b9176)(locations);
-}
 if ($d0f7ce18c37ad6f6$var$loginForm) $d0f7ce18c37ad6f6$var$loginForm.addEventListener('submit', (event)=>{
     event.preventDefault();
     const email = document.getElementById('email').value;
@@ -272,6 +626,11 @@ if ($d0f7ce18c37ad6f6$var$signupForm) $d0f7ce18c37ad6f6$var$signupForm.addEventL
     document.getElementById('password').value = '';
 });
 if ($d0f7ce18c37ad6f6$var$logOutBtn) $d0f7ce18c37ad6f6$var$logOutBtn.addEventListener('click', (0, $70af9284e599e604$export$a0973bcfe11b05c9));
+if ($d0f7ce18c37ad6f6$var$toursContainer) (0, $7298424caa41a876$export$8d4bd62767c5e70c)().then((toursData)=>(0, $ad6885a941318777$export$9829cf11df3bb7b9)(toursData)).catch((error)=>(0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', error.message));
+document.addEventListener('DOMContentLoaded', ()=>{
+    const slug = document.body.dataset.slug;
+    if (slug) (0, $7298424caa41a876$export$8b533883f347e0c7)(slug).then((tourData)=>(0, $3fa2a398896b9956$export$57685d4d62280076)(tourData)).catch((error)=>(0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', error.message));
+});
 if ($d0f7ce18c37ad6f6$var$userDataForm) $d0f7ce18c37ad6f6$var$userDataForm.addEventListener('submit', (event)=>{
     event.preventDefault();
     const formData = new FormData();
@@ -312,8 +671,19 @@ if ($d0f7ce18c37ad6f6$var$bookBtn) $d0f7ce18c37ad6f6$var$bookBtn.addEventListene
     }
 });
 const $d0f7ce18c37ad6f6$var$alertMessage = document.querySelector('body').dataset.alert;
-if ($d0f7ce18c37ad6f6$var$alertMessage) (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', $d0f7ce18c37ad6f6$var$alertMessage, 10);
-if ($d0f7ce18c37ad6f6$var$toursContainer) (0, $7298424caa41a876$export$11765089634545e1)();
+if ($d0f7ce18c37ad6f6$var$alertMessage) (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', $d0f7ce18c37ad6f6$var$alertMessage, 10); // if (mapBox) {
+ // 	const locationsData = mapBox.dataset.locations;
+ // 	if (locationsData) {
+ // 		try {
+ // 			const locations = JSON.parse(locationsData);
+ // 			displayMap(locations);
+ // 		} catch (error) {
+ // 			console.error('Error parsing JSON data:', error);
+ // 		}
+ // 	} else {
+ // 		console.error('No locations data found.');
+ // 	}
+ // }
 
 
 //# sourceMappingURL=bundle.js.map

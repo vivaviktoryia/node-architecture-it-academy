@@ -219,10 +219,10 @@ const deleteOne = (Model, associationsConfig = {}) =>
 		}
 	});
 
-const getOne = (Model, associations = {}) =>
+const getOne = (Model, associations = {}, parameter = 'id') =>
 	catchAsync(async (req, res, next) => {
 		const queryOptions = {
-			where: { id: req.params.id },
+			where: { [parameter]: req.params[parameter] },
 			include: Object.entries(associations).map(([assocName, assocConfig]) => ({
 				model: Model.sequelize.models[assocConfig.model],
 				as: assocName,
