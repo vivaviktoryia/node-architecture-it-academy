@@ -2,6 +2,10 @@ const path = require('path');
 const express = require('express');
 const { setupMorgan } = require('./utils/logger');
 const cookieParser = require('cookie-parser');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const hpp = require('hpp');
+const cors = require('cors');
 
 const globalErrorHandler = require('./src/controllers/errorController');
 const AppError = require('./utils/appError');
@@ -22,6 +26,8 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
+app.use(cors());
+app.options('*', cors());
 // body parser
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
@@ -29,10 +35,35 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // cookieParser
 app.use(cookieParser());
 
+// Prevent parameter pollution
+app.use(
+	hpp({
+		whitelist: [
+			'ratingsAverage',
+			'duration',
+			'name',
+			'ratingsQuantity',
+			'maxGroupSize',
+			'difficulty',
+			'price',
+		],
+	}),
+);
+
 // Logger
 setupMorgan(app);
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(helmet());
+
+// Limit requests from same API
+const limiter = rateLimit({
+	max: 100,
+	windowMs: 60 * 60 * 1000,
+	message: 'Too many requests from this IP, please try again in an hour!',
+});
+app.use('/api', limiter);
 
 // ROUTES:
 app.use('/', viewRouter);
