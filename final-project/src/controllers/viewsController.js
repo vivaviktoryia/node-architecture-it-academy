@@ -1,4 +1,12 @@
-const { Tour, User, Location, Image, Review } = require('../models');
+const {
+	Tour,
+	User,
+	Location,
+	Image,
+	Review,
+	Plugin,
+	Page,
+} = require('../models');
 const AppError = require('../../utils/appError');
 const { catchAsync } = require('../../utils/catchAsync');
 
@@ -14,7 +22,6 @@ const getTour = catchAsync(async (req, res, next) => {
 		.split('-')
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 		.join(' ');
-		
 	res
 		.status(200)
 		.set(
@@ -51,19 +58,35 @@ const getSignupForm = catchAsync(async (req, res, next) => {
 	});
 });
 
-
 const manageTours = catchAsync(async (req, res, next) => {
 	const locations = await Location.findAll({
-  attributes: ['id', 'description'], 
-});
-	const images = await Image.findAll({ attributes: ['id', 'fileName'] }); 
-	console.log(locations.dataValues);
+		attributes: ['id', 'description'],
+	});
+	const images = await Image.findAll({ attributes: ['id', 'fileName'] });
+
 	res.status(200).render('admin', {
 		title: 'Manage Tours',
 		page: 'manageTours',
-		images: images,
-		locations: locations,
-		tours: [],
+		images: images || [],
+		locations: locations || [],
+		plugins: [],
+	});
+});
+
+const manageStructure = catchAsync(async (req, res, next) => {
+	const plugins = await Plugin.findAll({
+		where: { active: true },
+		attributes: ['id','type', 'content', 'order'],
+		order: [['order', 'ASC']],
+	});
+	const pluginData = plugins.map((plugin) => plugin.dataValues);
+	console.log(pluginData);
+	res.status(200).render('admin', {
+		title: 'Manage Structure',
+		page: 'manageStructure',
+		plugins: pluginData,
+		images: [],
+		locations: [],
 	});
 });
 
@@ -74,4 +97,5 @@ module.exports = {
 	getSignupForm,
 	getAccount,
 	manageTours,
+	manageStructure,
 };

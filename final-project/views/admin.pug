@@ -24,14 +24,14 @@ block content
           .admin-nav
             h5.admin-nav__heading Manage tours
             ul.side-nav
-              +navItem('/admin/tours', 'Edit structure', 'edit')
-              +navItem('/admin/tours', 'Add tour', 'map')
+              +navItem('/admin/tours', 'Add Tour', 'map')
+              +navItem('/admin/plugins', 'Manage Structure', 'edit')
 
 
       .admin-view__content
         if (page === 'manageTours')
           .admin-view__form-container
-            h2.heading-secondary.ma-bt-md Manage Tours
+            h2.heading-secondary.ma-bt-md Add Tour
 
             form.form.form-add-tour-data(action='/api/v1/tours' method='POST')
               h3.heading-tertiary.ma-bt-sm Add New Tour
@@ -65,7 +65,6 @@ block content
               .form__group
                 label.form__label(for='tourImageCover') Cover Image
                 input#coverImageDefault.form__input( name='imageCover' value='default-cover.jpg')
-
               .form__group
                 label.form__label(for='tourStartDate') Start Date
                 input#tourStartDate.form__input(type='date', required, name='startDate')
@@ -84,14 +83,19 @@ block content
               .form__group.right
                 button.btn.btn--small.btn--green Add Tour
 
-        if (page === 'seeAllTours')
-          .admin-view__tour-list
-            h2.heading-secondary.ma-bt-md All Tours
-            each tour in tours
-              .tour-card
-                .tour-card__header
-                  h3.heading-tertiary= tour.name
-                .tour-card__details
-                  p= tour.summary
-                  p Price: $#{tour.price}
-                a.btn.btn--green.btn--small(href=`/admin/tours/${tour.id}`) View Tour
+        if (page === 'manageStructure')
+          .admin-view__form-container
+            h2.greeting__title.ma-bt-md Manage Plugins Structure
+
+            .advertisement-box
+              ul.plugin-list
+                each plugin, index in plugins
+                  li.plugin-item(
+                    data-id=plugin.id
+                    draggable="true"
+                  )
+                    h2 #{plugin.type}
+
+            .advertisement__link-container
+              button.btn.btn--green#saveOrder Save Order
+                              

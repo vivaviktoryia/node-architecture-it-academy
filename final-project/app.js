@@ -14,6 +14,8 @@ const reviewRouter = require('./src/routes/reviewRoutes');
 const locationRouter = require('./src/routes/locationRoutes');
 const imageRouter = require('./src/routes/imageRoutes');
 const bookingRouter = require('./src/routes/bookingRoutes');
+const pluginRouter = require('./src/routes/pluginRoutes');
+const pageRouter = require('./src/routes/pageRoutes');
 
 const app = express();
 
@@ -41,6 +43,9 @@ app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/locations', locationRouter);
 app.use('/api/v1/images', imageRouter);
 app.use('/api/v1/bookings', bookingRouter);
+
+app.use('/api/v1/admin/plugins', pluginRouter);
+app.use('/api/v1/admin/pages', pageRouter);
 
 app.all('*', (req, res, next) => {
 	next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

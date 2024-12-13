@@ -6,6 +6,8 @@ const { Location } = require('./locationModel');
 const { Image } = require('./imageModel');
 const { User } = require('./userModel');
 const { Review } = require('./reviewModel');
+const { Plugin } = require('./pluginModel');
+const { Page } = require('./pageModel');
 
 // Users_Tours
 Tour.belongsToMany(User, {
@@ -52,7 +54,6 @@ Image.belongsToMany(Tour, {
 	timestamps: false,
 });
 
-
 // Users_Reviews
 User.hasMany(Review, { foreignKey: 'userId', as: 'reviews' });
 Review.belongsTo(User, {
@@ -71,6 +72,20 @@ Review.belongsTo(Tour, {
 	onUpdate: 'CASCADE',
 });
 
+// Plugins_Pages
+Plugin.belongsToMany(Page, {
+	through: 'Plugins_To_Pages',
+	as: 'pages',
+	foreignKey: 'pluginId',
+	timestamps: false,
+});
+Page.belongsToMany(Plugin, {
+	through: 'Plugins_To_Pages',
+	as: 'plugins',
+	foreignKey: 'pageId',
+	timestamps: false,
+});
+
 module.exports = {
 	sequelize,
 	Tour,
@@ -78,4 +93,6 @@ module.exports = {
 	Location,
 	User,
 	Review,
+	Plugin,
+	Page,
 };

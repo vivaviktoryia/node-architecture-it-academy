@@ -130,8 +130,8 @@ if (tourDataForm) {
 
 		addTour(fields);
 		tourDataForm.reset();
-		document.getElementById('tourImages').selectedIndex = -1; 
-		document.getElementById('tourLocations').selectedIndex = -1; 
+		document.getElementById('tourImages').selectedIndex = -1;
+		document.getElementById('tourLocations').selectedIndex = -1;
 	});
 }
 
@@ -186,3 +186,64 @@ if (alertMessage) displayAlert('success', alertMessage, 10);
 // 		console.error('No locations data found.');
 // 	}
 // }
+
+document.addEventListener('DOMContentLoaded', () => {
+	const pluginList = document.querySelector('.plugin-list');
+	let draggedElement = null;
+	
+	if (pluginList) {
+		pluginList.addEventListener('dragstart', (e) => {
+			if (e.target && e.target.matches('.plugin-item')) {
+				draggedElement = e.target;
+			}
+		});
+
+		pluginList.addEventListener('dragover', (e) => {
+			e.preventDefault();
+			const target = e.target.closest('.plugin-item');
+			if (target && target !== draggedElement) {
+				pluginList.insertBefore(draggedElement, target);
+			}
+		});
+
+		pluginList.addEventListener('dragend', () => {
+			draggedElement = null;
+		});
+	}
+
+	document.querySelector('#saveOrder').addEventListener('click', async () => {
+		const newOrder = [...document.querySelectorAll('.plugin-item')].map(
+			(item, index) => ({
+				id: +item.dataset.id,
+				order: index + 1,
+			}),
+		);
+		console.log('Plugins order:', newOrder);
+
+		try {
+			const updatePromises = newOrder.map((plugin) =>
+				fetch(`/api/v1/admin/plugins/${plugin.id}`, {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						order: plugin.order,
+					}),
+				}).then((response) => {
+					if (!response.ok) {
+						throw new Error(`Failed to update plugin with ID: ${plugin.id}`);
+					}
+					return response.json();
+				}),
+			);
+
+			await Promise.all(updatePromises);
+
+			displayAlert('success', 'Plugins order saved successfully!');
+		} catch (error) {
+			console.error('Error saving plugin order:', error);
+			displayAlert('error', 'Failed to save plugin order.');
+		}
+	});
+});

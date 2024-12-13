@@ -178,7 +178,7 @@ const isLoggedIn = async (req, res, next) => {
 
 const restrictTo =
 	(...roles) =>
-	(req, res, next) => {
+		(req, res, next) => {
 		if (!roles.includes(req.user.role)) {
 			return next(
 				new AppError("You don'nt have permission to perform this action!", 403),
