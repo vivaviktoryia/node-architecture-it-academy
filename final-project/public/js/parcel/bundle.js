@@ -753,17 +753,19 @@ if ($d0f7ce18c37ad6f6$var$alertMessage) (0, $c67cb762f0198593$export$5e5cfdaa6ca
 document.addEventListener('DOMContentLoaded', ()=>{
     const pluginList = document.querySelector('.plugin-list');
     let draggedElement = null;
-    pluginList.addEventListener('dragstart', (e)=>{
-        if (e.target && e.target.matches('.plugin-item')) draggedElement = e.target;
-    });
-    pluginList.addEventListener('dragover', (e)=>{
-        e.preventDefault();
-        const target = e.target.closest('.plugin-item');
-        if (target && target !== draggedElement) pluginList.insertBefore(draggedElement, target);
-    });
-    pluginList.addEventListener('dragend', ()=>{
-        draggedElement = null;
-    });
+    if (pluginList) {
+        pluginList.addEventListener('dragstart', (e)=>{
+            if (e.target && e.target.matches('.plugin-item')) draggedElement = e.target;
+        });
+        pluginList.addEventListener('dragover', (e)=>{
+            e.preventDefault();
+            const target = e.target.closest('.plugin-item');
+            if (target && target !== draggedElement) pluginList.insertBefore(draggedElement, target);
+        });
+        pluginList.addEventListener('dragend', ()=>{
+            draggedElement = null;
+        });
+    }
     document.querySelector('#saveOrder').addEventListener('click', async ()=>{
         const newOrder = [
             ...document.querySelectorAll('.plugin-item')

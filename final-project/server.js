@@ -16,7 +16,7 @@ const server = app.listen(port, async () => {
 
 
 sequelize
-	.sync()
+	.sync({alter: true})
 	.then(() => {
 		logInfo(
 			`Tables ${JSON.stringify(
