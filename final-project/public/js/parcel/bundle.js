@@ -218,6 +218,37 @@ const $7298424caa41a876$export$a12efcda0f81b035 = async (tourId)=>{
 };
 
 
+/* eslint-disable */ 
+async function $3a8bc90300fd2862$export$fbe07c8c859e75b6() {
+    const newOrder = [
+        ...document.querySelectorAll('.plugin-item')
+    ].map((item, index)=>({
+            id: +item.dataset.id,
+            order: index + 1
+        }));
+    console.log('Plugins order:', newOrder);
+    try {
+        const updatePromises = newOrder.map((plugin)=>fetch(`/api/v1/admin/plugins/${plugin.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    order: plugin.order
+                })
+            }).then((response)=>{
+                if (!response.ok) throw new Error(`Failed to update plugin with ID: ${plugin.id}`);
+                return response.json();
+            }));
+        await Promise.all(updatePromises);
+        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', 'Plugins order saved successfully!');
+    } catch (error) {
+        console.error('Error saving plugin order:', error);
+        (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', 'Failed to save plugin order.');
+    }
+}
+
+
 const $ad6885a941318777$export$9829cf11df3bb7b9 = (tours)=>{
     const cardContainer = document.querySelector('.card-container');
     const existingCards = cardContainer.querySelectorAll('.card');
@@ -619,6 +650,25 @@ function $3fa2a398896b9956$var$renderReviewCard(review) {
  // }
 
 
+function $55d2efdb03c96043$export$5ba5adb646881b56() {
+    const pluginList = document.querySelector('.plugin-list');
+    let draggedElement = null;
+    if (pluginList) {
+        pluginList.addEventListener('dragstart', (e)=>{
+            if (e.target && e.target.matches('.plugin-item')) draggedElement = e.target;
+        });
+        pluginList.addEventListener('dragover', (e)=>{
+            e.preventDefault();
+            const target = e.target.closest('.plugin-item');
+            if (target && target !== draggedElement) pluginList.insertBefore(draggedElement, target);
+        });
+        pluginList.addEventListener('dragend', ()=>{
+            draggedElement = null;
+        });
+    }
+}
+
+
 const $d0f7ce18c37ad6f6$var$mapBox = document.getElementById('map');
 const $d0f7ce18c37ad6f6$var$loginForm = document.querySelector('.form--login');
 const $d0f7ce18c37ad6f6$var$signupForm = document.querySelector('.form--signup');
@@ -737,64 +787,25 @@ if ($d0f7ce18c37ad6f6$var$bookBtn) $d0f7ce18c37ad6f6$var$bookBtn.addEventListene
 });
 const $d0f7ce18c37ad6f6$var$alertMessage = document.querySelector('body').dataset.alert;
 if ($d0f7ce18c37ad6f6$var$alertMessage) (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', $d0f7ce18c37ad6f6$var$alertMessage, 10);
-// if (mapBox) {
-// 	const locationsData = mapBox.dataset.locations;
-// 	if (locationsData) {
-// 		try {
-// 			const locations = JSON.parse(locationsData);
-// 			displayMap(locations);
-// 		} catch (error) {
-// 			console.error('Error parsing JSON data:', error);
-// 		}
-// 	} else {
-// 		console.error('No locations data found.');
-// 	}
-// }
 document.addEventListener('DOMContentLoaded', ()=>{
-    const pluginList = document.querySelector('.plugin-list');
-    let draggedElement = null;
-    if (pluginList) {
-        pluginList.addEventListener('dragstart', (e)=>{
-            if (e.target && e.target.matches('.plugin-item')) draggedElement = e.target;
-        });
-        pluginList.addEventListener('dragover', (e)=>{
-            e.preventDefault();
-            const target = e.target.closest('.plugin-item');
-            if (target && target !== draggedElement) pluginList.insertBefore(draggedElement, target);
-        });
-        pluginList.addEventListener('dragend', ()=>{
-            draggedElement = null;
-        });
+    const saveOrderBtn = document.querySelector('#saveOrder');
+    if (saveOrderBtn) {
+        (0, $55d2efdb03c96043$export$5ba5adb646881b56)();
+        saveOrderBtn.addEventListener('click', (0, $3a8bc90300fd2862$export$fbe07c8c859e75b6));
     }
-    document.querySelector('#saveOrder').addEventListener('click', async ()=>{
-        const newOrder = [
-            ...document.querySelectorAll('.plugin-item')
-        ].map((item, index)=>({
-                id: +item.dataset.id,
-                order: index + 1
-            }));
-        console.log('Plugins order:', newOrder);
-        try {
-            const updatePromises = newOrder.map((plugin)=>fetch(`/api/v1/admin/plugins/${plugin.id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        order: plugin.order
-                    })
-                }).then((response)=>{
-                    if (!response.ok) throw new Error(`Failed to update plugin with ID: ${plugin.id}`);
-                    return response.json();
-                }));
-            await Promise.all(updatePromises);
-            (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', 'Plugins order saved successfully!');
-        } catch (error) {
-            console.error('Error saving plugin order:', error);
-            (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', 'Failed to save plugin order.');
-        }
-    });
-});
+}); // if (mapBox) {
+ // 	const locationsData = mapBox.dataset.locations;
+ // 	if (locationsData) {
+ // 		try {
+ // 			const locations = JSON.parse(locationsData);
+ // 			displayMap(locations);
+ // 		} catch (error) {
+ // 			console.error('Error parsing JSON data:', error);
+ // 		}
+ // 	} else {
+ // 		console.error('No locations data found.');
+ // 	}
+ // }
 
 
 //# sourceMappingURL=bundle.js.map

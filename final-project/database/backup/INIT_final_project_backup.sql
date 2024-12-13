@@ -1,9 +1,8 @@
-/*M!999999- enable the sandbox mode */ 
--- MariaDB dump 10.19  Distrib 10.6.20-MariaDB, for Win64 (AMD64)
+-- MySQL dump 10.19  Distrib 10.3.39-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: final_project
 -- ------------------------------------------------------
--- Server version	10.6.20-MariaDB
+-- Server version	10.3.39-MariaDB-0ubuntu0.20.04.2
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -22,7 +21,7 @@
 
 /*!40000 DROP DATABASE IF EXISTS `final_project`*/;
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `final_project` /*!40100 DEFAULT CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `final_project` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci */;
 
 USE `final_project`;
 
@@ -82,8 +81,9 @@ CREATE TABLE `images` (
   UNIQUE KEY `fileName_41` (`fileName`),
   UNIQUE KEY `fileName_42` (`fileName`),
   UNIQUE KEY `fileName_43` (`fileName`),
-  UNIQUE KEY `fileName_44` (`fileName`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+  UNIQUE KEY `fileName_44` (`fileName`),
+  UNIQUE KEY `fileName_45` (`fileName`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -156,8 +156,9 @@ CREATE TABLE `locations` (
   UNIQUE KEY `description_43` (`description`),
   UNIQUE KEY `description_44` (`description`),
   UNIQUE KEY `description_45` (`description`),
-  UNIQUE KEY `description_46` (`description`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+  UNIQUE KEY `description_46` (`description`),
+  UNIQUE KEY `description_47` (`description`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -166,7 +167,7 @@ CREATE TABLE `locations` (
 
 LOCK TABLES `locations` WRITE;
 /*!40000 ALTER TABLE `locations` DISABLE KEYS */;
-INSERT INTO `locations` VALUES (1,'Miami, USA','Point','\0\0\0\0\0\0\0ï¿½<Fyï¿½Tï¿½Dï¿½1uWï¿½9@','2024-12-11 08:10:16','2024-12-11 08:10:16'),(2,'Lummus Park Beach','Point','\0\0\0\0\0\0\0ï¿½Zï¿½ï¿½8Tï¿½ï¿½ï¿½ï¿½&ï¿½9@','2024-12-11 08:10:17','2024-12-11 08:10:17'),(3,'Islamorada','Point','\0\0\0\0\0\0\0jï¿½ï¿½ï¿½v)Tï¿½ï¿½ï¿½Mï¿½ï¿½8@','2024-12-11 08:10:17','2024-12-11 08:10:17'),(4,'Sombrero Beach','Point','\0\0\0\0\0\0\0i\0oï¿½ETï¿½\r6uï¿½8@','2024-12-11 08:10:17','2024-12-11 08:10:17'),(5,'West Key','Point','\0\0\0\0\0\0\04-ï¿½2qTï¿½FzQï¿½_ï¿½8@','2024-12-11 08:10:17','2024-12-11 08:10:17'),(6,'Aspen, USA','Point','\0\0\0\0\0\0\0`:ï¿½Û ï¿½Zï¿½nï¿½b~nï¿½C@','2024-12-11 08:10:17','2024-12-11 08:10:17'),(7,'Aspen Highlands','Point','\0\0\0\0\0\0\0Kï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½]ï¿½ï¿½aï¿½C@','2024-12-11 08:10:17','2024-12-11 08:10:17'),(8,'Beaver Creek','Point','\0\0\0\0\0\0\0!Wï¿½Yï¿½Zï¿½\Z4ï¿½Opï¿½C@','2024-12-11 08:10:17','2024-12-11 08:10:17'),(9,'Las Vegas, USA','Point','\0\0\0\0\0\0\0ï¿½eï¿½ï¿½ï¿½\\ï¿½o.\Z2B@','2024-12-11 08:10:17','2024-12-11 08:10:17'),(10,'Zion Canyon National Park','Point','\0\0\0\0\0\0\0ï¿½^Dï¿½1?\\ï¿½ï¿½ï¿½ï¿½(\\ï¿½B@','2024-12-11 08:10:17','2024-12-11 08:10:17'),(11,'Antelope Canyon','Point','\0\0\0\0\0\0\0ï¿½Aï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½\0ï¿½nB@','2024-12-11 08:10:17','2024-12-11 08:10:17'),(12,'Grand Canyon National Park','Point','\0\0\0\0\0\0\0ï¿½ï¿½6ï¿½h\\ï¿½k,amï¿½B@','2024-12-11 08:10:17','2024-12-11 08:10:17'),(13,'Joshua Tree National Park','Point','\0\0\0\0\0\0\0eï¿½ï¿½ï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½}A@','2024-12-11 08:10:18','2024-12-11 08:10:18');
+INSERT INTO `locations` VALUES (1,'Miami, USA','Point','\0\0\0\0\0\0\0û<FyæTÀDÛ1uWÆ9@','2024-12-11 08:10:16','2024-12-13 15:21:28'),(2,'Lummus Park Beach','Point','\0\0\0\0\0\0\0ÑZÑæ8TÀ¥£Ì&È9@','2024-12-11 08:10:17','2024-12-13 15:21:29'),(3,'Islamorada','Point','\0\0\0\0\0\0\0j¤¥òv)TÀä†ßM·è8@','2024-12-11 08:10:17','2024-12-13 15:21:29'),(4,'Sombrero Beach','Point','\0\0\0\0\0\0\0i\0oETÀ\r6uµ8@','2024-12-11 08:10:17','2024-12-13 15:21:29'),(5,'West Key','Point','\0\0\0\0\0\0\04-±2qTÀFzQ»_8@','2024-12-11 08:10:17','2024-12-13 15:21:29'),(6,'Aspen, USA','Point','\0\0\0\0\0\0\0`:­Û ´ZÀnÜb~n˜C@','2024-12-11 08:10:17','2024-12-13 15:21:29'),(7,'Aspen Highlands','Point','\0\0\0\0\0\0\0Kº ¾¶ZÀž]¾õa—C@','2024-12-11 08:10:17','2024-12-13 15:21:29'),(8,'Beaver Creek','Point','\0\0\0\0\0\0\0!WêY¡ZÀ\Z4ôOpÍC@','2024-12-11 08:10:17','2024-12-13 15:21:29'),(9,'Las Vegas, USA','Point','\0\0\0\0\0\0\0²eùºË\\Ào.\Z2B@','2024-12-11 08:10:17','2024-12-13 15:21:30'),(10,'Zion Canyon National Park','Point','\0\0\0\0\0\0\0Õ^DÛ1?\\ÀÂõ(\\™B@','2024-12-11 08:10:17','2024-12-13 15:21:30'),(11,'Antelope Canyon','Point','\0\0\0\0\0\0\0öA–Ø[À‚¨û\0¤nB@','2024-12-11 08:10:17','2024-12-13 15:21:30'),(12,'Grand Canyon National Park','Point','\0\0\0\0\0\0\0Å6©h\\Àk,amŒB@','2024-12-11 08:10:17','2024-12-13 15:21:30'),(13,'Joshua Tree National Park','Point','\0\0\0\0\0\0\0e‹¤Ýè]ÀŠº}A@','2024-12-11 08:10:18','2024-12-13 15:21:30');
 /*!40000 ALTER TABLE `locations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -217,8 +218,9 @@ CREATE TABLE `pages` (
   UNIQUE KEY `name_32` (`name`),
   UNIQUE KEY `name_33` (`name`),
   UNIQUE KEY `name_34` (`name`),
-  UNIQUE KEY `name_35` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+  UNIQUE KEY `name_35` (`name`),
+  UNIQUE KEY `name_36` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -241,7 +243,7 @@ DROP TABLE IF EXISTS `plugins`;
 CREATE TABLE `plugins` (
   `id` smallint(6) NOT NULL AUTO_INCREMENT,
   `type` enum('tour','greeting','advertisement') NOT NULL,
-  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`content`)),
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `order` smallint(6) NOT NULL,
   `active` tinyint(1) DEFAULT 1,
   `createdAt` datetime NOT NULL,
@@ -283,8 +285,9 @@ CREATE TABLE `plugins` (
   UNIQUE KEY `type_34` (`type`),
   UNIQUE KEY `type_35` (`type`),
   UNIQUE KEY `type_36` (`type`),
-  UNIQUE KEY `type_37` (`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+  UNIQUE KEY `type_37` (`type`),
+  UNIQUE KEY `type_38` (`type`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -293,7 +296,7 @@ CREATE TABLE `plugins` (
 
 LOCK TABLES `plugins` WRITE;
 /*!40000 ALTER TABLE `plugins` DISABLE KEYS */;
-INSERT INTO `plugins` VALUES (1,'advertisement','{\"text\":\"Special Offer: Save 20% on your first booking!\",\"link\":\"/bookings\",\"linkText\":\"Book Now\"}',3,1,'2024-12-13 13:41:12','2024-12-13 13:43:16'),(2,'greeting','{\"title\":\"Hello, Traveler!\",\"message\":\"Explore the best tours around the world.\"}',1,1,'2024-12-13 13:41:12','2024-12-13 13:43:16'),(3,'tour','{\"count\":3,\"header\":\"Tour Information\",\"text\":\"Exciting details about this tour.\",\"footerValue\":\"From $999\",\"link\":\"/overview\"}',2,1,'2024-12-13 13:41:12','2024-12-13 13:43:16');
+INSERT INTO `plugins` VALUES (1,'advertisement','{\"text\":\"Special Offer: Save 20% on your first booking!\",\"link\":\"/bookings\",\"linkText\":\"Book Now\"}',2,1,'2024-12-13 13:41:12','2024-12-13 15:23:10'),(2,'greeting','{\"title\":\"Hello, Traveler!\",\"message\":\"Explore the best tours around the world.\"}',1,1,'2024-12-13 13:41:12','2024-12-13 15:23:10'),(3,'tour','{\"count\":3,\"header\":\"Tour Information\",\"text\":\"Exciting details about this tour.\",\"footerValue\":\"From $999\",\"link\":\"/overview\"}',3,1,'2024-12-13 13:41:12','2024-12-13 15:23:10');
 /*!40000 ALTER TABLE `plugins` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -311,7 +314,7 @@ CREATE TABLE `plugins_to_pages` (
   KEY `pageId` (`pageId`),
   CONSTRAINT `plugins_to_pages_ibfk_1` FOREIGN KEY (`pluginId`) REFERENCES `plugins` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `plugins_to_pages_ibfk_2` FOREIGN KEY (`pageId`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -417,9 +420,11 @@ CREATE TABLE `reviews` (
   CONSTRAINT `reviews_ibfk_75` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `reviews_ibfk_76` FOREIGN KEY (`tourId`) REFERENCES `tours` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `reviews_ibfk_77` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `reviews_ibfk_78` FOREIGN KEY (`tourId`) REFERENCES `tours` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `reviews_ibfk_79` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `reviews_ibfk_8` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `reviews_ibfk_9` FOREIGN KEY (`tourId`) REFERENCES `tours` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -508,8 +513,9 @@ CREATE TABLE `tours` (
   UNIQUE KEY `name_49` (`name`),
   UNIQUE KEY `name_50` (`name`),
   UNIQUE KEY `name_51` (`name`),
+  UNIQUE KEY `name_52` (`name`),
   KEY `tours_slug` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -536,7 +542,7 @@ CREATE TABLE `tours_to_images` (
   KEY `imageId` (`imageId`),
   CONSTRAINT `tours_to_images_ibfk_1` FOREIGN KEY (`tourId`) REFERENCES `tours` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `tours_to_images_ibfk_2` FOREIGN KEY (`imageId`) REFERENCES `images` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -563,7 +569,7 @@ CREATE TABLE `tours_to_locations` (
   KEY `locationId` (`locationId`),
   CONSTRAINT `tours_to_locations_ibfk_1` FOREIGN KEY (`tourId`) REFERENCES `tours` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `tours_to_locations_ibfk_2` FOREIGN KEY (`locationId`) REFERENCES `locations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -638,8 +644,9 @@ CREATE TABLE `users` (
   UNIQUE KEY `email_39` (`email`),
   UNIQUE KEY `email_40` (`email`),
   UNIQUE KEY `email_41` (`email`),
-  UNIQUE KEY `email_42` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+  UNIQUE KEY `email_42` (`email`),
+  UNIQUE KEY `email_43` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -648,7 +655,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Viktoryia','admin@gmail.com','user-4.jpeg','admin','$2a$12$Cm.5YVQxVOtmMTq.yx3beeNQnT5h/kupUsVK0IKet5gHRw.Plsl0S','2024-12-11 08:08:02',NULL,NULL,1,'2024-12-11 08:08:03','2024-12-11 08:41:31'),(2,'Haven Grimes','Randi34@hotmail.com',NULL,'user','$2a$12$nj2iNuP9E1B1NoVCdnktH.uaI4MCOfRK0XiuSmk14YDVsh3vlsSNu','2024-12-11 08:09:50',NULL,NULL,1,'2024-12-11 08:09:51','2024-12-11 08:09:51'),(3,'Qwerty','Uriah14@yahoo.com','user-3.jpeg','admin','$2a$12$WYl17NCWjS21aO24DidlVez.20rjZPRHiX0E/OaXWP1EatG/t/uf6','2024-12-11 08:09:54',NULL,NULL,1,'2024-12-11 08:09:55','2024-12-11 13:58:10'),(4,'Bridgette Sdortze','Kenyatta_Lakin5@hotmail.com',NULL,'user','$2a$12$sb3asYJY139L5AEsY7NxrO0rl.LYgCpxcBg9yvh9eb9SicN5QAYOG','2024-12-11 08:22:43',NULL,NULL,1,'2024-12-11 08:22:44','2024-12-11 08:22:44'),(5,'Kristen White ','user@gmail.com','user-5.jpeg','user','$2a$12$OKoC93dG1OFOZvIvISNvf./K5VtOvjQEsjpwlno7yzlBPlwE8Yhvy','2024-12-11 08:56:38',NULL,NULL,1,'2024-12-11 08:24:05','2024-12-11 13:31:23'),(6,'Ringo Pixel','Astrid_Wehner36@hotmail.com','user-6.jpeg','admin','$2a$12$OoPZul8KbatCBFDmwEJCBOr6i8xSfNHYgsUSHWCDuKa783.HGG7Si','2024-12-11 08:24:48',NULL,NULL,1,'2024-12-11 08:24:49','2024-12-11 14:01:32'),(7,'Ervin Walsh','Laron21@yahoo.com',NULL,'admin','$2a$12$MBQOAcUSKuc8rMaB1D5JYejJCjXe7j66c9fWERUQEm1lQN163C2Hq','2024-12-13 13:40:52',NULL,NULL,1,'2024-12-13 13:40:53','2024-12-13 13:40:53');
+INSERT INTO `users` VALUES (1,'Viktoryia','admin@gmail.com','user-4.jpeg','admin','$2a$12$Cm.5YVQxVOtmMTq.yx3beeNQnT5h/kupUsVK0IKet5gHRw.Plsl0S','2024-12-11 08:08:02',NULL,NULL,1,'2024-12-11 08:08:03','2024-12-11 08:41:31'),(2,'Haven Grimes','Randi34@hotmail.com',NULL,'user','$2a$12$nj2iNuP9E1B1NoVCdnktH.uaI4MCOfRK0XiuSmk14YDVsh3vlsSNu','2024-12-11 08:09:50',NULL,NULL,1,'2024-12-11 08:09:51','2024-12-11 08:09:51'),(3,'Qwerty','Uriah14@yahoo.com','user-3.jpeg','admin','$2a$12$WYl17NCWjS21aO24DidlVez.20rjZPRHiX0E/OaXWP1EatG/t/uf6','2024-12-11 08:09:54',NULL,NULL,1,'2024-12-11 08:09:55','2024-12-11 13:58:10'),(4,'Bridgette Sdortze','Kenyatta_Lakin5@hotmail.com',NULL,'user','$2a$12$sb3asYJY139L5AEsY7NxrO0rl.LYgCpxcBg9yvh9eb9SicN5QAYOG','2024-12-11 08:22:43',NULL,NULL,1,'2024-12-11 08:22:44','2024-12-11 08:22:44'),(5,'Kristen White ','user@gmail.com','user-5.jpeg','user','$2a$12$OKoC93dG1OFOZvIvISNvf./K5VtOvjQEsjpwlno7yzlBPlwE8Yhvy','2024-12-11 08:56:38',NULL,NULL,1,'2024-12-11 08:24:05','2024-12-11 13:31:23'),(6,'Ringo Pixel','Astrid_Wehner36@hotmail.com','user-6.jpeg','admin','$2a$12$OoPZul8KbatCBFDmwEJCBOr6i8xSfNHYgsUSHWCDuKa783.HGG7Si','2024-12-11 08:24:48',NULL,NULL,1,'2024-12-11 08:24:49','2024-12-11 14:01:32'),(7,'Ervin Walsh','Laron21@yahoo.com',NULL,'admin','$2a$12$MBQOAcUSKuc8rMaB1D5JYejJCjXe7j66c9fWERUQEm1lQN163C2Hq','2024-12-13 13:40:52',NULL,NULL,1,'2024-12-13 13:40:53','2024-12-13 13:40:53'),(8,'Eddie Wolf','Alexandro58@yahoo.com',NULL,'admin','$2a$12$EbWvTkfkR2V5eQaN1vkJ7OzSl9jiaKDUuAH0y4m22GBmQaL5rJ6CO','2024-12-13 15:20:42',NULL,NULL,1,'2024-12-13 15:20:43','2024-12-13 15:20:43');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -666,7 +673,7 @@ CREATE TABLE `users_to_tours` (
   KEY `userId` (`userId`),
   CONSTRAINT `users_to_tours_ibfk_1` FOREIGN KEY (`tourId`) REFERENCES `tours` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `users_to_tours_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -687,4 +694,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-13 17:45:16
+-- Dump completed on 2024-12-13 15:26:18
