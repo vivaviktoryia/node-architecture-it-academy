@@ -2,15 +2,15 @@
 import { signup, login, logout } from './login';
 import { updateSettings } from './updateSettings';
 import { addTour } from './addTour';
-import { displayMap } from './mapbox';
 import { bookTour } from './bookTour';
-import { displayAlert } from './alert';
 import { fetchAllTours, fetchTourDataBySlug } from './fetchTours';
 import { updatePluginOrder } from './updatePluginOrder';
 
 //RENDER
 import { renderAllTours } from './renderAllTours';
 import { renderTourDetails } from './renderTourDetails';
+import { displayMap } from './mapbox';
+import { displayAlert } from './alert';
 import { enableDragAndDrop } from './dragAndDrop';
 
 const mapBox = document.getElementById('map');
