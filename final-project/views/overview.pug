@@ -2,13 +2,29 @@ extends base
 
 block content
     main.main
-        .card-container
-            each _ in Array(3)
-                .card
-                    .card__header
-                        h3.heading-tertirary <span>Loading...</span>
-                    .card__details
-                        p.card__text Placeholder for card details...
-                    .card__footer
-                        p.card__footer-value Loading...
-                        a.btn.btn--green.btn--small#tour-details(href="#") Details           
+        .plugin-container
+            if plugins && plugins.length
+                each plugin in plugins
+                    if plugin.type === 'tour'
+                        .card-container
+                            each _ in Array(plugin.content.count || 3)
+                                .card
+                                    .card__header
+                                        h3.heading-tertirary <span>#{plugin.content.header || 'Loading...'}</span>
+                                    .card__details
+                                        p.card__text #{plugin.content.text || 'Placeholder for card details...'}
+                                    .card__footer
+                                        p.card__footer-value #{plugin.content.footerValue || 'Loading...'}
+                                        a.btn.btn--green.btn--small(href=plugin.content.link || '#') Details
+                    else if plugin.type === 'advertisement'
+                        .advertisement-box
+                            .advertisement-content
+                                p.advertisement__text #{plugin.content.text || 'Default Advertisement Text'}
+                                if plugin.content.link
+                                    a.btn.advertisement__link(href=plugin.content.link || '#') #{plugin.content.linkText || 'Learn More'}
+                    else if plugin.type === 'greeting'
+                        .greeting
+                            h2.greeting__title #{plugin.content.title || 'Welcome!'}
+                            p.greeting__message #{plugin.content.message || 'Thank you for visiting our site.'}
+                    else
+                        .unknown-plugin Unknown plugin type: #{plugin.type}

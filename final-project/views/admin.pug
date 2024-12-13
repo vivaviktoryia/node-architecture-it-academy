@@ -24,8 +24,8 @@ block content
           .admin-nav
             h5.admin-nav__heading Manage tours
             ul.side-nav
-              +navItem('/admin/tours', 'Edit structure', 'edit')
-              +navItem('/admin/tours', 'Add tour', 'map')
+              +navItem('/admin/tours', 'Add Tour', 'map')
+              +navItem('/admin/plugins', 'Manage Structure', 'edit')
 
 
       .admin-view__content
@@ -78,20 +78,11 @@ block content
               .form__group
                 label.form__label(for='tourLocations') Locations (Select at least 2)
                 select#tourLocations.form__input(name='locations', required, multiple)
-                  each location in locations
+                  each location in locatiфons
                     option(value=location.id) #{location.description}
                 input#hiddenLocations.form__input(type='hidden' name='selectedLocations' value='[]')
               .form__group.right
                 button.btn.btn--small.btn--green Add Tour
 
-        if (page === 'seeAllTours')
-          .admin-view__tour-list
-            h2.heading-secondary.ma-bt-md All Tours
-            each tour in tours
-              .tour-card
-                .tour-card__header
-                  h3.heading-tertiary= tour.name
-                .tour-card__details
-                  p= tour.summary
-                  p Price: $#{tour.price}
-                a.btn.btn--green.btn--small(href=`/admin/tours/${tour.id}`) View Tour
+        if (page === 'manageStructure')
+          

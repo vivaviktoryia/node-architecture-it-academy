@@ -5,7 +5,6 @@ const {
 	updateOne,
 	createOne,
 	getOne,
-	getOneBySlug,
 	getAll,
 } = require('./handlerFactory');
 

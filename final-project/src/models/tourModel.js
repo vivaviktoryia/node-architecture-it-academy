@@ -23,8 +23,8 @@ const Tour = sequelize.define(
 					msg: 'A tour name should be between 2 and 50 characters',
 				},
 				isAlphaSpace(value) {
-					if (!/^[a-zA-Z\s]+$/.test(value)) {
-						throw new Error('Tour name should only contain characters');
+					if (!/^[a-zA-Zа-яА-ЯёЁ\s]+$/.test(value)) {
+						throw new Error('Tour name should only contain letters and spaces');
 					}
 				},
 			},
@@ -102,12 +102,12 @@ const Tour = sequelize.define(
 			},
 		},
 		description: {
-			type: DataTypes.STRING(500),
+			type: DataTypes.STRING(700),
 			allowNull: false,
 			validate: {
 				len: {
-					args: [2, 500],
-					msg: 'A tour description should be between 2 and 500 characters',
+					args: [2, 700],
+					msg: 'A tour description should be between 2 and 700 characters',
 				},
 			},
 		},

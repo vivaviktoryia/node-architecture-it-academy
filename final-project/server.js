@@ -14,6 +14,7 @@ const server = app.listen(port, async () => {
 	await logInfo(logLine);
 });
 
+
 sequelize
 	.sync()
 	.then(() => {
