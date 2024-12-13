@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+      
+        <url>
+            <loc>http://178.172.195.18:7180/</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+            <lastmod>2024-12-13T18:34:05.473Z</lastmod>
+        </url>
+      
+
+        <url>
+            <loc>http://178.172.195.18:7180/login</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+            <lastmod>2024-12-13T18:34:05.474Z</lastmod>
+        </url>
+      
+
+        <url>
+            <loc>http://178.172.195.18:7180/signup</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+            <lastmod>2024-12-13T18:34:05.474Z</lastmod>
+        </url>
+      
+
+        <url>
+            <loc>http://178.172.195.18:7180/me</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+            <lastmod>2024-12-13T18:34:05.474Z</lastmod>
+        </url>
+      
+
+        <url>
+            <loc>http://178.172.195.18:7180/admin/tours</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+            <lastmod>2024-12-13T18:34:05.474Z</lastmod>
+        </url>
+      
+
+        <url>
+            <loc>http://178.172.195.18:7180/admin/plugins</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+            <lastmod>2024-12-13T18:34:05.474Z</lastmod>
+        </url>
+      
+
+        <url>
+            <loc>http://178.172.195.18:7180/tour/the-forest-hiker</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.9</priority>
+            <lastmod>2024-12-11T08:25:01.000Z</lastmod>
+        </url>
+      
+
+        <url>
+            <loc>http://178.172.195.18:7180/tour/the-snow-adventurer</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.9</priority>
+            <lastmod>2024-12-11T08:25:07.000Z</lastmod>
+        </url>
+      
+
+        <url>
+            <loc>http://178.172.195.18:7180/tour/the-sea-explorer</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.9</priority>
+            <lastmod>2024-12-11T14:20:30.000Z</lastmod>
+        </url>
+      
+
+        <url>
+            <loc>http://178.172.195.18:7180/tour/test-default-tour-name</loc>
+            <changefreq>weekly</changefreq>
+            <priority>0.9</priority>
+            <lastmod>2024-12-13T13:56:39.000Z</lastmod>
+        </url>
+      
+    </urlset>
