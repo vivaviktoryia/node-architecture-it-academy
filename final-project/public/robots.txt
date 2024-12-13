@@ -1,0 +1,11 @@
+# Allow all search engines to index the website
+User-agent: *
+Disallow: /admin/  # Do not index the admin pages
+Disallow: /login/  # Do not index the login page
+Disallow: /signup/  # Do not index the signup page
+
+# Allow access to all other pages
+Allow: /
+
+# Specify the path to the sitemap
+Sitemap: http://178.172.195.18:7180/public/sitemap.xml

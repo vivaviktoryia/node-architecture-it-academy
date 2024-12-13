@@ -8,7 +8,8 @@
     "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/parcel",
     "backup:db:with-data": "node database/scripts/backup.js backup",
     "backup:db:without-data": "node database/scripts/backup.js backup --without-data",
-    "db:setup": "node database/scripts/backup.js restore database/backup/INIT_final_project_backup.sql"
+    "db:setup": "node database/scripts/backup.js restore database/backup/INIT_final_project_backup.sql",
+    "generate:sitemap": "node utils/generateSitemap.js"
   },
   "author": "Viktoryia",
   "license": "ISC",
@@ -18,8 +19,12 @@
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
     "core-js": "^3.39.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.5.0",
     "mariadb": "^3.4.0",
