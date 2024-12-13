@@ -736,19 +736,63 @@ if ($d0f7ce18c37ad6f6$var$bookBtn) $d0f7ce18c37ad6f6$var$bookBtn.addEventListene
     }
 });
 const $d0f7ce18c37ad6f6$var$alertMessage = document.querySelector('body').dataset.alert;
-if ($d0f7ce18c37ad6f6$var$alertMessage) (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', $d0f7ce18c37ad6f6$var$alertMessage, 10); // if (mapBox) {
- // 	const locationsData = mapBox.dataset.locations;
- // 	if (locationsData) {
- // 		try {
- // 			const locations = JSON.parse(locationsData);
- // 			displayMap(locations);
- // 		} catch (error) {
- // 			console.error('Error parsing JSON data:', error);
- // 		}
- // 	} else {
- // 		console.error('No locations data found.');
- // 	}
- // }
+if ($d0f7ce18c37ad6f6$var$alertMessage) (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', $d0f7ce18c37ad6f6$var$alertMessage, 10);
+// if (mapBox) {
+// 	const locationsData = mapBox.dataset.locations;
+// 	if (locationsData) {
+// 		try {
+// 			const locations = JSON.parse(locationsData);
+// 			displayMap(locations);
+// 		} catch (error) {
+// 			console.error('Error parsing JSON data:', error);
+// 		}
+// 	} else {
+// 		console.error('No locations data found.');
+// 	}
+// }
+document.addEventListener('DOMContentLoaded', ()=>{
+    const pluginList = document.querySelector('.plugin-list');
+    let draggedElement = null;
+    pluginList.addEventListener('dragstart', (e)=>{
+        if (e.target && e.target.matches('.plugin-item')) draggedElement = e.target;
+    });
+    pluginList.addEventListener('dragover', (e)=>{
+        e.preventDefault();
+        const target = e.target.closest('.plugin-item');
+        if (target && target !== draggedElement) pluginList.insertBefore(draggedElement, target);
+    });
+    pluginList.addEventListener('dragend', ()=>{
+        draggedElement = null;
+    });
+    document.querySelector('#saveOrder').addEventListener('click', async ()=>{
+        const newOrder = [
+            ...document.querySelectorAll('.plugin-item')
+        ].map((item, index)=>({
+                id: +item.dataset.id,
+                order: index + 1
+            }));
+        console.log('Plugins order:', newOrder);
+        try {
+            const updatePromises = newOrder.map((plugin)=>fetch(`/api/v1/admin/plugins/${plugin.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        order: plugin.order
+                    })
+                }).then((response)=>{
+                    if (!response.ok) throw new Error(`Failed to update plugin with ID: ${plugin.id}`);
+                    return response.json();
+                }));
+            await Promise.all(updatePromises);
+            (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', 'Plugins order saved successfully!');
+        } catch (error) {
+            console.error('Error saving plugin order:', error);
+            (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('error', 'Failed to save plugin order.');
+        }
+    });
+});
 
 
 //# sourceMappingURL=bundle.js.map

@@ -63,27 +63,30 @@ const manageTours = catchAsync(async (req, res, next) => {
 		attributes: ['id', 'description'],
 	});
 	const images = await Image.findAll({ attributes: ['id', 'fileName'] });
-	console.log(locations.dataValues);
+
 	res.status(200).render('admin', {
 		title: 'Manage Tours',
 		page: 'manageTours',
-		images: images,
-		locations: locations,
-		tours: [],
+		images: images || [],
+		locations: locations || [],
+		plugins: [],
 	});
 });
 
 const manageStructure = catchAsync(async (req, res, next) => {
 	const plugins = await Plugin.findAll({
 		where: { active: true },
-		attributes: ['type', 'content', 'order'],
+		attributes: ['id','type', 'content', 'order'],
 		order: [['order', 'ASC']],
 	});
-	console.log('💥💥💥', plugins);
+	const pluginData = plugins.map((plugin) => plugin.dataValues);
+	console.log(pluginData);
 	res.status(200).render('admin', {
 		title: 'Manage Structure',
 		page: 'manageStructure',
-		plugins,
+		plugins: pluginData,
+		images: [],
+		locations: [],
 	});
 });
 

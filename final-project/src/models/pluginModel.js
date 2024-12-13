@@ -27,7 +27,6 @@ const Plugin = sequelize.define('Plugin', {
 	},
 	order: {
 		type: DataTypes.SMALLINT,
-		unique: true,
 		allowNull: false,
 		validate: {
 			notNull: { msg: 'A Plugin should have an order' },

@@ -31,7 +31,7 @@ block content
       .admin-view__content
         if (page === 'manageTours')
           .admin-view__form-container
-            h2.heading-secondary.ma-bt-md Manage Tours
+            h2.heading-secondary.ma-bt-md Add Tour
 
             form.form.form-add-tour-data(action='/api/v1/tours' method='POST')
               h3.heading-tertiary.ma-bt-sm Add New Tour
@@ -65,7 +65,6 @@ block content
               .form__group
                 label.form__label(for='tourImageCover') Cover Image
                 input#coverImageDefault.form__input( name='imageCover' value='default-cover.jpg')
-
               .form__group
                 label.form__label(for='tourStartDate') Start Date
                 input#tourStartDate.form__input(type='date', required, name='startDate')
@@ -78,11 +77,25 @@ block content
               .form__group
                 label.form__label(for='tourLocations') Locations (Select at least 2)
                 select#tourLocations.form__input(name='locations', required, multiple)
-                  each location in locatiфons
+                  each location in locations
                     option(value=location.id) #{location.description}
                 input#hiddenLocations.form__input(type='hidden' name='selectedLocations' value='[]')
               .form__group.right
                 button.btn.btn--small.btn--green Add Tour
 
         if (page === 'manageStructure')
-          
+          .admin-view__form-container
+            h2.greeting__title.ma-bt-md Manage Plugins Structure
+
+            .advertisement-box
+              ul.plugin-list
+                each plugin, index in plugins
+                  li.plugin-item(
+                    data-id=plugin.id
+                    draggable="true"
+                  )
+                    h2 #{plugin.type}
+
+            .advertisement__link-container
+              button.btn.btn--green#saveOrder Save Order
+                              
