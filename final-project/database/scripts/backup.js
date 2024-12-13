@@ -1,9 +1,13 @@
+const dotenv = require('dotenv');
+dotenv.config({ path: `${__dirname}/config.env` });
+
 const { exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
 const user = process.env.DB_USER || 'root';
 const dbName = process.env.DB_NAME || 'final_project';
+const dbPassword = process.env.DB_PASSWORD;
 const backupDir = path.join(__dirname, '../backup');
 
 if (!fs.existsSync(backupDir)) {
@@ -38,21 +42,21 @@ const getExportDBCommand = (
 	const dataOption = withData ? '' : '--no-data';
 	const dataSuffix = withData ? 'with-data' : 'without-data';
 	const backupFileName = `${backupDir}/backup_${dbName}_${dataSuffix}_${timestamp}.sql`;
-	return `mysqldump -u ${user} -p --databases ${dataOption} --add-drop-database --no-tablespaces  ${dbName} > ${backupFileName}`;
+	return `mysqldump -u ${user} -p${dbPassword} --databases ${dataOption} --add-drop-database --no-tablespaces ${dbName} > ${backupFileName}`;
 };
 
 const getImportDBCommand = (user, dbName, fileName) => {
-	return `mysql -u ${user} -p ${dbName} < ${fileName}`;
+	return `mysql -u ${user} -p${dbPassword} ${dbName} < ${fileName}`;
 };
 
 // Add a command to check if the database exists
 const checkIfDatabaseExistsCommand = (user, dbName) => {
-	return `mysql -u ${user} -p -e "SHOW DATABASES LIKE '${dbName}'"`;
+	return `mysql -u ${user} -p${dbPassword} -e "SHOW DATABASES LIKE '${dbName}'"`;
 };
 
 // Add a command to create the database if it doesn't exist
 const createDatabaseCommand = (user, dbName) => {
-	return `mysql -u ${user} -p -e "CREATE DATABASE IF NOT EXISTS ${dbName}"`;
+	return `mysql -u ${user} -p${dbPassword} -e "CREATE DATABASE IF NOT EXISTS ${dbName}"`;
 };
 
 const timestamp = new Date()
@@ -100,6 +104,17 @@ const restoreDatabase = async (backupFile) => {
 	}
 };
 
+const checkForEscapedHyphens = (backupFile) => {
+	const data = fs.readFileSync(backupFile, 'utf8');
+	const matches = data.match(/\\-/g);
+	if (matches) {
+		console.warn(`Found ${matches.length} escaped hyphens in the dump file.`);
+		const fixedData = data.replace(/\\-/g, '-');
+		fs.writeFileSync(backupFile, fixedData, 'utf8');
+		console.log('Escaped hyphens replaced with regular hyphens.');
+	}
+};
+
 const args = process.argv.slice(2);
 
 if (args[0] === 'backup') {
@@ -111,6 +126,7 @@ if (args[0] === 'backup') {
 		console.error('Please provide the backup file path for restore.');
 		process.exit(1);
 	}
+	checkForEscapedHyphens(backupFile);
 	restoreDatabase(backupFile);
 } else {
 	console.error('Invalid command. Use "backup" or "restore".');
