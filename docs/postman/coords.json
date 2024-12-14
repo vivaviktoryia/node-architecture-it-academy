@@ -1,0 +1,63 @@
+[
+    {
+        "description": "Miami, USA",
+        "coordinates": [-80.185942, 25.774772]
+    },
+    {
+        "description": "Lummus Park Beach",
+        "coordinates": [-80.128473, 25.781842]
+    },
+    {
+        "description": "Islamorada",
+        "coordinates": [-80.647885, 24.909047]
+    },
+    {
+        "description": "Sombrero Beach",
+        "coordinates": [-81.0784, 24.707496]
+    },
+    {
+        "description": "West Key",
+        "coordinates": [-81.768719, 24.552242]
+    },
+    {
+        "description": "Aspen, USA",
+        "coordinates": [-106.822318,
+            39.190872]
+    },
+    {
+        "description": "Aspen Highlands",
+        "coordinates": [-106.855385,
+            39.182677]
+    },
+    {
+        "description": "Beaver Creek",
+        "coordinates": [-106.516623,
+            39.60499]
+    },
+    {
+        "description": "Las Vegas, USA",
+        "coordinates": [-115.172652,
+            36.110904]
+    },
+    {
+        "description": "Zion Canyon National Park",
+        "coordinates": [-112.987418,
+            37.198125]
+    },
+    {
+        "description": "Antelope Canyon",
+        "coordinates": [-111.376161,
+            36.86438]
+    },
+    {
+        "description": "Grand Canyon National Park",
+        "coordinates": [-112.115763,
+            36.058973]
+    },
+    {
+        "description": "Joshua Tree National Park",
+        "coordinates": [-116.107963,
+            34.011646]
+    }
+
+]

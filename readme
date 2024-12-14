@@ -6,7 +6,14 @@ C:\Windows\System32\drivers\etc\hosts - can be managed
 ::1             localhost
 
 
-// Installation MAriaDb on remote server (ubuntu/linux)
+//nginx 
+sudo apt update
+sudo apt install nginx
+sudo nano /etc/nginx/nginx.conf
+
+
+
+// Installation MAriaDb on remote server (ubnuntu/linux)
 sudo systemctl status mariadb
 
 sudo nano /etc/apt/sources.list

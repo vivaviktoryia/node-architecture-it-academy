@@ -1,0 +1,2800 @@
+{
+	"info": {
+		"_postman_id": "a143d53b-d2ec-4f31-8d95-94707b3b7935",
+		"name": "FINAL_PROJECT",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15387243"
+	},
+	"item": [
+		{
+			"name": "AUTH",
+			"item": [
+				{
+					"name": "SIGNUP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response && response.token) {\r",
+									"    const { token: jwt } = response;\r",
+									"    pm.environment.set('jwt', jwt);\r",
+									"}\r",
+									"if (response && response.data.user) {\r",
+									"    const { email, id: userId } = response.data.user;\r",
+									"    pm.environment.set('email', email);\r",
+									"    pm.environment.set('userId', userId);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{$randomFullName}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"password\": \"{{password}}\",\r\n    \"passwordConfirm\": \"{{password}}\",\r\n    \"role\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/users/signup",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response && response.token) {\r",
+									"    const { token: jwt } = response;\r",
+									"    pm.environment.set('jwt', jwt);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n   }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/users/login",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET me",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/users/me",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE ME",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "TEST USER",
+									"description": "allowed: 'name', 'email'",
+									"type": "text"
+								},
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "2.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/users/updateMe",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"updateMe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE MY PASSWORD",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const requestBody = JSON.parse(pm.request.body.raw);\r",
+									"\r",
+									"if (requestBody && pm.response.code === 200) {\r",
+									"    const { password } = requestBody;\r",
+									"    pm.environment.set('password', password);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"passwordCurrent\": \"{{password}}\",\r\n    \"password\": \"test12345\",\r\n    \"passwordConfirm\": \"test12345\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/users/updateMyPassword",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"updateMyPassword"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "USERS",
+			"item": [
+				{
+					"name": "GET all users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"\r",
+									"if (response.data && response.data.length !== 0) {\r",
+									"    // const userId = response.data.data.find(user => user.role === \"user\")?.id;\r",
+									"    const userId = response.data[0].id;\r",
+									"    pm.environment.set(\"userId\", userId);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/users",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "admin",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/users/:userId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "{{userId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/users/:userId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "{{userId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST create user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test Tour\",\r\n    \"email\": \"laura@example.com\",\r\n    \"password\": \"easy\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/users",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TOURS",
+			"item": [
+				{
+					"name": "POST create tour",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"[\r",
+									"    {\r",
+									"        \"name\": \"The Forest Hiker\",\r",
+									"        \"duration\": 10,\r",
+									"        \"maxGroupSize\": 20,\r",
+									"        \"difficulty\": \"easy\",\r",
+									"        \"price\": 1000,\r",
+									"        \"priceDiscount\": 15,\r",
+									"        \"summary\": \"Breathtaking hike through the Canadian Banff National Park\",\r",
+									"        \"description\": \"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\",\r",
+									"        \"imageCover\": \"tour-1-cover.jpg\",\r",
+									"        \"startDate\": \"2025-12-05T18:52:50.331Z\",\r",
+									"        \"images\": [\r",
+									"            1,\r",
+									"            2,\r",
+									"            3\r",
+									"        ],\r",
+									"        \"locations\": [\r",
+									"            1,\r",
+									"            2,\r",
+									"            3\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"name\": \"The Sea Explorer\",\r",
+									"        \"duration\": 21,\r",
+									"        \"maxGroupSize\": 8,\r",
+									"        \"difficulty\": \"medium\",\r",
+									"        \"price\": 888,\r",
+									"        \"priceDiscount\": 10,\r",
+									"        \"summary\": \"Exploring the jaw-dropping US east coast by foot and by boat\",\r",
+									"        \"description\": \"Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\",\r",
+									"        \"imageCover\": \"tour-2-cover.jpg\",\r",
+									"        \"startDate\": \"2025-07-05T18:52:50.331Z\",\r",
+									"        \"images\": [\r",
+									"            4,\r",
+									"            5,\r",
+									"            6\r",
+									"        ],\r",
+									"        \"locations\": [\r",
+									"            4,\r",
+									"            5,\r",
+									"            6\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"name\": \"The Snow Adventurer\",\r",
+									"        \"duration\": 16,\r",
+									"        \"maxGroupSize\": 5,\r",
+									"        \"difficulty\": \"difficult\",\r",
+									"        \"price\": 1234,\r",
+									"        \"priceDiscount\": 13,\r",
+									"\t\t\"summary\": \"Exciting adventure in the snow with snowboarding and skiing\",\r",
+									"        \"description\": \"Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum! Dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur, exercitation ullamco laboris nisi ut aliquip. Lorem ipsum dolor sit amet, consectetur adipisicing elit!\",\r",
+									"        \"imageCover\": \"tour-3-cover.jpg\",\r",
+									"        \"startDate\": \"2025-03-03T18:52:50.331Z\",\r",
+									"        \"images\": [\r",
+									"            7,8,9\r",
+									"        ],\r",
+									"        \"locations\": [\r",
+									"            7,\r",
+									"            8,\r",
+									"            9\r",
+									"        ]\r",
+									"    }\r",
+									"]\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"// const tour = response.data.data.find(tour =>\r",
+									"//     tour?.name.toLowerCase().includes(\"test\")\r",
+									"// );\r",
+									"\r",
+									"const tour = response.data?.mainRecord;\r",
+									"if (response && tour) {\r",
+									"    const tourId =  tour?.id ;\r",
+									"\r",
+									"    pm.environment.set(\"tourToDelete\", tourId);\r",
+									"    pm.environment.set(\"randomTourId\", tourId)\r",
+									"}\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "m",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{$randomLoremWords}}\",\r\n    \"duration\": 40,\r\n    \"maxGroupSize\": 20,\r\n    \"difficulty\": \"difficult\",\r\n    \"price\": 121,\r\n    \"priceDiscount\": 2,\r\n    \"summary\": \"Exciting adventure in the snow with snowboarding and skiing\",\r\n    \"description\": \"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\",\r\n    \"imageCover\": \"tour-3-cover.jpg\",\r\n    \"startDate\": \"2025-12-05T18:52:50.331Z\",\r\n    \"images\": [\r\n        1,\r\n        2,\r\n        3\r\n    ],\r\n    \"locations\": [\r\n        11,\r\n        12,\r\n        13\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all tours",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// pm.environment.set(\"tourToDelete\", pm.response.json().data.tours[0]._id)\r",
+									"const response = pm.response.json();\r",
+									"// const tour = response.data.find(tour =>\r",
+									"//     tour?.name.toLowerCase().includes(\"test\")\r",
+									"// );\r",
+									"\r",
+									"if (response && response.data) {\r",
+									"    const tourId =  response.data[0].id;\r",
+									"\r",
+									"    pm.environment.set(\"tourToDelete\", tourId);\r",
+									"    pm.environment.set(\"randomTourId\", tourId)\r",
+									"}\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt",
+									"description": "ratingsAverage",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "ratingsAverage",
+									"disabled": true
+								},
+								{
+									"key": "fields",
+									"value": "name,price,duration",
+									"description": "name,price,duration",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "price[lt]",
+									"value": "100",
+									"description": "duration[gt],ratingsAverage[gte]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET tour",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours/:tourId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours",
+								":tourId"
+							],
+							"variable": [
+								{
+									"key": "tourId",
+									"value": "{{randomTourId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH update tour",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"price\": 789,\r\n  \r\n\r\n    \"locations\": [1,2,3,4,5]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours/:tourId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours",
+								":tourId"
+							],
+							"variable": [
+								{
+									"key": "tourId",
+									"value": "{{randomTourId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE tour",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours/{{tourToDelete}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours",
+								"{{tourToDelete}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST create tour - AUTO",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"[\r",
+									"    {\r",
+									"        \"name\": \"The Forest Hiker\",\r",
+									"        \"duration\": 10,\r",
+									"        \"maxGroupSize\": 20,\r",
+									"        \"difficulty\": \"easy\",\r",
+									"        \"price\": 1000,\r",
+									"        \"priceDiscount\": 15,\r",
+									"        \"summary\": \"Breathtaking hike through the Canadian Banff National Park\",\r",
+									"        \"description\": \"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\",\r",
+									"        \"imageCover\": \"tour-1-cover.jpg\",\r",
+									"        \"startDate\": \"2025-12-05T18:52:50.331Z\",\r",
+									"        \"images\": [\r",
+									"            1,\r",
+									"            2,\r",
+									"            3\r",
+									"        ],\r",
+									"        \"locations\": [\r",
+									"            1,\r",
+									"            2,\r",
+									"            3\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"name\": \"The Sea Explorer\",\r",
+									"        \"duration\": 21,\r",
+									"        \"maxGroupSize\": 8,\r",
+									"        \"difficulty\": \"medium\",\r",
+									"        \"price\": 888,\r",
+									"        \"priceDiscount\": 10,\r",
+									"        \"summary\": \"Exploring the jaw-dropping US east coast by foot and by boat\",\r",
+									"        \"description\": \"Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\",\r",
+									"        \"imageCover\": \"tour-2-cover.jpg\",\r",
+									"        \"startDate\": \"2025-07-05T18:52:50.331Z\",\r",
+									"        \"images\": [\r",
+									"            4,\r",
+									"            5,\r",
+									"            6\r",
+									"        ],\r",
+									"        \"locations\": [\r",
+									"            4,\r",
+									"            5,\r",
+									"            6\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"name\": \"The Snow Adventurer\",\r",
+									"        \"duration\": 16,\r",
+									"        \"maxGroupSize\": 5,\r",
+									"        \"difficulty\": \"difficult\",\r",
+									"        \"price\": 1234,\r",
+									"        \"priceDiscount\": 13,\r",
+									"\t\t\"summary\": \"Exciting adventure in the snow with snowboarding and skiing\",\r",
+									"        \"description\": \"Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum! Dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur, exercitation ullamco laboris nisi ut aliquip. Lorem ipsum dolor sit amet, consectetur adipisicing elit!\",\r",
+									"        \"imageCover\": \"tour-3-cover.jpg\",\r",
+									"        \"startDate\": \"2025-03-03T18:52:50.331Z\",\r",
+									"        \"images\": [\r",
+									"            7,8,9\r",
+									"        ],\r",
+									"        \"locations\": [\r",
+									"            7,\r",
+									"            8,\r",
+									"            9\r",
+									"        ]\r",
+									"    }\r",
+									"]\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"// const tour = response.data.data.find(tour =>\r",
+									"//     tour?.name.toLowerCase().includes(\"test\")\r",
+									"// );\r",
+									"\r",
+									"const tour = response.data?.mainRecord;\r",
+									"if (response && tour) {\r",
+									"    const tourId =  tour?.id ;\r",
+									"\r",
+									"    pm.environment.set(\"tourToDelete\", tourId);\r",
+									"    pm.environment.set(\"randomTourId\", tourId)\r",
+									"}\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"duration\": {{duration}},\r\n    \"maxGroupSize\": {{maxGroupSize}},\r\n    \"difficulty\": \"{{difficulty}}\",\r\n    \"price\": {{price}},\r\n    \"priceDiscount\": {{priceDiscount}},\r\n    \"summary\": \"{{summary}}\",\r\n    \"description\": \"{{description}}\",\r\n    \"imageCover\": \"{{imageCover}}\",\r\n    \"startDate\": \"{{startDate}}\",\r\n    \"images\": [\r\n       {{images}}\r\n    ],\r\n    \"locations\": [\r\n       {{locations}}\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET tour slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours/:slug",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours",
+								":slug"
+							],
+							"variable": [
+								{
+									"key": "slug",
+									"value": "assumenda-quibusdam-eveniet"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "LOCATIONS",
+			"item": [
+				{
+					"name": "POST create location",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const locations = [\r",
+									"    {'description': 'Miami, USA',\r",
+									"    'coordinates': [-80.185942, 25.774772]\r",
+									"    },\r",
+									"    {'description': 'Lummus Park Beach',\r",
+									"    'coordinates': [-80.128473, 25.781842]\r",
+									"    },\r",
+									"    {'description': 'Miami, USA',\r",
+									"    'coordinates': [-80.185942, 25.774772]\r",
+									"    },\r",
+									"    {'description': 'Islamorada',\r",
+									"    'coordinates': [-80.647885, 24.909047]\r",
+									"    },\r",
+									"    {'description': 'Sombrero Beach',\r",
+									"    'coordinates': [-81.0784, 24.707496]\r",
+									"    },\r",
+									"    {'description': 'West Key',\r",
+									"    'coordinates': [-81.768719, 24.552242]\r",
+									"    },\r",
+									"]"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response && response.data.mainRecord) {\r",
+									"    const locationId = response.data.mainRecord.id;\r",
+									"\r",
+									"    pm.environment.set(\"randomLocationId\", locationId);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"description\": \"Lummus Park Beach\",\r\n    \"coordinates\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [\r\n            -85.128473,\r\n            24.781842\r\n        ]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/locations",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET ALL locations",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"description\": \"Lummus Park Beach\",\r\n    \"coordinates\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [\r\n            -80.128473,\r\n            25.781842\r\n        ]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/locations",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"locations"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "-createdAt",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET location",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/locations/:locationId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"locations",
+								":locationId"
+							],
+							"variable": [
+								{
+									"key": "locationId",
+									"value": "{{randomLocationId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE location",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n    \"coordinates\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [\r\n            -85.128473,\r\n            28.781842\r\n        ]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/locations/:locationId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"locations",
+								":locationId"
+							],
+							"variable": [
+								{
+									"key": "locationId",
+									"value": "{{randomLocationId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST create location - AUTO",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"[\r",
+									"    {\r",
+									"        \"description\": \"Miami, USA\",\r",
+									"        \"coordinates\": [\r",
+									"            -80.185942,\r",
+									"            25.774772\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"Lummus Park Beach\",\r",
+									"        \"coordinates\": [\r",
+									"            -80.128473,\r",
+									"            25.781842\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"Islamorada\",\r",
+									"        \"coordinates\": [\r",
+									"            -80.647885,\r",
+									"            24.909047\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"Sombrero Beach\",\r",
+									"        \"coordinates\": [\r",
+									"            -81.0784,\r",
+									"            24.707496\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"West Key\",\r",
+									"        \"coordinates\": [\r",
+									"            -81.768719,\r",
+									"            24.552242\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"Aspen, USA\",\r",
+									"        \"coordinates\": [\r",
+									"            -106.822318,\r",
+									"            39.190872\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"Aspen Highlands\",\r",
+									"        \"coordinates\": [\r",
+									"            -106.855385,\r",
+									"            39.182677\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"Beaver Creek\",\r",
+									"        \"coordinates\": [\r",
+									"            -106.516623,\r",
+									"            39.60499\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"Las Vegas, USA\",\r",
+									"        \"coordinates\": [\r",
+									"            -115.172652,\r",
+									"            36.110904\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"Zion Canyon National Park\",\r",
+									"        \"coordinates\": [\r",
+									"            -112.987418,\r",
+									"            37.198125\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"Antelope Canyon\",\r",
+									"        \"coordinates\": [\r",
+									"            -111.376161,\r",
+									"            36.86438\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"Grand Canyon National Park\",\r",
+									"        \"coordinates\": [\r",
+									"            -112.115763,\r",
+									"            36.058973\r",
+									"        ]\r",
+									"    },\r",
+									"    {\r",
+									"        \"description\": \"Joshua Tree National Park\",\r",
+									"        \"coordinates\": [\r",
+									"            -116.107963,\r",
+									"            34.011646\r",
+									"        ]\r",
+									"    }\r",
+									"]\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response && response.data?.mainRecord) {\r",
+									"    const locationId = response.data.mainRecord.id;\r",
+									"\r",
+									"    pm.environment.set(\"randomLocationId\", locationId);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"description\": \"{{description}}\",\r\n    \"coordinates\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [{{coordinates}}]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/locations",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE location - AUTO",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"coordinates\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [\r\n            {{coordinates}}\r\n        ]\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/locations/:locationId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"locations",
+								":locationId"
+							],
+							"variable": [
+								{
+									"key": "locationId",
+									"value": "{{id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "IMAGES",
+			"item": [
+				{
+					"name": "POST create img",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"[\r",
+									"    {\r",
+									"        \"fileName\": \"tour-1-1.jpg\"\r",
+									"    },\r",
+									"    {\r",
+									"        \"fileName\": \"tour-1-2.jpg\"\r",
+									"    },\r",
+									"    {\r",
+									"        \"fileName\": \"tour-1-3.jpg\"\r",
+									"    },\r",
+									"    {\r",
+									"        \"fileName\": \"tour-2-1.jpg\"\r",
+									"    },\r",
+									"    {\r",
+									"        \"fileName\": \"tour-2-2.jpg\"\r",
+									"    },\r",
+									"    {\r",
+									"        \"fileName\": \"tour-2-3.jpg\"\r",
+									"    },\r",
+									"    {\r",
+									"        \"fileName\": \"tour-3-1.jpg\"\r",
+									"    },\r",
+									"    {\r",
+									"        \"fileName\": \"tour-3-2.jpg\"\r",
+									"    },\r",
+									"    {\r",
+									"        \"fileName\": \"tour-3-3.jpg\"\r",
+									"    }\r",
+									"]\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response && response.data?.mainRecord) {\r",
+									"    const imageId = response.data.mainRecord?.id;\r",
+									"\r",
+									"    pm.environment.set(\"randomImgId\", imageId);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fileName\": \"tour-3-3.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/images",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"images"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET ALL imgs",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/images?sort=createdAt",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"images"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "createdAt"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET img",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/images/:imgId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"images",
+								":imgId"
+							],
+							"variable": [
+								{
+									"key": "imgId",
+									"value": "{{randomImgId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST create img - AUTO",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response && response.data?.mainRecord) {\r",
+									"    const imageId = response.data.mainRecord?.id;\r",
+									"\r",
+									"    pm.environment.set(\"randomImgId\", imageId);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fileName\": \"{{fileName}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/images",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"images"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PLUGINS",
+			"item": [
+				{
+					"name": "POST create plugin",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"[\r",
+									"    {\r",
+									"        \"type\": \"advertisement\",\r",
+									"        \"content\": {\r",
+									"            \"text\": \"Special Offer: Save 20% on your first booking!\",\r",
+									"            \"link\": \"/bookings\",\r",
+									"            \"linkText\": \"Book Now\"\r",
+									"        },\r",
+									"        \"order\": 3\r",
+									"    },\r",
+									"\r",
+									"    {\r",
+									"        \"type\": \"greeting\",\r",
+									"        \"content\": {\r",
+									"            \"title\": \"Hello, Traveler!\",\r",
+									"            \"message\": \"Explore the best tours around the world.\"\r",
+									"        },\r",
+									"        \"order\": 2\r",
+									"    },\r",
+									"    {\r",
+									"        \"type\": \"tour\",\r",
+									"        \"content\": {\r",
+									"            \"count\": 3,\r",
+									"            \"header\": \"Tour Information\",\r",
+									"            \"text\": \"Exciting details about this tour.\",\r",
+									"            \"footerValue\": \"From $999\",\r",
+									"            \"link\": \"/overview\"\r",
+									"        },\r",
+									"        \"order\": 1\r",
+									"    }\r",
+									"]"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response && response.data?.mainRecord) {\r",
+									"    const pluginId = response.data.mainRecord?.id;\r",
+									"\r",
+									"    pm.environment.set(\"randomPluginId\", pluginId);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"advertisement\",\r\n    \"content\": {\r\n        \"text\": \"Special Offer: Save 20% on your first booking!\",\r\n        \"link\": \"/bookings\",\r\n        \"linkText\": \"Book Now\"\r\n    },\r\n    \"order\": 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/plugins",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"plugins"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET ALL plugins",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/plugins?sort=order",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"plugins"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "order"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET plugin",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/plugins/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"plugins",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH update plugin",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"[\r",
+									"    {\r",
+									"    \"type\": \"advertisement\",\r",
+									"    \"content\": \"Get 20% discount on your first tour!\",\r",
+									"    \"order\":2\r",
+									"}\r",
+									"]"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response && response.data?.mainRecord) {\r",
+									"    const pluginId = response.data.mainRecord?.id;\r",
+									"\r",
+									"    pm.environment.set(\"randomPluginId\", pluginId);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n    \"content\": {\r\n        \"message\": \"Welcome to Our Tour Site! We are Glad to See You!\",\r\n        \"subtitle\": \"Enjoy exclusive offers and updates.\"\r\n    },\r\n    \"order\": 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/plugins/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"plugins",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{randomPluginId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST create plugin -AUTO",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"[\r",
+									"    {\r",
+									"        \"type\": \"advertisement\",\r",
+									"        \"content\": {\r",
+									"            \"text\": \"Special Offer: Save 20% on your first booking!\",\r",
+									"            \"link\": \"/bookings\",\r",
+									"            \"linkText\": \"Book Now\"\r",
+									"        },\r",
+									"        \"order\": 3\r",
+									"    },\r",
+									"\r",
+									"    {\r",
+									"        \"type\": \"greeting\",\r",
+									"        \"content\": {\r",
+									"            \"title\": \"Hello, Traveler!\",\r",
+									"            \"message\": \"Explore the best tours around the world.\"\r",
+									"        },\r",
+									"        \"order\": 2\r",
+									"    },\r",
+									"    {\r",
+									"        \"type\": \"tour\",\r",
+									"        \"content\": {\r",
+									"            \"count\": 3,\r",
+									"            \"header\": \"Tour Information\",\r",
+									"            \"text\": \"Exciting details about this tour.\",\r",
+									"            \"footerValue\": \"From $999\",\r",
+									"            \"link\": \"/overview\"\r",
+									"        },\r",
+									"        \"order\": 1\r",
+									"    }\r",
+									"]"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response && response.data?.mainRecord) {\r",
+									"    const pluginId = response.data.mainRecord?.id;\r",
+									"\r",
+									"    pm.environment.set(\"randomPluginId\", pluginId);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"{{type}}\",\r\n    \"content\": {{content}},\r\n    \"order\": {{order}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/plugins",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"plugins"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PAGES",
+			"item": [
+				{
+					"name": "POST create page",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"[\r",
+									"    {\r",
+									"        \"type\": \"advertisement\",\r",
+									"        \"content\": {\r",
+									"            \"text\": \"Special Offer: Save 20% on your first booking!\",\r",
+									"            \"link\": \"/bookings\",\r",
+									"            \"linkText\": \"Book Now\"\r",
+									"        },\r",
+									"        \"order\": 3\r",
+									"    },\r",
+									"\r",
+									"    {\r",
+									"        \"type\": \"greeting\",\r",
+									"        \"content\": {\r",
+									"            \"title\": \"Hello, Traveler!\",\r",
+									"            \"message\": \"Explore the best tours around the world.\"\r",
+									"        },\r",
+									"        \"order\": 2\r",
+									"    },\r",
+									"    {\r",
+									"        \"type\": \"tour\",\r",
+									"        \"content\": {\r",
+									"            \"count\": 3,\r",
+									"            \"header\": \"Tour Information\",\r",
+									"            \"text\": \"Exciting details about this tour.\",\r",
+									"            \"footerValue\": \"From $999\",\r",
+									"            \"link\": \"/overview\"\r",
+									"        },\r",
+									"        \"order\": 1\r",
+									"    }\r",
+									"]"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response && response.data?.mainRecord) {\r",
+									"    const pageId = response.data.mainRecord?.id;\r",
+									"\r",
+									"    pm.environment.set(\"randomPageId\", pageId);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"overview\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/pages",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"pages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET ALL pages",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/pages",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"pages"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "order",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET page",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/pages/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"pages",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{randomPageId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH update page",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"[\r",
+									"    {\r",
+									"    \"type\": \"advertisement\",\r",
+									"    \"content\": \"Get 20% discount on your first tour!\",\r",
+									"    \"order\":2\r",
+									"}\r",
+									"]"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if (response && response.data?.mainRecord) {\r",
+									"    const pluginId = response.data.mainRecord?.id;\r",
+									"\r",
+									"    pm.environment.set(\"randomPluginId\", pluginId);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"plugins\": [\r\n        1\r\n        \r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/admin/pages/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"pages",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "REVIEWS",
+			"item": [
+				{
+					"name": "POST create review",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().data.mainRecord) {\r",
+									"    pm.environment.set(\"randomReviewId\", pm.response.json().data.mainRecord.id);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"review\": \"{{$randomLoremSentence}}\",\r\n    \"rating\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours/:tourId/reviews",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours",
+								":tourId",
+								"reviews"
+							],
+							"variable": [
+								{
+									"key": "tourId",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours/:tourId/reviews/:reviewId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours",
+								":tourId",
+								"reviews",
+								":reviewId"
+							],
+							"variable": [
+								{
+									"key": "tourId",
+									"value": "{{randomTourId}}"
+								},
+								{
+									"key": "reviewId",
+									"value": "{{randomReviewId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all TOUR reviews",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if(response && response?.data?.data){\r",
+									"pm.environment.set(\"randomReviewId\", response.data.data[0].id);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours/:tourId/reviews",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours",
+								":tourId",
+								"reviews"
+							],
+							"variable": [
+								{
+									"key": "tourId",
+									"value": "{{randomTourId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours/:tourId/reviews/:reviewId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours",
+								":tourId",
+								"reviews",
+								":reviewId"
+							],
+							"variable": [
+								{
+									"key": "tourId",
+									"value": "{{randomTourId}}"
+								},
+								{
+									"key": "reviewId",
+									"value": "{{randomReviewId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"review\": \"TEST review\",\r\n    \"rating\": 2\r\n \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/tours/:tourId/reviews/:reviewId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tours",
+								":tourId",
+								"reviews",
+								":reviewId"
+							],
+							"variable": [
+								{
+									"key": "tourId",
+									"value": "{{randomTourId}}"
+								},
+								{
+									"key": "reviewId",
+									"value": "{{randomReviewId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all reviews (ALL TOURS)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"if(response && response?.data?.data){\r",
+									"pm.environment.set(\"randomReviewId\", response.data.data[0].id);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/reviews",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BOOKINGS",
+			"item": [
+				{
+					"name": "POST create booking",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/bookings",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

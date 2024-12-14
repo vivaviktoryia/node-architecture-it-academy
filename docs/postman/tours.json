@@ -1,0 +1,66 @@
+[
+    {
+        "name": "The Forest Hiker",
+        "duration": 10,
+        "maxGroupSize": 20,
+        "difficulty": "easy",
+        "price": 1000,
+        "priceDiscount": 15,
+        "summary": "Breathtaking hike through the Canadian Banff National Park",
+        "description": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        "imageCover": "tour-1-cover.jpg",
+        "startDate": "2025-12-05T18:52:50.331Z",
+        "images": [
+            1,
+            2,
+            3
+        ],
+        "locations": [
+            1,
+            2,
+            3
+        ]
+    },
+    {
+        "name": "The Sea Explorer",
+        "duration": 21,
+        "maxGroupSize": 8,
+        "difficulty": "medium",
+        "price": 888,
+        "priceDiscount": 10,
+        "summary": "Exploring the jaw-dropping US east coast by foot and by boat",
+        "description": "Consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet!",
+        "imageCover": "tour-2-cover.jpg",
+        "startDate": "2025-07-05T18:52:50.331Z",
+        "images": [
+            4,
+            5,
+            6
+        ],
+        "locations": [
+            4,
+            5,
+            6
+        ]
+    },
+    {
+        "name": "The Snow Adventurer",
+        "duration": 16,
+        "maxGroupSize": 5,
+        "difficulty": "difficult",
+        "price": 1234,
+        "priceDiscount": 13,
+		"summary": "Exciting adventure in the snow with snowboarding and skiing",
+        "description": "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum! Dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur, exercitation ullamco laboris nisi ut aliquip. Lorem ipsum dolor sit amet, consectetur adipisicing elit!",
+        "imageCover": "tour-3-cover.jpg",
+        "startDate": "2025-03-03T18:52:50.331Z",
+        "images": [
+            7,8,9
+        ],
+        "locations": [
+            7,
+            8,
+            9
+        ]
+    }
+]
