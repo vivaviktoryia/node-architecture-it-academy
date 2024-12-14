@@ -1,7 +1,7 @@
 [
     {
         "type": "advertisement",
-        "content": "{\"text\":\"Special Offer: Save 20% on your first booking!\",\"link\":\"/bookings\",\"linkText\":\"Book Now\"}",
+        "content": "{\"text\":\"Special Offer: Save 20% on your first booking!\",\"link\":\"/api/v1/bookings\",\"linkText\":\"Book Now\"}",
         "order": 3
     },
     {

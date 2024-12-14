@@ -86,10 +86,15 @@ const $936fcc27ffb6bbb1$export$f558026a994b6051 = async (data, type)=>{
             'Password'
         ].includes(dataType)) throw new Error('Invalid type was provided!');
         const url = `/api/v1/users/${dataType === 'Password' ? 'updateMyPassword' : 'updateMe'}`;
-        const res = await fetch(url, {
+        const fetchOptions = {
             method: 'PATCH',
-            body: data
-        });
+            headers: {}
+        };
+        if (dataType === 'Password') {
+            fetchOptions.headers['Content-Type'] = 'application/json';
+            fetchOptions.body = JSON.stringify(data);
+        } else fetchOptions.body = data; // FormData for `updateMe`
+        const res = await fetch(url, fetchOptions);
         const responseData = await res.json();
         if (res.ok && responseData.status === 'success') {
             (0, $c67cb762f0198593$export$5e5cfdaa6ca4292c)('success', `${dataType} updated successfully!`);
