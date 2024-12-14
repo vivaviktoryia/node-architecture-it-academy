@@ -9,11 +9,10 @@ checkDatabaseConnection();
 const app = require('./app');
 const port = parseInt(process.env.PORT || 7181);
 
-const server = app.listen(port, async () => {
+const server = app.listen(port, '127.0.0.1', async () => {
 	const logLine = `Web server running on port ${port}, process.pid = ${process.pid}`;
 	await logInfo(logLine);
 });
-
 
 sequelize
 	.sync()
