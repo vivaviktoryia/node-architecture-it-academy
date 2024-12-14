@@ -3,7 +3,6 @@ const express = require('express');
 const { setupMorgan } = require('./utils/logger');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
 const hpp = require('hpp');
 const cors = require('cors');
 
@@ -54,8 +53,6 @@ app.use(
 setupMorgan(app);
 
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use(helmet());
 
 // Limit requests from same API
 const limiter = rateLimit({
