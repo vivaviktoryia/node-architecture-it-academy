@@ -2,7 +2,7 @@ const path = require('path');
 const express = require('express');
 const { setupMorgan } = require('./utils/logger');
 const globalErrorHandler = require('./src/controllers/errorController');
-const AppError = require('./src/utils/appError');
+const AppError = require('./utils/appError');
 
 const viewRouter = require('./src/routes/viewRoutes');
 

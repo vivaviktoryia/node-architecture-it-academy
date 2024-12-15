@@ -1,4 +1,5 @@
 **/node_modules
 _server.log
 check
-.env
+*.env
+.parcel-cache

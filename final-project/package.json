@@ -1,0 +1,44 @@
+{
+  "name": "final-project",
+  "version": "1.0.0",
+  "main": "./public/js/parcel/bundle.js",
+  "scripts": {
+    "start": "nodemon server.js ",
+    "watch:js": "parcel watch ./public/js/index.js --dist-dir ./public/js/parcel",
+    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/parcel",
+    "backup:db:with-data": "node database/scripts/backup.js backup",
+    "backup:db:without-data": "node database/scripts/backup.js backup --without-data",
+    "db:setup": "node database/scripts/backup.js restore database/backup/INIT_final_project_backup.sql",
+    "generate:sitemap": "node utils/generateSitemap.js"
+  },
+  "author": "Viktoryia",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "core-js": "^3.39.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "luxon": "^3.5.0",
+    "mariadb": "^3.4.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16",
+    "nodemon": "^3.1.7",
+    "pug": "^3.0.3",
+    "regenerator-runtime": "^0.14.1",
+    "rotating-file-stream": "^3.2.5",
+    "sequelize": "^6.37.5",
+    "sharp": "^0.33.5",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "parcel": "^2.13.2"
+  }
+}

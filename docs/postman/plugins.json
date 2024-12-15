@@ -1,0 +1,17 @@
+[
+    {
+        "type": "advertisement",
+        "content": "{\"text\":\"Special Offer: Save 20% on your first booking!\",\"link\":\"/api/v1/bookings\",\"linkText\":\"Book Now\"}",
+        "order": 3
+    },
+    {
+        "type": "greeting",
+        "content": "{\"title\":\"Hello, Traveler!\",\"message\":\"Explore the best tours around the world.\"}",
+        "order": 2
+    },
+    {
+        "type": "tour",
+        "content": "{\"count\":3,\"header\":\"Tour Information\",\"text\":\"Exciting details about this tour.\",\"footerValue\":\"From $999\",\"link\":\"/overview\"}",
+        "order": 1
+    }
+]
